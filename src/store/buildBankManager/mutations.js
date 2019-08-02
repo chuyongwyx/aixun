@@ -32,7 +32,7 @@ export default{
 
     //添加负责人的返回的二维码照片
     getbuildBankManagerDataWxEr(state,params){
-            state.buildBankWxEr ="data:image/*;base64,"+params.result;    
+            state.buildBankWxEr =params.result;    
     },
    //获取单个信息
    getBankUserInfo(state,params){

@@ -3,7 +3,7 @@
         <div class="user-Permissions" v-show="userPermissions">
                   <div class="userAdmin-head">
                      <h2>权限</h2>
-                     <div class="addUserAdmin" @click="handleToSetPermission">设置权限</div>
+                     <div class="addUserAdmin" @click="handleToSetPermission" :class="[{'disable':userId==''},{'addUserAdminActive':userId !=''}]">设置权限</div>
                  </div>
                   <div class="userAdminForm">
                         <table cellpadding="0" cellspacing="0">
@@ -14,7 +14,7 @@
                             </th>
                             <th>人员名称</th>
                             </tr>
-                            <tr v-for="(item,index) in permissionUser"  @click="handleReplacePermissions($event,item)" class="trhover" >
+                            <tr v-for="(item,index) in permissionUser"  @click="handleReplacePermissions($event,item)"  class="trhover" >
                             <td>{{item.DepartmentName}}</td>
                             <td>{{item.name}}</td>
                             </tr>
@@ -30,10 +30,10 @@
                 </div>
                 <div class="setPermissionsFormone">
                       <div class="userSetForm">
-                            <div @click="handelBack"><span>返回上一级</span></div>
+                            <div @click="handelBack"><span class="goback">返回上一级</span></div>
                             <div><span class="iconfont icon-xiangyou"></span></div>
                             <div><span>{{ModifyDepartmentName}}</span><span>{{ModifyName}}</span></div>
-                            <div><button>保存</button></div>
+                            <div><button @click="handlePermission">保存</button></div>
 
                       </div>
                         <table cellpadding="0" cellspacing="0">
@@ -45,7 +45,7 @@
                                 </tr>
                                 <tr>
                                     <td>云支付申请跟进总表</td>
-                                    <td><span class="iconfont icon-xuanzhong1 icon1"></span></td>
+                                    <td><span class="iconfont icon-radio icon"></span></td>
                                     <td><span class="iconfont icon-radio icon"></span></td>
                                     <td><span class="iconfont icon-radio icon"></span></td>
                                 </tr>
@@ -75,11 +75,17 @@
                         <div class="">商户向爱心申请开通云支付:</div>
                         <div class="formselect">
                              <div>
-                                    <div><span class="iconfont icon-radio icon"></span></div>
+                                    <div @click="handleCreateCloudApplicationForm" id="CloudApplicationFormCreate">
+                                      <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPay.CloudApplicationForm.Create']"></span>
+                                      <span class="iconfont icon-radio icon" v-else></span>
+                                    </div>
                                     <div>新建申请单</div>
                             </div>
                             <div>
-                                   <div><span class="iconfont icon-xuanzhong1 icon1"></span></div>
+                                   <div @click="handleAcceptAndFinishCloudApplicationForm" id="CloudApplicationFormAcceptAndFinish">
+                                      <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPay.CloudApplicationForm.AcceptAndFinish']"></span>
+                                       <span class="iconfont icon-radio icon" v-else></span>
+                                   </div>
                                    <div> 受理&完成申请单</div>
                             </div>
                         </div>
@@ -89,24 +95,39 @@
                          <div class="">为商户申请品牌认证:</div>
                          <div class="formselect">
                              <div>
-                                    <div><span class="iconfont icon-radio icon"></span></div>
+                                    <div @click="handleCreateBrandCertificationApplicationForm" id="BrandCertificationApplicationFormCreate">
+                                        <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPay.BrandCertificationApplicationForm.Create']"></span>
+                                        <span class="iconfont icon-radio icon" v-else></span>
+                                    </div>
                                     <div>申请品牌认证</div>
                              </div>
                              <div>
-                                     <div><span class="iconfont icon-radio icon"></span></div>
+                                    <div @click="handleUploadBrandCertificationApplicationForm" id="BrandCertificationApplicationFormUpload">
+                                       <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPay.BrandCertificationApplicationForm.Upload']"></span>
+                                       <span class="iconfont icon-radio icon" v-else></span>
+                                    </div>
                                     <div>提交认证资料</div>
                              </div>
                              <div>
-                                     <div><span class="iconfont icon-radio icon"></span></div>
+                                    <div @click="handleVerifyBrandCertificationApplicationForm" id="BrandCertificationApplicationFormVerify">
+                                        <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPay.BrandCertificationApplicationForm.Verify']"></span>
+                                        <span class="iconfont icon-radio icon" v-else></span>
+                                    </div>
                                     <div>品牌认证</div>
                              </div>
                              <div>
-                                    <div><span class="iconfont icon-radio icon"></span></div>
+                                    <div @click="handleOpenOrderBrandCertificationApplicationForm" id="BrandCertificationApplicationFormOpenOrder">
+                                        <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPay.BrandCertificationApplicationForm.OpenOrder']"></span>
+                                        <span class="iconfont icon-radio icon" v-else></span>
+                                    </div>
                                     <div>开通云单据</div>
                              </div>
                              <div>
-                                     <div><span class="iconfont icon-radio icon"></span></div>
-                                    <div>开通云单据</div>
+                                     <div @click="handleOpenPayBrandCertificationApplicationForm" id="BrandCertificationApplicationFormOpenPay">
+                                        <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPay.BrandCertificationApplicationForm.OpenPay']"></span>
+                                       <span class="iconfont icon-radio icon" v-else></span>
+                                     </div>
+                                    <div>开通云支付</div>
                              </div>
                          </div>
                     </div>
@@ -115,11 +136,17 @@
                             <div>爱迅、银行配合开通云支付收款账号:</div>
                             <div class="formselect">
                                 <div>
-                                    <div><span class="iconfont icon-radio icon"></span></div>
+                                    <div @click="handleCreateApplicationFormFollowUp" id="ApplicationFormFollowUpCreate">
+                                       <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPay.ApplicationFormFollowUp.Create']"></span>
+                                      <span class="iconfont icon-radio icon" v-else></span>
+                                    </div>
                                     <div>申请云支付收款账号</div>
                                 </div>
                                 <div>
-                                    <div><span class="iconfont icon-radio icon"></span></div>
+                                    <div @click="handleArrangeTrainingInstitution" id="ApplicationFormFollowUpArrangeTrainingInstitution">
+                                        <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPay.ApplicationFormFollowUp.ArrangeTrainingInstitution']"></span>
+                                        <span class="iconfont icon-radio icon" v-else></span>
+                                    </div>
                                     <div>安排培训机构</div>
                                 </div>
                             </div>
@@ -129,11 +156,17 @@
                         <div>内部管理:</div>
                             <div class="formselect">
                                 <div>
-                                    <div><span class="iconfont icon-radio icon"></span></div>
+                                    <div @click="handleUsersSystemSetting" id="SystemSettingUsers">
+                                        <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['SystemSetting.Users']"></span>
+                                        <span class="iconfont icon-radio icon" v-else></span>
+                                    </div>
                                     <div>人员</div>
                                 </div>
                                 <div>
-                                    <div><span class="iconfont icon-radio icon"></span></div>
+                                    <div @click="handlePermissionsSystemSetting" id="SystemSettingPermissions">
+                                        <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['SystemSetting.Permissions']"></span>
+                                        <span class="iconfont icon-radio icon" v-else></span>
+                                    </div>
                                     <div>权限</div>
                                 </div>
                             </div>
@@ -159,16 +192,21 @@ export default {
      },
      computed:{
         ...Vuex.mapState({
-              permissionUser:state=>state.permissions.permissionUser
+              permissionUser:state=>state.permissions.permissionUser,
+              permissAllow:state=>state.permissions.permissAllow
         })
      }, 
      methods:{
        ...Vuex.mapActions({
             handleGetUsers:"permissions/handleGetUsers",
+            //获取用户权限
             getUserPermissionDatas:"permissions/getUserPermissionDatas",
+            //设置用户权限
+            modifyUserPermission:"permissions/modifyUserPermission"
        }),
        //切换到设置权限
-        handleToSetPermission(){
+        handleToSetPermission($event){
+          
           if(this.userId){
               this.getUserPermissionDatas(this.userId);
               this.userPermissions =false,
@@ -183,12 +221,157 @@ export default {
         },
       //选中修改权限的栏
       handleReplacePermissions($event,param){
+         var trs = document.getElementsByClassName('trhover');
+          var len = trs.length;
+          for(var i=0;i<len;i++){
+             trs[i].style.background=''
+          }
+          $event.target.parentNode.style.background ='#EDEEEF';
          this.userId=param.id;
          this.ModifyDepartmentName= param.departmentName
          this.ModifyName=param.name
-         console.log(this.userId)
-      }
+      },
+      //选择权限操作
+      handleSelectIcon($event){
+           if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              $event.target.classList.remove('icon1');
+              $event.target.classList.remove('icon-xuanzhong1');
+              $event.target.classList.add('icon');
+              $event.target.classList.add('icon-radio');
+
+          }else{
+              $event.target.classList.remove('icon');
+              $event.target.classList.remove('icon-radio');
+              $event.target.classList.add('icon1');
+              $event.target.classList.add('icon-xuanzhong1');
+          }
+      },
+      //新建申请单
+      handleCreateCloudApplicationForm($event){
+            this.handleSelectIcon($event)
+      },
+    //受理完成
+    handleAcceptAndFinishCloudApplicationForm($event){
+          this.handleSelectIcon($event)
+    },
+    //申请品牌认证
+    handleCreateBrandCertificationApplicationForm($event){
+        this.handleSelectIcon($event)
+    },
+    //提交认证资料
+    handleUploadBrandCertificationApplicationForm($event){
+         this.handleSelectIcon($event)
+    },
+    //品牌认证
+    handleVerifyBrandCertificationApplicationForm($event){
+         this.handleSelectIcon($event)
+    },
+    //开通云单据
+    handleOpenOrderBrandCertificationApplicationForm($event){
+        this.handleSelectIcon($event)
+    },
+    //开通云支付 
+    handleOpenPayBrandCertificationApplicationForm($event){
+      this.handleSelectIcon($event)
+    },
+    //申请云支付收款账号
+    handleCreateApplicationFormFollowUp($event){
+     this.handleSelectIcon($event)
+    },
+    //安排培训机构
+    handleArrangeTrainingInstitution($event){
+      this.handleSelectIcon($event)
+    },
+    //人员
+    handleUsersSystemSetting($event){
+      this.handleSelectIcon($event)
+    },
+    //权限
+    handlePermissionsSystemSetting($event){
+     this.handleSelectIcon($event)
+    },
+
+    //最后保存操作
+    handlePermission(){
+      //查看每个块中的权限
+      //设置权限
+      var permissArray =[];
+    //新建申请单id
+      var CloudApplicationFormCreate= document.getElementById('CloudApplicationFormCreate');
+         if(CloudApplicationFormCreate.children[0].className.indexOf('icon-radio')===-1){
+              permissArray.push('CloudPay.CloudApplicationForm.Create');
+        }
+      //受理完成申请单id
+      var CloudApplicationFormAcceptAndFinish= document.getElementById('CloudApplicationFormAcceptAndFinish');
+       if(CloudApplicationFormAcceptAndFinish.children[0].className.indexOf('icon-radio')===-1){
+            
+             permissArray.push('CloudPay.CloudApplicationForm.AcceptAndFinish')
+        }
+        //申请品牌认证
+      var BrandCertificationApplicationFormCreate= document.getElementById('BrandCertificationApplicationFormCreate');
+       if(BrandCertificationApplicationFormCreate.children[0].className.indexOf('icon-radio')===-1){
+             
+              permissArray.push('CloudPay.BrandCertificationApplicationForm.Create')
+        }
+      //提交认证资料
+      var BrandCertificationApplicationFormUpload = document.getElementById('BrandCertificationApplicationFormUpload');
+         if(BrandCertificationApplicationFormUpload.children[0].className.indexOf('icon-radio')===-1){
+              permissArray.push('CloudPay.BrandCertificationApplicationForm.Upload')
+
+        }
+      //品牌认证
+      var BrandCertificationApplicationFormVerify = document.getElementById('BrandCertificationApplicationFormVerify');
+        if(BrandCertificationApplicationFormVerify.children[0].className.indexOf('icon-radio')===-1){
+             
+              permissArray.push('CloudPay.BrandCertificationApplicationForm.Verify')
+        }
+      //开通云单据
+      var BrandCertificationApplicationFormOpenOrder = document.getElementById('BrandCertificationApplicationFormOpenOrder');
+       if(BrandCertificationApplicationFormOpenOrder.children[0].className.indexOf('icon-radio')===-1){
+                permissArray.push('CloudPay.BrandCertificationApplicationForm.OpenOrder')
+        }
+      //开通云支付
+      var BrandCertificationApplicationFormOpenPay =document.getElementById('BrandCertificationApplicationFormOpenPay');
+        if(BrandCertificationApplicationFormOpenPay.children[0].className.indexOf('icon-radio')===-1){
+              
+              permissArray.push('CloudPay.BrandCertificationApplicationForm.OpenPay')
+        }
+      //申请云支付收款账号
+      var ApplicationFormFollowUpCreate  = document.getElementById('ApplicationFormFollowUpCreate');
+       if(ApplicationFormFollowUpCreate.children[0].className.indexOf('icon-radio')===-1){
+              permissArray.push('CloudPay.ApplicationFormFollowUp.Create')
+              
+        }
+      //安排培训机构
+      var ApplicationFormFollowUpArrangeTrainingInstitution = document.getElementById('ApplicationFormFollowUpArrangeTrainingInstitution');
+       if(ApplicationFormFollowUpArrangeTrainingInstitution.children[0].className.indexOf('icon-radio')===-1){
+              
+               permissArray.push('CloudPay.ApplicationFormFollowUp.ArrangeTrainingInstitution')
+        }
+      //人员
+      var  SystemSettingUsers = document.getElementById('SystemSettingUsers');
+       if(SystemSettingUsers.children[0].className.indexOf('icon-radio')===-1){
+            
+              permissArray.push('SystemSetting.Users')
+        }
+      //权限
+      var SystemSettingPermissions =document.getElementById('SystemSettingPermissions');
+       if(SystemSettingPermissions.children[0].className.indexOf('icon-radio')===-1){
+             
+               permissArray.push('SystemSetting.Permissions')
+        }
+      var param = JSON.stringify({
+          "name":permissArray
+      })
+       this.modifyUserPermission(param);
+
+       //此时关闭着这个组件
+        this.userPermissions =true,
+        this.setPermissions=false
+    }
      },
+
     created(){
       this.handleGetUsers();
     }
@@ -224,20 +407,27 @@ export default {
   color: rgba(51, 51, 51, 1);
   float: left;
 }
+.goback:hover{
+  cursor: pointer;
+}
 .userAdmin-head >.addUserAdmin {
   float: right;
   width: 100px;
-  height: 36px;
-   background: #E1E1E1;
+  height: 36px; 
   color: #fff;
   line-height: 36px;
   text-align: center;
   font-size: 14px;
   border-radius: 4px;
+  
 }
-.addUserAdmin-active{
-  background: #5897ff; 
+.addUserAdminActive{
+  background: #5897ff;
 }
+.disable{
+  background: #E1E1E1;
+}
+
 .userAdminForm {
  
   margin-left: 89px;
@@ -261,6 +451,7 @@ export default {
 
 .trhover:hover{
   background:#EDEEEF;
+  cursor: pointer;
 }
 .userAdminForm > .caption {
   width:331px;
@@ -406,8 +597,7 @@ export default {
 }
 
 .icon{
-    
-        font-size:20px;
+        font-size:21px;
         color:#5897FF;
     }
 .icon1{
@@ -444,13 +634,19 @@ export default {
 }
 .formselect>div{
    float: left;
-   margin-right: 40px;
+   margin-right: 20px;
+   height: 37px;
 }
 .formselect>div>div{
-    float: left;
+ float: left;
     line-height: 20px;
     margin-top: 15px;
     margin-right: 10px;
+}
+.formselect>div>div:nth-of-type(1){
+   
+    width:27px;
+   
     
 }
 }
@@ -468,6 +664,9 @@ export default {
 .addUserAdmin:hover{
   cursor: pointer;
 }
+.goback:hover{
+  cursor: pointer;
+}
 .userAdmin-head > h2 {
   width: 39px;
   font-size: 19px;
@@ -480,15 +679,21 @@ export default {
   float: right;
   width: 73px;
   height: 26px;
-  background: #E1E1E1;
   color: #fff;
   line-height: 26px;
   text-align: center;
   font-size: 12px;
   border-radius: 4px;
 }
+.addUserAdminActive{
+  background: #5897ff;
+}
+.disable{
+  background: #E1E1E1;
+}
 .trhover:hover{
   background:#EDEEEF;
+  cursor: pointer;
 }
 .addUserAdmin-active{
   background: #5897ff; 
@@ -696,7 +901,8 @@ export default {
 }
 .formselect>div{
    float: left;
-   margin-right: 29px;
+   margin-right:15px;
+   height:29px;
 }
 .formselect>div>div{
     float: left;
@@ -704,6 +910,9 @@ export default {
     margin-top: 11px;
     margin-right: 7px;
     
+}
+.formselect>div>div:nth-of-type(1){
+  width:27px;
 }
 }
 </style>

@@ -7,7 +7,7 @@ export const buildBankManager =()=>{
 //添加负责人扫描二维码
 
 export const buildBankManagerWxEr = (param)=>{
-    return http("get","/apis/api/GZTI/GetMPRegisterQRCode/?width="+param)
+    return http("get","/apis/api/GZTI/GetChargerInviteQRCode/?width="+param)
 }
 
 //获取培训单个用户信息

@@ -78,10 +78,10 @@
                     </div>
             </div>
         </div>
-</template>
+</template> 
 <script>
 import Vuex  from "vuex";
-import md5 from 'js-md5'
+import md5 from 'js-md5';
 export default {
         name:"submitCertInfo",
         data(){
@@ -190,15 +190,13 @@ export default {
                 // BusinessLicensePhoto	string	营业执照照片（base64）
                 // BusinessLicensePhotoMD5	string	营业执照照片MD5码
                 // BusinessLicensePhotoFormat	string	营业执照图片格式（目前支持jpg、jpeg、png、gif)
-                var param = JSON.stringify({
+                var param = {
                      "id":this.applyId,
                      "ShopPhoto":this.imgdata,
                      "ShopPhotoMD5":md5(this.imgdata),
-                     "ShopPhotoFormat":this.imgdata.substring(11,15).replace(';',''),
                      "BusinessLicensePhoto":this.imgdataTwo,
                      "BusinessLicensePhotoMD5":md5(this.imgdataTwo),
-                     "BusinessLicensePhotoFormat":this.imgdataTwo.substring(11,15).replace(';','')
-                })
+                } 
                 if(this.imgdata!==""){
                     this.uploadApplicationFormInformation(param);
                     this.imgdata="";

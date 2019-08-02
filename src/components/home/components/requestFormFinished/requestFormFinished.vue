@@ -111,7 +111,7 @@
         <div class="remarks" id="remarkValue">
               <div v-for="(item,index) in RemarkData">
                   <div><span>【{{item.brandName}}】:</span></div>
-                  <div><span> {{item.type}},</span><span>申请单号：</span><span>{{item.number}}</span></div>
+                  <div><span> {{item.type}}</span><span>申请单号：</span><span>{{item.number}}</span></div>
               </div>
         </div>
         <div class="footer">

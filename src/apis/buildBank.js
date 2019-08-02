@@ -7,7 +7,7 @@ export const buildBankManager =()=>{
 //添加负责人扫描二维码
 
 export const buildBankManagerWxEr = (param)=>{
-    return http("get","/apis/api/CCB/GetMPRegisterQRCode/?width="+param)
+    return http("get","/apis/api/CCB/GetChargerInviteQRCode/?width="+param)
 }
 
 //获取建行单个用户信息

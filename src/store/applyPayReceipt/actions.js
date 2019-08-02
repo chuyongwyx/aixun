@@ -9,4 +9,4 @@ export default{
     async addApplicationForm({commit,state},param){
         var dataInfo = await AddApplicationForm(param)
     } 
-}
+}  

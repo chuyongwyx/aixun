@@ -2,7 +2,7 @@
      <div class="brandCert">
             <div class="CertInfo-tit">
                 <h2>品牌认证</h2>
-                <div class="cert-btn">去认证</div>
+                <div class="cert-btn" @click="handleToBrandCertModel">去认证</div>
             </div>
             <div class="CertInfo-content">
                     <table cellpadding="0" cellspacing="0">
@@ -15,14 +15,14 @@
                                 <td>申请人</td>
                                 <td>提交人</td>
                             </tr>
-                            <tr class="trhover" v-for="(item,index) in getInformationSubmittedApplicationForms" @click="handleToCert($event,item)">
+                            <tr class="trhover" v-for="(item,index) in getInformationSubmittedApplicationForms" @click="handleToCert($event,item)" >
                                 <td>{{item.creationTime.substring(0,10)}}</td>
                                 <td>{{item.number}}</td>
                                 <td>{{item.projectNumber}}</td>
                                 <td>{{item.projectName}}</td>
-                                <td>{{item.BrandName}}</td>
-                                <td>{{item.CreatorUsername}}</td>
-                                <td>{{item.InformationSubmittedUsername}}</td>
+                                <td>{{item.brandName}}</td>
+                                <td>{{item.creatorUsername}}</td>
+                                <td>{{item.informationSubmittedUsername}}</td>
                             </tr>
                             
                     </table>
@@ -39,22 +39,22 @@
                         <div class="data-body">
                                 <div class="applyNumber apply">
                                      <div><span>申请单号:</span></div>
-                                     <div>KT2019132132132</div>
+                                     <div>{{getInformationSubmitteIdList.number}}</div>
                                 </div>
                                 <div class="applyName apply">
                                       <div><span>品牌名称:</span></div>
-                                      <div>淘淘纺织3号店</div>
+                                      <div>{{getInformationSubmitteIdList.brandName}}</div>
                                 </div>
                                 <div class="submitName apply">
                                       <div><span>提交人:</span></div>
-                                      <div>建行-麦助理</div>
+                                      <div>{{getInformationSubmitteIdList.informationSubmittedUsername}}</div>
 
                                 </div>
                                 <div class="shopImg apply">
                                         <div><span>*</span><span>门店照片:</span></div>
                                         <div class="showImg">
                                                 <div  class="getImg">
-                                                    <img :src="imgdata" alt="">
+                                                    <img :src="imgdata?imgdata:getInformationSubmitteIdList.shopPhoto" alt="" id="imgshopPhoto">
                                                 </div>
                                                 <div class="reupload">
                                                         <span class="iconfont icon-tupian"></span>
@@ -69,27 +69,40 @@
                                 <!-- 营业执照 -->
                                 <div class="apply business-license">
                                         <div>营业执照:</div>
-                                                <div class="addreupload" v-if="uploadTwo">
-                                                    <span>补充上传</span>
-                                                    <input type="file" id="file" accept="image/jpg,image/png,image/jpeg,image/gif" @change="handeladdreupload($event)">
+                                                <div class="showImgTwo" v-if="getInformationSubmitteIdList.businessLicensePhoto">
+                                                    <img :src="imgdataTwo?imgdataTwo:getInformationSubmitteIdList.businessLicensePhoto" alt="" class="imgdataTwo">
+                                                    <div class="reupload">
+                                                            <span class="iconfont icon-tupian"></span>
+                                                            <span>重新上传</span>
+                                                            <input type="file" accept="image/jpg,image/png,image/jpeg,image/gif"   @change="handelReuploadTwo($event)">
+                                                    </div>
                                                 </div>
-                                                <div class="showImgTwo" v-if="imgshow">
-                                                        <img :src="imgdataTwo" alt="">
+                                                <div class="showImgTwoAgin" v-else>
+                                                     <div class="getImg" v-if="addbusinessLicensePhoto">
+                                                        <img :src="imgdataTwo" alt="" class="imgdataTwo">
                                                         <div class="imgdelTwo" @click="handleDelUpload"><span class="iconfont icon-shanchu"></span><span>删除</span></div>
+                                                    </div>
+                                                    <div class="addchuan" v-show="uploadTwo">
+                                                            <span>补充上传</span>
+                                                            <input type="file" id="file" accept="image/jpg,image/png,image/jpeg,image/gif" @change="handeladdreupload($event)">
+                                                    </div>
+                                                   
                                                 </div>
+                                                
                                        
                                 </div>
                                 <!-- 提交页脚 -->
                                 <div class="footer">
-                                        <button>认证通过</button>
+                                        <button @click="handleTobrandCert">认证通过</button>
                                 </div>
                         </div>
-                </div>
+                </div> 
             </div>
      </div>
 </template>
 <script>
 import Vuex from 'vuex';
+import md5 from 'js-md5'
 export default {
         name:"brandCert",
         data() {
@@ -99,28 +112,58 @@ export default {
                 imgdataTwo:"",
                 imgshow:false,
                 uploadTwo:true,
+                finishId:"",
+                addbusinessLicensePhoto:false,
             }
+        },
+        watch: {
+
         },
         computed:{
             ...Vuex.mapState({
                 //获取已提交资料的申请单
-                getInformationSubmittedApplicationForms:state=>state.brandCert.getInformationSubmittedApplicationForms
+                getInformationSubmittedApplicationForms:state=>state.brandCert.getInformationSubmittedApplicationForms,
+                //获取根据id传回来的数据
+                getInformationSubmitteIdList:state=>state.brandCert.getInformationSubmitteIdList,
+                
             })
         },
         created(){
                 this.getInformationForms();
         },
         methods: {
-                //操作认证按钮
+                
                 ...Vuex.mapActions({
-                     getInformationForms:"brandCert/getInformationSubmittedApplicationForms"
-                }),
-                handleToCert($event,param){
+                     getInformationForms:"brandCert/getInformationSubmittedApplicationForms",
+                     //根据id获取认证资料
+                     getInformationSubmittedApplicationFormByID:"brandCert/getInformationSubmittedApplicationFormByID",
+                     //补充上传资料
+                     replenishApplicationFormInformation:"brandCert/replenishApplicationFormInformation",
+                     //认证通过
+                     verifyApplicationFormInformation:"brandCert/verifyApplicationFormInformation"
 
+                }),
+                //选择需要认证的数据    
+                handleToCert($event,param){
+                    var  trs = document.getElementsByClassName('trhover');
+                    var len = trs.length;
+                    for(var i=0;i<len;i++){
+                        trs[i].style.background = '';
+                    }
+                    $event.target.parentNode.style.background = '#EDEEEF';
+                    this.finishId = param.id;
+                },
+                handleToBrandCertModel(){
+                    if(this.finishId !==""){
+                            this.model=true;
+                            //根据id来获取资料
+                            this.getInformationSubmittedApplicationFormByID(this.finishId);
+                            
+                    }
                 },
                 //重新上传照片
                 handelReupload($event){
-                         var _this = this;
+                        var _this = this;
                         var file =$event.target.files[0];
                         var reader = new FileReader();
                         reader.readAsDataURL(file);       
@@ -128,11 +171,12 @@ export default {
                         // 图片base64化
                         var newUrl = this.result;
                         _this.imgdata=newUrl;
+                       
                     }
                 },
-            //补充上传
-            handeladdreupload($event){
-                  var _this = this;
+            //这是营业执照的重新上传
+            handelReuploadTwo($event){
+                        var _this = this;
                         var file =$event.target.files[0];
                         var reader = new FileReader();
                         reader.readAsDataURL(file);       
@@ -140,21 +184,63 @@ export default {
                         // 图片base64化
                         var newUrl = this.result;
                         _this.imgdataTwo=newUrl;
-                        _this.imgshow = true;
-                        _this.uploadTwo =false;
-                }
+                    }
             },
+            //营业执照的补充上传
+            handeladdreupload($event){
+                        var _this = this;
+                        var file =$event.target.files[0];
+                        var reader = new FileReader();
+                        reader.readAsDataURL(file);       
+                        reader.onload = function(e) {
+                        // 图片base64化
+                        var newUrl = this.result;
+                        _this.imgdataTwo=newUrl;
+                        _this.addbusinessLicensePhoto=true;
+                        _this.uploadTwo=false;
+                        
+                    }
+        },
+        
          //删除错误上传
          handleDelUpload(){
-             this.imgshow = false;
-                 this.uploadTwo=true;
-               var file =  document.getElementById('file')
+               var file = document.getElementById('file')
                file.value='';
+               this.imgdataTwo="";
+               this.addbusinessLicensePhoto=false;
+               this.uploadTwo=true;
+               
          },
          
          //关闭模态框
          handleCloseModel(){
              this.model= false;
+             this.imgdata="";
+             this.imgdataTwo="";
+         },
+         //补充上传完
+         handleTobrandCert(){
+                var addbusinessLicensePhoto = document.getElementsByClassName('imgdataTwo')[0];
+                if(addbusinessLicensePhoto!=='undefined'){
+                    this.imgdataTwo=addbusinessLicensePhoto.src
+                    var imgshopPhoto =document.getElementById('imgshopPhoto');
+                    this.imgdata =imgshopPhoto.src;
+                     var param =JSON.stringify({
+                        "id":this.finishId,
+                        "ShopPhoto":this.imgdata,
+                        "ShopPhotoMD5":md5(this.imgdata),
+                        "BusinessLicensePhotoMD5":md5(this.imgdataTwo),
+                        "BusinessLicensePhoto":this.imgdataTwo
+                    })
+                    this.replenishApplicationFormInformation(param);
+                }
+            var paramTwo ={
+                "id":this.finishId
+            }
+            this.verifyApplicationFormInformation(paramTwo);
+                this.model= false;
+                this.imgdata="";
+                this.imgdataTwo="";
          }
         },
 }
@@ -174,6 +260,10 @@ export default {
 .cert-btn:active{
     background:#6da4ff;
 
+}
+.trhover:hover{
+    background:#EDEEEF;
+    cursor: pointer;
 }
 .CertInfo-tit {
   margin-top: 80px;
@@ -339,9 +429,12 @@ export default {
 .reupload{
     position:absolute;
     bottom:0;
-    left:46px;
-    width:100px;
+    left: 0;
+    width:100%;
     height:34px;
+    background:rgba(0,0,0,0.3);
+    text-align: center;
+    line-height: 34px;
 }
 .reupload>span{
     color: #fff;
@@ -352,25 +445,25 @@ export default {
     position:absolute;
     top:0;
     left:0;
-    width:72px;
+  width: 100%;
     height:34px;
 }
 
 /* 营业执照 */
-.addreupload{
+.showImgTwoAgin{
     position: relative;
 }
-.addreupload>input{
+.showImgTwoAgin>input{
     opacity:0;
     position:absolute;
     top: 0;
     left: 0;
 
 }
-.addreupload>span{
+.showImgTwoAgin>span{
     color: #5897FF;
 }
-.addreupload>input:hover{
+.showImgTwoAgin>input:hover{
     cursor: pointer;
 }
 .showImgTwo{
@@ -386,14 +479,32 @@ export default {
 .imgdelTwo{
     position:absolute;
     width:180px;
+    height: 34px;
     font-size:14px;
+    line-height: 34px;
     bottom:0;
     left:0;
     color:#fff;
     text-align: center;  
+    background:rgba(0,0,0,0.3);
 }
 .imgdelTwo:hover{
     cursor: pointer;
+}
+.addchuan{
+     width:180px;
+    position: relative;
+}
+.addchuan>input{
+  opacity:0;
+  position:absolute;
+  top:0;
+  left:0;
+  width: 100%;
+  height:34px;
+}
+.addchuan>span{
+   color: #5897FF; 
 }
 
 
@@ -424,6 +535,17 @@ export default {
   box-sizing: border-box;
   padding: 0 47px;
 }
+.cert-btn:hover{
+    cursor: pointer;
+}
+.cert-btn:active{
+    background:#6da4ff;
+
+}
+.trhover:hover{
+    background:#EDEEEF;
+    cursor: pointer;
+}
 .CertInfo-tit {
   margin-top: 58px;
   overflow: hidden;
@@ -442,11 +564,11 @@ export default {
   background: rgba(88, 151, 255, 1);
   border-radius: 4px;
   color: #fff;
-  float: left;
+  float: right;
   font-size: 12px;
   line-height: 26px;
   text-align: center;
-  margin-left: 464px;
+  margin-right: 170px;
 }
 .CertInfo-content{
     margin-top: 28px;
@@ -588,8 +710,11 @@ export default {
 .reupload{
     position:absolute;
     bottom:0;
-    left:33px;
-    width:73px;
+    left:0;
+    width: 100%;
+    background:rgba(0,0,0,0.3);
+    text-align: center;
+    line-height: 25px;
     height:25px;
 }
 .reupload>span{
@@ -601,25 +726,25 @@ export default {
     position:absolute;
     top:0;
     left:0;
-    width:52px;
+    width: 100%;
     height:25px;
 }
 
 /* 营业执照 */
-.addreupload{
+.showImgTwoAgin{
     position: relative;
 }
-.addreupload>input{
+.showImgTwoAgin>input{
     opacity:0;
     position:absolute;
     top: 0;
     left: 0;
 
 }
-.addreupload>span{
+.showImgTwoAgin>span{
     color: #5897FF;
 }
-.addreupload>input:hover{
+.showImgTwoAgin>input:hover{
     cursor: pointer;
 }
 .showImgTwo{
@@ -643,6 +768,21 @@ export default {
 }
 .imgdelTwo:hover{
     cursor: pointer;
+}
+.addchuan{
+     width:131px;
+    position: relative;
+}
+.addchuan>input{
+  opacity:0;
+  position:absolute;
+  top:0;
+  left:0;
+  width: 100%;
+  height:25px;
+}
+.addchuan>span{
+   color: #5897FF; 
 }
 
 

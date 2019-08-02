@@ -9,6 +9,10 @@ export default{
        //获取用户权限数据
        async getUserPermissionDatas({commit,state},param){
               var dataList = await GetUserPermissionDatas(param)
-             commit("handleGetUserPermissionDatas",param)
+             commit("handleGetUserPermissionDatas",dataList)
+       },
+       //修改用户权限
+       async modifyUserPermission({commit,state},param){
+             var dataInfo = await ModifyUserPermission(param)  
        }
 } 

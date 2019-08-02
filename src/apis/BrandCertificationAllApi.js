@@ -36,8 +36,8 @@ export const ReplenishApplicationFormInformation=(param)=>{
 }
 
 //根据ID获取已提交资料的申请单信息（包含图片）
-export const GetInformationSubmittedApplicationFormByID=()=>{
-    return http("get","/apis/api/BrandCertificationApplicationForm/GetInformationSubmittedApplicationFormByID")
+export const GetInformationSubmittedApplicationFormByID=(param)=>{
+    return http("get","/apis/api/BrandCertificationApplicationForm/GetInformationSubmittedApplicationFormByID/?id="+param)
 }
 
 //认证提交的资料

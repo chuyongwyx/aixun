@@ -7,7 +7,14 @@ export default{
    },
    //提交数据
    async uploadApplicationFormInformation({commit,state},param){
-       var datainfo = await UploadApplicationFormInformation(param);
-        console.log(datainfo);
+        var paramTwo = JSON.stringify(param)
+       var datainfo = await UploadApplicationFormInformation(paramTwo);
+        if(datainfo.success){
+            state.getApplyingApplicationForms.map((item,index)=>{
+                    if(item.id===param.id){
+                        state.getApplyingApplicationForms.splice(index,1);
+                    }
+            })
+        }
    }
 }
