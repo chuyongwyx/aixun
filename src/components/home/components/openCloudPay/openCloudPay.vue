@@ -20,17 +20,23 @@
                   </table>
             </div>
             <div class="footer">
-                    <button @click="handleToFinished">开通</button> 
+                    <button @click="handleToFinished" :class="{'Notselect':dataId.length==0?true:false}"><span v-show="openLoading==false?true:false">开通</span><span v-show="openLoading==false?false:true">开通中...</span></button> 
             </div>
      </div> 
-</template>
+</template> 
 <script>
 import  Vuex  from  'vuex';
 export default {
     name:"openCloudPay",
     data(){
       return{
-          dataId:""
+          dataId:[],
+           //  没选中
+          Notselect:"background:rgba(243,244,245,1);color:#B7B8BA;",
+
+          //函数防抖
+          timer:null,
+          openLoading:false
       }
     },
     methods:{
@@ -41,46 +47,72 @@ export default {
       }),
        //选中需要开通的云支付
           handleSelectedOpenCloudDoc($event,param){
+           this.Notselect="background:rgba(88, 151, 255, 1);color:#fff";
             //清空其他的复选框颜色
             var trs =document.getElementsByClassName('trhover');
             var len =trs.length;
-            for(var i=0;i<len;i++){
-              trs[i].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_weixuanzhong');
-              trs[i].firstElementChild.firstElementChild.classList.add('icon');   
-                   trs[i].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_xuanzhong');
-                   trs[i].firstElementChild.firstElementChild.classList.remove('icon1');
-
-            }
+          
             if($event.target.className.indexOf('icon-fuxuankuang_weixuanzhong') !==-1){
                 $event.target.classList.remove('icon-fuxuankuang_weixuanzhong');
                 $event.target.classList.remove('icon');
                 $event.target.classList.add('icon-fuxuankuang_xuanzhong');
                 $event.target.classList.add('icon1');
-                 this.dataId =param.id;
+                   this.dataId.push(param.id);
             }else{
                 $event.target.classList.add('icon-fuxuankuang_weixuanzhong');
                 $event.target.classList.add('icon');
                 $event.target.classList.remove('icon-fuxuankuang_xuanzhong');
                 $event.target.classList.remove('icon1');
-                 this.dataId =""
+                 this.dataId.map((item,index)=>{
+                    if(item==param.id){
+                      this.dataId.splice(index,1);
+                    }
+                 })
             }
         },
       //开通云支付
-       //开通云单据
-        handleToFinished(){
-            var param = {
-                "id":this.dataId
+      handleToFinished(){
+        var _this =this;
+          if(this.timer){
+            clearTimeout(this.timer);
+            this.openLoading=false;
+          }
+          if(this.dataId.length!==0){
+            this.openLoading=true;
+            this.timer=setTimeout(()=>{
+             var param = {
+                "IDs":_this.dataId
+              }
+            _this.openCloudPay(param);
+            },300)
+           
+        }
+      }
+    },
+    watch: {
+       success(newValue,oldValue){
+            // this.Notselect="background:rgba(88, 151, 255, 1);color:#fff";
+             //清空其他的复选框颜色
+             this.openLoading =false;
+             if(newValue==true){
+            var trs =document.getElementsByClassName('trhover');
+            var len =trs.length;
+            for(var i=0;i<len;i++){
+               trs[i].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_xuanzhong','icon1');
+               trs[i].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_weixuanzhong','icon');
             }
-            this.openCloudPay(param);
+            this.dataId=[];
+            }
         }
     },
     computed:{
         ...Vuex.mapState({
-            "GetOpenedCloudOrderBrands":state=>state.openCloudPay.GetOpenedCloudOrderBrands
+            "GetOpenedCloudOrderBrands":state=>state.openCloudPay.GetOpenedCloudOrderBrands,
+            "success":state=>state.openCloudPay.success
         })
     },
    created(){
-      this.getOpenedCloudOrderBrands();
+      // this.getOpenedCloudOrderBrands();
    }
 }
 
@@ -170,6 +202,14 @@ export default {
     outline: none;
     border:0;
     border-radius: 4px;
+}
+.footer .Notselect{
+    background:rgba(243,244,245,1);
+    color:#B7B8BA;
+  }
+.footer .Notselect:active{
+    background:rgba(243,244,245,1);
+    color:#B7B8BA;
 }
 .icon{
   color: #D4D4D4;
@@ -264,6 +304,10 @@ export default {
     outline: none;
     border:0;
 }
+.footer .Notselect{
+    background:rgba(243,244,245,1);
+    color:#B7B8BA;
+  }
 .icon{
   color: #D4D4D4;
 }

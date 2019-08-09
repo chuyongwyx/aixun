@@ -81,15 +81,15 @@ export default {
                     //缓存路由
                      handlePushRouter:"home/handlePushRouter",
                      //安排培训人员初始化信息
-                     getOrgnTrainingInstInfo:"organTrainingInst/getOrgnTrainingInstInfo",
+                     getSettedApplicationForms:"organTrainingInst/getSettedApplicationForms",
                      //获取新建申请单的项目信息
-                     getInitialAddDatas:"newRequestForm/getInitialAddDatas",
+                    //  getInitialAddDatas:"newRequestForm/getInitialAddDatas",
                      //获取品牌认证的项目信息
-                     applyBrandCertInitialAddDatas:"applyBrandCert/initialAddDatas",
+                    //  applyBrandCertInitialAddDatas:"applyBrandCert/initialAddDatas",
                      //获取提交资料页面的数据信息
                      getApplyingApplicationForms:"submitCertInfo/getApplyingApplicationForms",
                      //获取申请云支付收款账号的初始信息
-                     getPayReceiptInitialAddDatas:"applyPayReceipt/initialAddDatas",
+                    //  getPayReceiptInitialAddDatas:"applyPayReceipt/initialAddDatas",
                      //开通云单据的初始信息
                      getVerifiedBrands:"openCloudDoc/getVerifiedBrands",
                      //开通云支付
@@ -102,7 +102,7 @@ export default {
                                 "path":"/newRequestForm",
                                 "name":"newRequestForm"
                 }
-                this.getInitialAddDatas();
+                // this.getInitialAddDatas();
                  this.handlePushRouter(paramRouter);
                  this.$router.push('/newRequestForm');
             },
@@ -145,7 +145,7 @@ export default {
                 }
                  this. handlePushRouter(paramRouter);
                 this.$router.push('/applyBrandCert');
-                this.applyBrandCertInitialAddDatas();
+                // this.applyBrandCertInitialAddDatas();
             },
             //提交资料
             handleToSubmitCertInfo($event){
@@ -198,18 +198,18 @@ export default {
                                 "name":"applyPayReceipt"
                 }
                  this. handlePushRouter(paramRouter);
-                 this.getPayReceiptInitialAddDatas();
+                //  this.getPayReceiptInitialAddDatas();
                 this.$router.push('/applyPayReceipt');
             },
             //安排培训人员
             handleToOrganTrainingInst($event){
-                this.getOrgnTrainingInstInfo();
+                this.getSettedApplicationForms();
                  var paramRouter ={
                                 "text":$event.target.innerText,
                                 "path":"/organTrainingInst",
                                 "name":"organTrainingInst"
                 }
-                 this. handlePushRouter(paramRouter);
+                 this.handlePushRouter(paramRouter);
                 this.$router.push('/organTrainingInst');
             }
         },

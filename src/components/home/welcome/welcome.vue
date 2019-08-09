@@ -1,6 +1,5 @@
 <template>
     <div class="welcome">
-             <transition name="slide" enter-active-class="slideInDown" leave-active-class="slideOutUp" :duration="200">
                     <div class="nav">
                             <!-- 左边导航栏部分 -->
                                 <div class="nav-left">
@@ -9,40 +8,25 @@
                                     <div class="pay-abnormalMonitoring" :class='{"nav-active":payAbnormalMonitoring}' @click="handelToMonitoring"><span class="iconfont icon-shebeileijiankongdian"></span><span>云支付异常监控</span></div>
                                     <div class="Int-manage" :class='{"nav-active":IntManage}' @click="handelToManage" ><span class="iconfont icon-guanli"></span><span>系统设置</span></div>
                                 </div>
-                                <div class="nav-right" @click="handleNavToShow">
-                                        <component :is=" Component"></component>
+                                <div class="nav-right">
+                                        <router-view></router-view>  
                                 </div>
                             
                     </div>
-                    </transition>
-            
     </div>
 </template>
 
 <script>
 import Vuex from 'vuex';
-import  welcomehomeComponent from "../homeComponet/welcomehome.vue";
-import payItemsComponent  from "../homeComponet/payItem.vue";
-import payQueryComponent  from "../homeComponet/payQuery.vue";
-import intManageComponent  from "../homeComponet/intManage.vue";
-import  abnormalMonitoring from "../homeComponet/abnormalMonitoring.vue";
+
 export default {
     data(){
         return{
-               
                 payItems:false,
                 payQuery:false,
                 IntManage:false,
-                payAbnormalMonitoring:false,
-                Component:"WelcomehomeComponent"    
+                payAbnormalMonitoring:false,        
         }
-    },
-     components:{
-        "PayItemsComponent":payItemsComponent,
-        "PayQueryComponent":payQueryComponent,
-        "AbnormalMonitoring":abnormalMonitoring,
-        "IntManageComponent":intManageComponent,
-        "WelcomehomeComponent":welcomehomeComponent
     },
     methods:{
         ...Vuex.mapActions({
@@ -55,7 +39,7 @@ export default {
              this.payQuery =false;
              this.IntManage= false;
              this.payAbnormalMonitoring=false;
-             this.Component ="PayItemsComponent";
+             this.$router.push('/payItem');
              this.hanlePayItemMessage();
         },
         handelToSearch(){
@@ -63,39 +47,46 @@ export default {
              this.payQuery =true;
              this.IntManage= false;
              this.payAbnormalMonitoring=false;
-             this.Component ="PayQueryComponent";
+            
+              this.$router.push('/payQuery');
         },
         handelToMonitoring(){
              this.payItems = false;
              this.payQuery =false;
              this.IntManage= false;
              this.payAbnormalMonitoring=true;
-             this.Component ="AbnormalMonitoring";
+            this.$router.push('/abnormalMonitoring')
         },
         handelToManage(){
              this. payItems = false;
              this.payQuery =false;
              this.payAbnormalMonitoring=false;
              this.IntManage= true;
-             this.Component ="IntManageComponent";
+            this.$router.push('/intManage');
         },
 
-        //点击右侧的菜单栏nav隐藏
-        handleNavToShow(){
-            this.navShow = false;
-        }   
+       
     },
     created(){
-         
+      
     }
 }
 </script>
 <style lang="" scoped>
 @media screen and (min-width:1400px){
+    .welcome{
+         width:100%;
+         height: 100%;
+    }
+    .nav{
+         width: 100%;
+         height:100%;
+    }
    .welcome .nav> .nav-left{
             width:20%;
             box-sizing: border-box;
             float: left;
+            height: 100%;
     }
     .nav-left>div:hover{
         cursor: pointer;
@@ -127,6 +118,7 @@ export default {
     .welcome .nav> .nav-right{
         float:left;
         width:80% ;
+        height: 100%;
         box-sizing: border-box;
         min-height: 260px;
         border-left:1px solid rgba(235,237,239,1);
@@ -138,13 +130,14 @@ export default {
         height: 100%;
     }
      .welcome .nav{
-            width:100%;
-            background:rgba(255,255,255,1);
+           width:100%;
+           background:rgba(255,255,255,1);
            height: 100%;
            
      }
     .welcome .nav> .nav-left{
             width:20%;
+            height:100%;
             box-sizing: border-box;
             float: left;
     }
@@ -178,6 +171,7 @@ export default {
     .welcome .nav> .nav-right{
         float:left;
         width:80% ;
+        height: 100%;
         box-sizing: border-box;
         height: 100%;
         border-left:1px solid rgba(235,237,239,1);

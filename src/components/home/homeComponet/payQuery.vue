@@ -1,15 +1,15 @@
 <template>
         <div class="pay-query-r">
                 <div>
-                         <div @click="handleTosummaryCloudPayments">云支付申请跟进表</div>
+                         <div @click="handleTosummaryCloudPayments">申请云支付功能总表</div>
                 </div>
                 <div>
-                         <div @click="handleToGeneralApplicationBrandCert">品牌认证申请跟进表</div>
-                         <div @click="handleToSummaryBrands">品牌总表</div>        
+                         <div @click="handleToGeneralApplicationBrandCert">申请品牌认证总表</div>
+                         <div @click="handleToSummaryBrands">项目品牌总表</div>        
                 </div>
                
                 <div>
-                        <div @click="handleToTaskSummaryStatem">任务跟进表</div>
+                        <div @click="handleToTaskSummaryStatem">申请云支付账号总表</div>
                 </div>
         </div>
 </template>

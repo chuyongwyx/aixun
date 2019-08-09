@@ -2,7 +2,7 @@
         <div class="submitCertInfo">
             <div class="submitCertInfo-tit">
                 <h2>提交认证资料</h2>
-                <div class="submit-head" @click="handleSubmitData">提交资料</div>
+                <div class="submit-head" @click="handleSubmitData" v-show="applyId==''?false:true">提交资料</div>
             </div>
             <div class="submitCertInfo-content">
                     <table cellpadding="0" cellspacing="0">
@@ -97,8 +97,8 @@ export default {
                 applyId:"",
                 applyNumber:"",
                 applyBrandName:"",
-
-
+                //提交资料按钮
+                // submitData:false,
             }
         },
         computed:{
@@ -115,6 +115,7 @@ export default {
              }),
             //选中申请的数据
              handleToSubmitDataModel($event,param){
+                 this.submitData=true;
                  this.applyId=param.id;
                  this.applyNumber =param.number;
                  this.applyBrandName = param.brandName;
@@ -183,13 +184,6 @@ export default {
             },
             //提交申请资料
             handleToSubmitFormInfo(){
-                // id	int	申请单ID
-                // ShopPhoto	string	门店照片（base64）
-                // ShopPhotoMD5	string	门店照片MD5码
-                // ShopPhotoFormat	string	门店照片图片格式（目前支持jpg、jpeg、png、gif)
-                // BusinessLicensePhoto	string	营业执照照片（base64）
-                // BusinessLicensePhotoMD5	string	营业执照照片MD5码
-                // BusinessLicensePhotoFormat	string	营业执照图片格式（目前支持jpg、jpeg、png、gif)
                 var param = {
                      "id":this.applyId,
                      "ShopPhoto":this.imgdata,
@@ -215,6 +209,13 @@ export default {
                     fileTwo ='';
                     this.submitDataModel=false;
 
+                    //清除当前选中的行数状态
+                    var trs = document.getElementsByClassName('trhover');
+                    var len =trs.length;
+                    for(var i=0;i<len;i++){
+                        trs[i].style.background="";
+                    }
+
             }
          } 
 }
@@ -238,6 +239,7 @@ export default {
 .submitCertInfo .submitCertInfo-tit {
   margin-top: 80px;
   overflow: hidden;
+  height:36px;
 }
 .submitCertInfo-tit > h2 {
   font-size: 24px;

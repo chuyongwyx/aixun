@@ -3,7 +3,7 @@ export default{
     //获取已提交资料的申请单
     async getInformationSubmittedApplicationForms({commit,state}){
         var dataList = await GetInformationSubmittedApplicationForms();
-        commit("handleData",dataList);
+        commit("handleData",dataList); 
     },
     //根据ID获取已提交资料的申请单信息（包含图片）
     async getInformationSubmittedApplicationFormByID({commit,state},param){
@@ -22,9 +22,9 @@ export default{
        if(datainfo.success){
          state.getInformationSubmittedApplicationForms.map((item,index)=>{
              if(item.id==param.id){
-                state.getInformationSubmittedApplicationForms.splice(index);
+                state.getInformationSubmittedApplicationForms.splice(index,1);
              }
-         })
+         }) 
        };
    }
 } 

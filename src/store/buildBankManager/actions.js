@@ -1,4 +1,4 @@
-import {buildBankManager ,buildBankManagerWxEr,builBankUserInfo,ExaminePass,refuseUserInfo,RevokeBuidlManager} from '../../apis/buildBank';
+import {buildBankManager ,buildBankManagerWxEr,builBankUserInfo,ExaminePass,refuseUserInfo,RevokeBuidlManager,GetWorkingCarById} from '../../apis/buildBank';
 let  Base64 = require('js-base64').Base64;
 export default{
         //获取建行用户
@@ -29,5 +29,11 @@ export default{
         //撤销建行负责人
         async revokeBuidlManager({commit,state},param){
             let RevokeManagerInfo = await RevokeBuidlManager(param);
+        },
+        //查看办理人员附件
+        async getWorkingCardByID({commit,state},param){
+            let WorkingCar = await GetWorkingCarById(param);
+            commit("handleToWorkingCar",WorkingCar)
         }
+
 }

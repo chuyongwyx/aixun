@@ -18,9 +18,9 @@
           <td>{{item.DepartmentName}}</td>
           <td>{{item.name}}</td>
           <td>
-            <span @click="handleuserAdModify($event)" :data-id="item.id">编辑</span>
-            <span @click="handleUserDelete" :data-id="item.id">删除</span>
-            <span @click="handleResetPassWord($event,item.id)">重置密码</span>
+            <span @click="handleuserAdModify($event)" :data-id="item.id" class="tdhover">编辑</span>
+            <span @click="handleUserDelete" :data-id="item.id" class="tdhover">删除</span>
+            <span @click="handleResetPassWord($event,item.id)" class="tdhover">重置密码</span>
           </td>
         </tr>
       </table>
@@ -62,26 +62,26 @@
 
             <div>
               <div>人员名称：</div>
-              <div>
-                <input type="text" v-model="addName"/>
+              <div class="border-box">
+                <input type="text" v-model="addName" placeholder="请输入人员名称..."/>
               </div>
             </div>
             <div>
               <div>用户名：</div>
-              <div>
-                <input type="text" v-model="addUserName" />
+              <div class="border-box">
+                <input type="text" v-model="addUserName" placeholder="请输入用户名..."/>
               </div>
             </div>
             <div>
               <div>邮箱：</div>
-              <div>
-                <input type="text" v-model="addEmailAddress" />
+              <div class="border-box">
+                <input type="text" v-model="addEmailAddress" placeholder="请输入邮箱..." />
               </div>
             </div>
             <div>
             <div>
                   <label for=""  class="Modifyuse"  @click="handleToAddStartUse">
-                       <span class="iconfont icon-xuanzhong2" id="startUseOne"></span>
+                       <span class="iconfont icon-xuanzhong2 user-icon" id="startUseOne"></span>
                       <span>启动</span>
                   </label>  
             </div>
@@ -104,7 +104,7 @@
               </div>
               <div>
                 <div class="selected">
-                  <span class="selected-options" id="selected-options" style="line-height:38px;font-size:14px;margin-left:15px;">{{userInfoById.departmentName}}</span>
+                  <span class="selected-options" id="selected-options" >{{userInfoById.departmentName}}</span>
                   <span class="iconfont icon-xiala1 icon" id="selected-icon" @click="handleSelectShow"></span>
                     <div class="select-options" v-if="selectModify" @click="handelToSelectOption($event)">
                       <div>
@@ -121,19 +121,19 @@
 
             <div>
               <div>人员名称：</div>
-              <div>
+              <div class="border-box">
                 <input type="text" v-model="userInfoById.name"/>
               </div>
             </div>
             <div>
               <div>用户名：</div>
-              <div>
+              <div class="border-box">
                 <input type="text" v-model="userInfoById.userName"/>
               </div>
             </div>
             <div>
               <div>邮箱：</div>
-              <div>
+              <div class="border-box">
                 <input type="text" v-model="userInfoById.emailAddress" />
               </div>
             </div>
@@ -146,7 +146,7 @@
               </div>
               <div  v-else>
                   <label for="" @click="handleToStartUse" class="Modifyuse">
-                       <span class="iconfont icon-xuanzhong2" id="startUse"></span>
+                       <span class="iconfont icon-xuanzhong2 user-icon" id="startUse"></span>
                       <span>启动</span>
                   </label>  
               </div>
@@ -233,12 +233,12 @@ export default {
           var iconId = document.getElementById('stopUse')
          if(iconId.classList.value.indexOf('icon-xuanzhong2') === -1){
               iconId.classList.add('icon-xuanzhong2');
-              iconId.classList.remove('icon-selected','user-icon');
+              iconId.classList.remove('icon-selected');
               iconId.nextElementSibling.innerText="启动"
               this.ModifyIsActive=false;
         }else{
               iconId.classList.remove('icon-xuanzhong2');
-              iconId.classList.add('icon-selected','user-icon');
+              iconId.classList.add('icon-selected');
               iconId.nextElementSibling.innerText="停用"
               this.ModifyIsActive=true;
         }
@@ -248,12 +248,12 @@ export default {
         var iconId = document.getElementById('startUse')
         if(iconId.classList.value.indexOf('icon-xuanzhong2') === -1){
               iconId.classList.add('icon-xuanzhong2');
-              iconId.classList.remove('icon-selected','user-icon');
+              iconId.classList.remove('icon-selected');
               iconId.nextElementSibling.innerText="启动"
               this.ModifyIsActive=false;
         }else{
               iconId.classList.remove('icon-xuanzhong2');
-              iconId.classList.add('icon-selected','user-icon');
+              iconId.classList.add('icon-selected');
               iconId.nextElementSibling.innerText="停用"
               this.ModifyIsActive=true;
         }
@@ -331,12 +331,12 @@ export default {
         var iconId = document.getElementById('startUseOne');
         if(iconId.classList.value.indexOf('icon-xuanzhong2') === -1){
               iconId.classList.add('icon-xuanzhong2');
-              iconId.classList.remove('icon-selected','user-icon');
+              iconId.classList.remove('icon-selected');
               iconId.nextElementSibling.innerText="启动"
               this.addIsActive=false;
         }else{
               iconId.classList.remove('icon-xuanzhong2');
-              iconId.classList.add('icon-selected','user-icon');
+              iconId.classList.add('icon-selected');
               iconId.nextElementSibling.innerText="停用"
               this.addIsActive=true;
         }
@@ -438,6 +438,9 @@ export default {
   text-indent: 15px;
   font-size: 14px;
   color: #888888;
+}
+.tdhover:hover{
+  text-decoration: underline;
 }
 .userAdminForm > caption {
   width: 529px;
@@ -555,17 +558,21 @@ export default {
   width: 250px;
   height: 38px;
 }
-
 .adduser-content > div:nth-of-type(2) {
 }
-.adduser-content > div > div > input {
+.adduser-content > div > div>input{
   width: 250px;
-  border: 0;
+  /* border: 0; */
   outline: none;
   height: 38px;
-  background: #f1f3f6;
-  text-indent: 15px;
+  text-indent: 10px;
   font-size: 14px;
+  border: 1px solid #E8EBF0;
+ color:#333333;
+}
+.adduser-content > div > div:nth-of-type(1) > input {
+  background: #f1f3f6;
+  border: 0;
 }
 /* 下拉框 */
 .selected {
@@ -691,6 +698,9 @@ export default {
   font-weight: normal;
   font-size: 12px;
 }
+.tdhover:hover{
+  text-decoration: underline;
+}
 .userAdminForm > table th:nth-of-type(1) {
   width: 110px;
 }
@@ -793,12 +803,17 @@ export default {
 }
 .adduser-content > div > div > input {
   width: 182px;
-  border: 0;
+  border: 1px solid ;
   outline: none;
   height: 28px;
-  background: #f1f3f6;
-  text-indent: 15px;
+ border: 1px solid #E8EBF0;
+ color:#333333;
+  text-indent: 10px;
   font-size: 12px;
+}
+.adduser-content > div > div:nth-of-type(1) > input{
+   background: #f1f3f6;
+   border: 0;
 }
 /* 下拉框 */
 .selected {

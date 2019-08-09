@@ -1,7 +1,7 @@
 <template>
   <div class="summaryCloud">
     <div class="summaryCloud-head">
-      <h2>品牌认证申请跟进总表</h2>
+      <h2>申请品牌认证总表</h2>
     </div>
     <div class="search">
       <div>
@@ -11,11 +11,8 @@
         <DatePicker
           :open="openStart"
           :value="dateStart"
-          confirm
           type="date"
           @on-change="handleChangeDateStart"
-          @on-clear="handleClearDateStart"
-          @on-ok="handleOkDateStart"
           class="datepicker">
           <a
             href="javascript:void(0)"
@@ -32,16 +29,13 @@
       </div>
       <div class="to">
         <span>至</span>
-      </div>
+      </div> 
       <div class="date-end">
         <DatePicker
           :open=" openEnd"
           :value="dateEnd"
-          confirm
           type="date"
           @on-change="handleChangeDateEnd"
-          @on-clear="handleClearDateEnd"
-          @on-ok="handleOkDateEnd"
           class="datepicker"
         >
           <a
@@ -70,23 +64,23 @@
         </div>
         <div class="opations" v-show="selectShow" @click="handleClickOpations($event)">
           <div>
-            <span class="opation">未受理</span>
+            <span class="opation" data-id="1">未受理</span>
           </div>
           <div>
-            <span class="opation">已完成</span>
+            <span class="opation" data-id="2">已受理</span>
           </div>
           <div>
-            <span class="opation">强制关闭</span>
+            <span class="opation" data-id="3">完成</span>
           </div>
           <div>
-            <span class="opation">已受理</span>
+            <span class="opation" data-id="4">关闭</span>
           </div>
         </div>
       </div>
       <div class="search-btn">
-        <button>查询</button>
+        <button @click="handleToSearchForm">查询</button>
       </div>
-      <div class="btns">
+      <div class="btns" v-show="BtnHideaOrShow">
         <button class="btn-replace" @click="handleClickShowMeans">查看认证资料</button>
         <button class="upClos" @click="handleClickClose">强制关闭</button>
       </div>
@@ -99,7 +93,6 @@
         <tr>
           <td>申请日期</td>
           <td>申请单号</td>
-          <td>申请类型</td>
           <td>项目编号</td>
           <td>项目名称</td>
           <td>品牌名称</td>
@@ -108,20 +101,20 @@
           <td>认证人</td>
           <td>状态</td>
         </tr>
-        <tr class="trhover">
-          <td>2019/07/11</td>
-          <td>Kt201909160001</td>
-          <td>开通云支付</td>
-          <td>004001</td>
-          <td>淘淘纺织</td>
-          <td>林生</td>
-          <td>1839774564</td>
-          <td>-</td>
-          <td>张三</td>
-          <td>申请中</td>
+        <tr class="trhover" @click="handlToTrsSelect($event,item,index)" v-for="(item,index) in dataList">
+          <td>{{item.creationTime.substring(0,10)}}</td>
+          <td>{{item.number}}</td>
+          <td>{{item.projectNumber}}</td>
+          <td>{{item.projectName}}</td>
+          <td>{{item.brandName}}</td>
+          <td>{{item.creatorUsername}}</td>
+          <td>{{item.informationSubmittedUsername}}</td>
+          <td>{{item.verifyUsername}}</td>
+          <td>{{item.status==1?'申请中':item.status==2?'带认证':item.status==3?'已认证':'强制关闭'}}</td>
         </tr>
+        
       </table>
-        <Page :total="100" />
+         <Page :total="count" :page-size="MaxResultCount" class="page" :current="page" @on-change="handleToDatalist" v-show="count<=14?false:true"/>
     </div>
     <!-- 请备注你的申请单模态框 -->
             <div class="CertModel" v-show="model">
@@ -133,22 +126,22 @@
                         <div class="data-body">
                                 <div class="applyNumber apply">
                                      <div><span>申请单号:</span></div>
-                                     <div>KT2019132132132</div>
+                                     <div>{{dataBrandCert.number}}</div>
                                 </div>
                                 <div class="applyName apply">
                                       <div><span>品牌名称:</span></div>
-                                      <div>淘淘纺织3号店</div>
+                                      <div>{{dataBrandCert.brandName}}</div>
                                 </div>
                                 <div class="submitName apply">
                                       <div><span>提交人:</span></div>
-                                      <div>建行-麦助理</div>
+                                      <div>{{dataBrandCert.informationSubmittedUsername}}</div>
 
                                 </div>
                                 <div class="shopImg apply">
                                         <div><span>门店照片:</span></div>
                                         <div class="showImg">
                                                 <div  class="getImg">
-                                                    <img src="" alt="">
+                                                    <img :src="dataBrandCert.shopPhoto" alt="">
                                                 </div>
                                         </div>
                                        
@@ -158,35 +151,37 @@
                                 <div class="apply business-license">
                                         <div>营业执照:</div>
                                                 <div>
-                                                    <img src="" alt="">
+                                                    <img :src="dataBrandCert.BusinessLicensePhoto" alt="">
                                                 </div>
                                        
                                 </div>
                         </div>
                 </div>
         </div>
-   
-    <!-- 强制关闭模态框 -->
-    <div class="closeModel" v-if="closeModel">
-            <div class="close-content">
-                <div class="close-head">
-                     <span>提示</span>
-                     <span class="iconfont icon-chuyidong" @click="handelCloseCloseModel"></span>
-                </div>
-                <div class="close-body">
-                    是否强制关闭?
-                </div>
-                <div class="close-footer">
-                    <button>取消</button>
-                    <button>确定</button>
-                </div>
-            </div>
-    </div>
+  
+            <!-- 关闭的原因备注 -->
+       <div class="closeReasonMain" v-if="closeModel">  
+        <div class="closeReason">
+                  <div class="accept-head">
+                                <span>关闭原因</span>
+                                <span class="iconfont icon-chuyidong" @click="handleToCloseReason"></span>
+                  </div>
+                  <div class="closeRemark">
+                            <textarea name="" id="" cols="30" rows="10" v-model="closeRemark"  :style="tipText" @focus="handleTofocus"></textarea>
+                  </div>
+                  <div class="closeRemarkBtn"> 
+                         <button class="closeBtn" @click="handleToCloseReason">取消</button>
+                         <button class="sureBtn" @click="handleTocloseRemark">确定</button>
+                   </div>
+
+          </div>
+      </div>
   </div>
 </template>
 <script>
-export default {
-  name:"generalApplicationBrandCert",
+import Vuex from "vuex";
+export default { 
+  name:"generalApplicationBrandCert", 
   data() {
     return {
       openStart: false,
@@ -195,36 +190,57 @@ export default {
       dateEnd: "",
       selectShow: false,
       selected: "未受理",
+      selectedId:1,
+      MaxResultCount:14,
+      page:1,
       model:false,
       closeModel:false,
+      //提示文字颜色
+      tipText:"color:#c5c8ce;",
+      //关闭原因
+      closeRemark:"请输入原因...",
+      //传递的id
+      id:"",
+      //按钮显示与隐藏
+      BtnHideaOrShow:false
     };
   },
+  computed: {
+      ...Vuex.mapState({
+          //总行数
+          count:state=>state.generalApplicationBrandCert.count,
+          //渲染的数据行数
+          dataList:state=>state.generalApplicationBrandCert.dataList,
+          //查看的认证资料
+          dataBrandCert:state=>state.generalApplicationBrandCert.dataBrandCert,
+          
+      }) 
+  },
   methods: {
+    ...Vuex.mapActions({
+          //查询品牌认证申请跟进总表
+          getApplicationForms:"generalApplicationBrandCert/getApplicationForms",
+          //查看认证资料
+          getApplicationFormByID:"generalApplicationBrandCert/getApplicationFormByID",
+          //强制关闭申请单
+          closeApplicationForm:"generalApplicationBrandCert/closeApplicationForm",
+    }),
     //日期生成器
     handleClickDateStart() {
       this.openStart = !this.openStart;
     },
     handleChangeDateStart(date) {
-      var data = date.replace(/-/g, "/");
-      this.dateStart = data;
+      // var data = date.replace(/-/g, "/");
+      this.dateStart = date;
+       this.openStart = false;
     },
-    handleClearDateStart() {
-      this.openStart = false;
-    },
-    handleOkDateStart() {
-      this.openStart = false;
-    },
+   
     handleClickDateEnd() {
       this.openEnd = !this.openEnd;
     },
     handleChangeDateEnd(date) {
-      var data = date.replace(/-/g, "/");
-      this.dateEnd = data;
-    },
-    handleClearDateEnd() {
-      this.openEnd = false;
-    },
-    handleOkDateEnd() {
+      // var data = date.replace(/-/g, "/");
+      this.dateEnd = date;
       this.openEnd = false;
     },
     //下拉选择器
@@ -235,25 +251,100 @@ export default {
     handleClickOpations($event) {
       if ($event.target.className === "opation") {
         this.selected = $event.target.innerText;
+        this.selectedId = parseInt($event.target.getAttribute('data-id'));
         this.selectShow = false;
       }
     },
+    //查询对应的信息
+    handleToSearchForm(){
+        var param = JSON.stringify({
+          "MaxResultCount":this.MaxResultCount,
+          "SkipCount":0, 
+          "Sorting":"",
+          "StartDate":this.dateStart,
+          "EndDate":this.dateEnd,
+          "Status":this.selectedId
+      })
+      this.BtnHideaOrShow=false;
+      this.getApplicationForms(param);
+    },
+
+    //选中表格中对应的数据
+   handlToTrsSelect($event,param,index){
+          var trs = document.getElementsByClassName('trhover');
+          var len =trs.length;
+          for(var i=0;i<len;i++){
+                    trs[i].style.background="";
+            }
+           trs[index].style.background="rgba(237,238,239,1)";
+            this.id =param.id;
+            this.BtnHideaOrShow=true;
+
+  },
     // 关闭模态框
     handleCloseModel(){
         this.model = false;
+        this.closeModel=false;
     },
     //查看认证资料
     handleClickShowMeans(){
+        this.getApplicationFormByID(this.id)
         this.model=true;
+        this.closeModel=false;
     },
-    //强制关闭
+    //强制关闭按钮点击
     handleClickClose(){
       this.closeModel =true;
+      this.model=false;
     },
     //关闭强制关闭的模态框
     handelCloseCloseModel(){
       this.closeModel=false;
-    }
+      this.model = false;
+    },
+    //取消强制关闭按钮模态框
+    handleToCloseReason(){
+        this.model=false;
+        this.closeModel=false;
+        this.closeRemark='请输入原因...';
+        this.tipText="color:#c5c8ce;";
+    },
+    //文本域得焦时
+    handleTofocus(){
+        if(this.closeRemark=='请输入原因...'){
+              this.closeRemark="";
+          }
+        this.tipText ="color:#515A6E;"
+    },
+    //分页
+    handleToDatalist(page){
+          this.page = page;
+          var param = JSON.stringify({
+            "MaxResultCount":this.MaxResultCount,
+            "SkipCount":(this.page-1)*this.MaxResultCount,
+            "Sorting":"",
+            "StartDate":this.dateStart,
+            "EndDate":this.dateEnd,
+            "Status":this.selectedId
+        })
+        this.getApplicationForms(param);
+    },
+    //确定向后台发送关闭的备注
+    handleTocloseRemark(){
+      if(this.closeRemark!=='请输入原因...'){
+            var param = {
+                "id":this.id,
+                "CloseRemark":this.closeRemark
+            } 
+            //强制关闭
+            this.closeApplicationForm(param);
+            this.closeRemark='请输入原因...';
+            this.tipText="color:#c5c8ce;";
+            this.model=false;
+            this.closeModel=false;
+            
+      }
+  },
   }
 };
 </script>
@@ -261,11 +352,13 @@ export default {
 @media screen and (min-width:1400px) {
 
 .summaryCloud {
-   width:1400px;
-   margin: 0 auto;
+   width: 1400px;
+  margin: 0 auto;
   height: max-content;
   box-sizing: border-box;
   padding-right: 63px;
+  position: relative;
+  height: 100%;
 }
 .summaryCloud-head {
   margin-top: 81px;
@@ -276,7 +369,7 @@ export default {
   font-weight: 500;
 }
 .search {
-  margin-left: 104px;
+  margin-left: 67px;
   margin-top: 31px;
   height: 41px;
 }
@@ -352,6 +445,7 @@ export default {
 }
 .selected {
   height: 28px;
+  width:110px;
   background: rgba(241, 243, 246, 1);
   border-radius: 4px;
 }
@@ -360,10 +454,12 @@ export default {
 }
 .selected > span:nth-of-type(1) {
   margin-left: 11px;
+  float: left;
   margin-right: 10px;
 }
 .selected > span:nth-of-type(2) {
-  margin-right: 14px;
+  margin-right: 10px;
+  float: right;
 }
 .search-btn {
   width: 90px;
@@ -383,23 +479,33 @@ export default {
   height: 36px;
   outline: 0;
 }
+.search-btn > button:active{
+ background: #6da4ff;
+}
 .search .btns {
   float: right;
   margin-top: -5px;
 }
 .btns > button {
   font-size: 14px;
-  background: #5897ff;
-  color: #fff;
   border-radius: 4px;
-  outline: none;
-  border: 0;
   padding-left: 14px;
   padding-right: 15px;
   line-height: 36px;
+   outline: none;
+}
+.upClos{
+   background: #5897ff;
+   color: #fff;
+    border: 0;
+   
 }
 .btn-replace{
   margin-right:20px;
+  border: 1px solid #5897ff;
+  color: #5897ff;
+  background: #fff;
+ 
 }
 .appCloudeForm {
   margin-top: 49px;
@@ -429,6 +535,7 @@ export default {
   background: rgba(241, 243, 246, 1);
   color: #888888;
 }
+
 
 /* .accept-tabel>table > tr > td:nth-of-type(1){
     width: 130px;
@@ -467,10 +574,20 @@ export default {
 .page > .ivu-page-item a {
   
 }
+.ivu-page {
+    text-align: center;
+    
+  }
+.page{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom:200px;
+}
 
 /* 模态框的显示隐藏 */
 .CertModel {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -480,8 +597,8 @@ export default {
 }
 .data{
     width: 700px;
-    /* height: 630px; */
-    position: absolute;
+    height: 630px;
+     position: fixed;
     left:50%;
     top:50%;
     margin-top:-315px;
@@ -610,84 +727,96 @@ export default {
 .imgdelTwo:hover{
     cursor: pointer;
 }
-
-/* 强制关闭模态框 */
-.closeModel{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height:100%;
-    background:rgba(0,0,0,0.3);
+/* 关闭的原因备注 */
+.closeReasonMain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
-.close-content{
-    position: absolute;
-    top: 50%;
-    left:50%;
-    margin-left:-210px;
-    margin-top:-130px;
-    width:420px;
-    /* height:260px; */
-    background:#fff;
+.closeReason{
+   width:460px;
+   height: 320px;
+   position: fixed;
+   top: 50%;
+   left: 50%;
+   margin-left:-230px;
+   margin-top:-160px;
+   background:#fff;
+   z-index:11;
 }
-.close-head{
-    margin-top: 29px;
-    overflow: hidden;
+.closeReason >.accept-head{
+  margin: 20px 0;
+  overflow: hidden;
 }
-.close-head > span:nth-of-type(1){
+.closeReason >.accept-head>span:nth-of-type(1){
   float: left;
-  margin-left: 187px;
-  font-size: 18px;
-  font-family: PingFangSC-Regular;
-  font-weight: 400;
-  color: rgba(51, 51, 51, 1);
+  font-size: 20px;
+  margin-left:184px;
+  line-height: 1;
+  line-height: 32px;
 }
- .close-head > span:nth-of-type(2)
- {
-  float: right;
-  font-size: 18px;
-  margin-right: 20px;
-  color: #d2d2d2;
+.closeReason >.accept-head>span:nth-of-type(2){
+  float:right;
+  margin-right: 34px;
+  font-size: 22px;
+  color: #C7C6C6;
+
 }
-.close-body{
-    margin-top: 54px;
-    margin-bottom: 68px;
-    text-align: center;
-    font-size: 14px;
+.closeRemark{
+  width: 380px;
+  height: 140px;
+  border: 1px solid #E8EBF0;
+  margin: 0 auto;
+  padding: 6px;
 }
-.close-footer{
-    margin-left:40px;
-    margin-bottom:23px;
-}
-.close-footer>button:nth-of-type(1){
-    width:160px;
-    height:48px;
-    font-size: 14px;
+.closeRemark >textarea{
+    width:100%;
+    height:100%;
+    resize: none;
     outline: none;
-    border:1px solid rgba(88,151,255,1);
-    background:#fff;
-    border-radius: 4px;
-    color: #5897FF;
-    margin-right:20px; 
+    border: 0;
 }
-.close-footer>button:nth-of-type(2){
-    width:160px;
-    height:48px;
-    background:#5897FF;
-    color:#fff;
-    font-size: 14px;
-    outline: none;
-    border:1px solid #5897FF;
+.closeRemarkBtn{
+  padding:0 50px;
+  margin-top:24px; 
 }
+.closeRemarkBtn .closeBtn{
+   width:155px;
+   height: 40px;
+   border:1px solid #5897FF;
+   color: #5897FF;
+   background: #fff;
+   outline: none;
+   border-radius: 4px;
+   margin-right:20px;
+}
+.closeRemarkBtn .sureBtn{
+   width:155px;
+   height: 40px;
+   border:0;
+   color: #fff;
+   background: #5897FF;
+   outline: none;
+   border-radius: 4px;
+   margin-left: 20px;
+}
+
 }
 /* 1024为标准 */
 @media screen and (max-width:1400px) {
   .summaryCloud {
-   width:1024px;
-   margin: 0 auto;
+  width: 1024px;
+  margin: 0 auto;
   height: max-content;
   box-sizing: border-box;
-  padding-right: 46px;
+  padding-right: 16px;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
 }
 .summaryCloud-head {
   margin-top: 59px;
@@ -698,7 +827,7 @@ export default {
   font-weight: 500;
 }
 .search {
-  margin-left: 76px;
+  margin-left: 49px;
   margin-top: 22px;
   height: 30px;
 }
@@ -775,6 +904,7 @@ export default {
 }
 .selected {
   height: 20px;
+  width: 90px;
   background: rgba(241, 243, 246, 1);
   border-radius: 4px;
 }
@@ -784,9 +914,11 @@ export default {
 .selected > span:nth-of-type(1) {
   margin-left: 8px;
   margin-right: 7px;
+  float: left;
 }
 .selected > span:nth-of-type(2) {
   margin-right: 10px;
+  float: right;
 }
 .search-btn {
   width: 66px;
@@ -806,23 +938,32 @@ export default {
   height: 26px;
   outline: 0;
 }
+.search-btn > button:active{
+ background: #6da4ff;
+}
 .search .btns {
   float: right;
   margin-top: -4px;
 }
 .btns > button {
   font-size: 12px;
-  background: #5897ff;
-  color: #fff;
   border-radius: 4px;
   outline: none;
-  border: 0;
+ 
   padding-left: 10px;
   padding-right: 11px;
   line-height: 26px;
 }
+.upClos{
+ background: #5897ff;
+  color: #fff;
+   border: 0;
+}
 .btn-replace{
   margin-right:15px;
+  border: 1px solid #5897ff;
+  color: #5897ff;
+  background: #fff;
 }
 .appCloudeForm {
   margin-top: 36px;
@@ -890,10 +1031,19 @@ export default {
 .page > .ivu-page-item a {
   
 }
-
+.ivu-page {
+    text-align: center;
+    
+  }
+.page{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom:100px;
+}
 /* 模态框的显示隐藏 */
 .CertModel {
-  position: absolute;
+  position:fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -904,9 +1054,10 @@ export default {
 .data{
     width: 511px;
     /* height: 630px; */
-    position: absolute;
+    position: fixed;
     left:50%;
     top:50%;
+    z-index: 11;
     margin-top:-230px;
     margin-left: -255px;
     background: #fff;
@@ -1035,72 +1186,84 @@ export default {
 }
 
 /* 强制关闭模态框 */
-.closeModel{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height:100%;
-    background:rgba(0,0,0,0.3);
+/* 关闭的原因备注 */
+.closeReasonMain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
-.close-content{
-    position: absolute;
-    top: 50%;
-    left:50%;
-    margin-left:-153px;
-    margin-top:-95px;
-    width:306px;
-    /* height:260px; */
-    background:#fff;
+.closeReason{
+   width:336px;
+   height: 234px;
+   position: fixed;
+   top: 50%;
+   left: 50%;
+   margin-left:-168px;
+   margin-top:-117px;
+   background:#fff;
+   z-index: 11;
 }
-.close-head{
-    margin-top: 21px;
-    overflow: hidden;
+.closeReason >.accept-head{
+  margin: 15px 0;
+  overflow: hidden;
 }
-.close-head > span:nth-of-type(1){
+.closeReason >.accept-head>span:nth-of-type(1){
   float: left;
-  margin-left: 136px;
   font-size: 16px;
-  font-family: PingFangSC-Regular;
-  font-weight: 400;
-  color: rgba(51, 51, 51, 1);
+  margin-left:134px;
+  line-height: 1;
+  line-height: 23px;
 }
- .close-head > span:nth-of-type(2)
- {
-  float: right;
+.closeReason >.accept-head>span:nth-of-type(2){
+  float:right;
+  margin-right: 25px;
   font-size: 16px;
-  margin-right: 15px;
-  color: #d2d2d2;
+  color: #C7C6C6;
+
 }
-.close-body{
-    margin-top: 39px;
-    margin-bottom: 50px;
-    text-align: center;
-    font-size: 14px;
+.closeRemark{
+  width: 277px;
+  height: 102px;
+  border: 1px solid #E8EBF0;
+  margin: 0 auto;
+  padding: 4px;
 }
-.close-footer{
-    margin-left:29px;
-    margin-bottom:17px;
-}
-.close-footer>button:nth-of-type(1){
-    width:117px;
-    height:35px;
-    font-size: 12px;
+.closeRemark >textarea{
+    width:100%;
+    height:100%;
+    resize: none;
     outline: none;
-    border:1px solid rgba(88,151,255,1);
-    background:#fff;
-    border-radius: 4px;
-    color: #5897FF;
-    margin-right:15px; 
+    border: 0;
 }
-.close-footer>button:nth-of-type(2){
-    width:117px;
-    height:35px;
-    background:#5897FF;
-    color:#fff;
-    font-size: 12px;
-    outline: none;
-    border:1px solid #5897FF;
+.closeRemarkBtn{
+  padding:0 36px;
+  margin-top:17px; 
 }
+.closeRemarkBtn .closeBtn{
+   width:113px;
+   height: 29px;
+   border:1px solid #5897FF;
+   color: #5897FF;
+   background: #fff;
+   outline: none;
+   border-radius: 4px;
+   margin-right:15px;
+}
+.closeRemarkBtn .sureBtn{
+   width:113px;
+   height: 29px;
+   border:0;
+   color: #fff;
+   background: #5897FF;
+   outline: none;
+   border-radius: 4px;
+   margin-left: 15px;
+}
+
+
 }
 </style>

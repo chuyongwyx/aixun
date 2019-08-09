@@ -1,6 +1,26 @@
 export default{
         permissionUser:[],
         permissAllow:{
+                //云支付申请跟进总表
+                //查看
+                "CloudPayInquiry.CloudApplicationFormSummaryStatement.Inquiry":false,        
+                //关闭
+                "CloudPayInquiry.CloudApplicationFormSummaryStatement.Close":false,
+                //修改备注
+                "CloudPayInquiry.CloudApplicationFormSummaryStatement.ModifyRemark":false,
+                //品牌认证跟进总表
+                //查看
+                "CloudPayInquiry.BrandCertificationApplicationFormSummaryStatement.Inquiry":false,
+                //关闭
+                "CloudPayInquiry.BrandCertificationApplicationFormSummaryStatement.Close":false,
+                //品牌总表
+                //查看
+                "CloudPayInquiry.ProjectBrandSummaryStatement.Inquiry":false,
+                //云支付收款账号申请跟进总表
+                //查看
+                "CloudPayInquiry.ReceivableAccountApplicationFormSummaryStatement.Inquiry":false,
+                //关闭
+                "CloudPayInquiry.ReceivableAccountApplicationFormSummaryStatement.Close":false,
                 //新建申请单
                 "CloudPay.CloudApplicationForm.Create" :false,
                 //受理&完成申请单

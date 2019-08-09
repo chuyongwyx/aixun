@@ -5,58 +5,92 @@
                 </div>
                 <div class="search">
                         <span>项目编号:</span>
-                        <input type="text">
-                        <button>查询</button>
+                        <input type="text" v-model="ProjectNumber">
+                        <button @click="handleTosearch">查询</button>
                 </div>
                 <div class="itemCount-form">
-                        <table cellpadding="0" cellspacing="0">
-                        <tr>
-                                <td>项目编号</td>
-                                <td>项目名称</td>
-                                <td>品牌名称</td>
-                                <td>状态</td>
-                                <td>运单据</td>
-                                <td>云支付</td>
-                        </tr>
-                        <tbody>
-                        <tr>
-                                <td rowspan="2">0046665</td>
-                                <td rowspan="2">淘淘纺织</td>
-                                <td>0</td>
-                                <td>淘淘纺织</td>
-                                <td>运单据</td>
-                                <td>未启用</td>
-                        </tr>
-                        <tr>
-                                <td>0</td>
-                                <td>淘淘纺织</td>
-                                <td>运单据</td>
-                                <td>未启用</td>
-                        </tr>
-                        </tbody>
-                        <tbody>
-                        <tr>
-                                <td rowspan="2">0046665</td>
-                                <td rowspan="2">淘淘纺织</td>
-                                <td>0</td>
-                                <td>淘淘纺织</td>
-                                <td>运单据</td>
-                                <td>未启用</td>
-                        </tr>
-                          <tr>
-                                <td>0</td>
-                                <td>淘淘纺织</td>
-                                <td>运单据</td>
-                                <td>未启用</td>
-                        </tr>
-                        </tbody>
-                        </table>
+                                <ul class="itemCountNav">
+                                <li>项目编号</li>
+                                <li>项目名称</li>
+                                <li>品牌名称</li>
+                                <li>状态</li>
+                                <li>云单据</li>
+                                <li>云支付</li>
+                                </ul>
+
+                        <div class=" wrapper itemCountTable" ref="main" style="position:relative;">
+                                <div class="content itemCountTableCont">
+                                       <table cellpadding="0" cellspacing="0">
+                                        <tr v-for="(item,index) in  DataList">
+                                                <td>{{item.projectNumber}}</td>
+                                                <td>{{item.projectName}}</td>
+                                                <td>{{item.name}}</td>
+                                                <td>{{item.brandStatus==2?'已开通':'未开通'}}</td>
+                                                <td>{{item.openedCloudOrder?'已开通':'未启用'}}</td>
+                                                <td>{{item.openedCloudPay?'已开通':'未启用'}}</td>
+                                        </tr>
+
+                                        <!-- <tr>
+                                                <td rowspan="2">0046665</td>
+                                                <td rowspan="2">淘淘纺织</td>
+                                                <td>0</td>
+                                                <td>淘淘纺织</td>
+                                                <td>运单据</td>
+                                                <td>未启用</td>
+                                        </tr>
+                                        <tr>
+                                                <td>0</td>
+                                                <td>淘淘纺织</td>
+                                                <td>运单据</td>
+                                                <td>未启用</td>
+                                        </tr> -->
+                                
+                                        </table>                
+                                </div>
+                        </div>
+                       
                 </div>
      </div>
 </template>
 <script>
+import Vuex  from "vuex";
+import  Bscroll  from 'better-scroll';
 export default {
-    name:"summaryBrands"
+    name:"summaryBrands",       
+    data(){ 
+        return{
+                "ProjectNumber":""
+        }
+    },
+    mounted(){
+             this.$nextTick(() =>{
+		this.scroll = new Bscroll(this.$refs.main,{
+			click: true,
+			scrollY:true,
+			scrollbar:true,
+			mouseWheel:true
+                })		
+            })
+   },
+    computed:{
+            ...Vuex.mapState({
+                    DataList: state=>state.summaryBrands.DataList
+            })
+    },
+    methods:{
+            ...Vuex.mapActions({
+                    //项目品牌总表查询
+                    getProjectBrands:"summaryBrands/getProjectBrands",
+            }),
+            handleTosearch(){
+                    var param =JSON.stringify({
+                            "ProjectNumber":this.ProjectNumber
+                    })
+                    console.log(param);
+                    this.getProjectBrands(param);
+
+            }
+    }
 }
 </script>
 <style scoped>
@@ -102,54 +136,107 @@ export default {
         font-size: 14px;
         margin-left: 30px;
         border-radius: 4px;
+        outline: none;
+}
+
+.search > button:active{
+        background:#6da4ff;
 }
 .itemCount-form{
     margin-left: 90px;
 }
-
-.itemCount-form>table{
+.itemCountTable{
+   height:385px;
+   width: 746px;
+   overflow: hidden;
+}
+.itemCountTableCont{
+height: max-content;
+}
+.itemCountTableCont>table{
   width:746px;
   border-top: 1px solid #E7E7E7;
   border-left:1px solid #E7E7E7;
+  table-layout: fixed;
   
 }
-.itemCount-form>table>tbody>tr{
-
-}
-.itemCount-form>table>tbody>tr>td{
-   border-bottom:1px solid #E7E7E7;
-  border-right: 1px solid #E7E7E7;
+.itemCountNav{  
+  width:745px;
   line-height: 42px;
-  text-align: center;
-  font-size: 14px;
-  color: #888888;
-}
-.itemCount-form>table>tr:nth-of-type(1)>td{
-  line-height: 30px;
   text-align: center;
   font-size: 14px;
   background:rgba(241,243,246,1);
   height: 42px;
   color: #888888;
+  border-top: 1px solid #E7E7E7;
+  border-left:1px solid #E7E7E7;
+  border-right: 1px solid #E7E7E7;
+overflow: hidden;
 }
-/* .itemCount-form>table>tr>td:nth-of-type(1){
-  width:44px;
+.itemCountNav>li{
+   float: left;
+   border-right:1px solid #E7E7E7;
+   height: 42px; 
+}
+.itemCountNav>li:nth-of-type(1){
+    width:104px;
+        
+}
+.itemCountNav>li:nth-of-type(2){
+    width: 145px;    
+
+}
+.itemCountNav>li:nth-of-type(3){
+   width: 186px;
+}
+.itemCountNav>li:nth-of-type(4){
+   width: 104px;
+}
+.itemCountNav>li:nth-of-type(5){
+   width: 103px;
+}
+.itemCountNav>li:nth-of-type(6){
+   width: 101px;
+  border-right: 0;
+}
+.itemCountTableCont>table>tr{
+
+}
+.itemCountTableCont>table>tr>td{
+   border-bottom:1px solid #E7E7E7;
+  border-right: 1px solid #E7E7E7;
+  line-height: 30px;
+  text-align: center;
+  font-size: 14px;
+  color: #888888;
+}
+
+.itemCountTableCont>table>tr>td:nth-of-type(1){
+  width:100px;
   height: 42px;
 }
-.itemCount-form>table>tr>td:nth-of-type(2){
-  width:200px;
+.itemCountTableCont>table>tr>td:nth-of-type(2){
+  width:140px;
  height: 42px;
   
 }
-.cloudDoc-form>table>tr>td:nth-of-type(3){
+.itemCountTableCont>table>tr>td:nth-of-type(3){
   width: 180px;
  height: 42px;
  
 }
-.itemCount-form>table>tr>td:nth-of-type(4){
-    width:180px;
+.itemCountTableCont>table>tr>td:nth-of-type(4){
+    width:100px;
     height: 42px;
-} */
+}
+.itemCountTableCont>table>tr>td:nth-of-type(5){
+    width:100px;
+    height: 42px;
+}
+.itemCountTableCont>table>tr>td:nth-of-type(6){
+    width:100px;
+    height: 42px;
+}
 }
 
 @media screen and (max-width:1400px){
@@ -198,48 +285,96 @@ export default {
     margin-left: 66px;
 }
 
-.itemCount-form>table{
-  width:746px;
+.itemCountTable{
+   height:281px;
+   width: 544px;
+   overflow: hidden;
+}
+.itemCountTableCont{
+height: max-content;
+}
+.itemCountTableCont>table{
+  width:544px;
   border-top: 1px solid #E7E7E7;
   border-left:1px solid #E7E7E7;
+  table-layout: fixed;
   
 }
-.itemCount-form>table>tbody>tr{
+.itemCountNav{  
+  width:544px;
+  line-height: 30px;
+  text-align: center;
+  font-size: 12px;
+  background:rgba(241,243,246,1);
+  height: 30px;
+  color: #888888;
+  border-top: 1px solid #E7E7E7;
+  border-left:1px solid #E7E7E7;
+  border-right: 1px solid #E7E7E7;
+overflow: hidden;
+}
+.itemCountNav>li{
+   float: left;
+   border-right:1px solid #E7E7E7;
+   height: 30px; 
+}
+.itemCountNav>li:nth-of-type(1){
+    width:76px;
+        
+}
+.itemCountNav>li:nth-of-type(2){
+    width: 106px;    
 
 }
-.itemCount-form>table>tbody>tr>td{
+.itemCountNav>li:nth-of-type(3){
+   width: 135px;
+}
+.itemCountNav>li:nth-of-type(4){
+   width: 76px;
+}
+.itemCountNav>li:nth-of-type(5){
+   width: 75px;
+}
+.itemCountNav>li:nth-of-type(6){
+   width: 73px;
+  border-right: 0;
+}
+.itemCountTableCont>table>tr{
+
+}
+.itemCountTableCont>table>tr>td{
    border-bottom:1px solid #E7E7E7;
   border-right: 1px solid #E7E7E7;
-  line-height: 42px;
-  text-align: center;
-  font-size: 14px;
-  color: #888888;
-}
-.itemCount-form>table>tr:nth-of-type(1)>td{
   line-height: 30px;
   text-align: center;
   font-size: 14px;
-  background:rgba(241,243,246,1);
-  height: 42px;
   color: #888888;
+  height: 30px;
 }
-/* .itemCount-form>table>tr>td:nth-of-type(1){
-  width:44px;
-  height: 42px;
-}
-.itemCount-form>table>tr>td:nth-of-type(2){
-  width:200px;
- height: 42px;
-  
-}
-.cloudDoc-form>table>tr>td:nth-of-type(3){
-  width: 180px;
- height: 42px;
+
+.itemCountTableCont>table>tr>td:nth-of-type(1){
+  width:74px;
  
 }
-.itemCount-form>table>tr>td:nth-of-type(4){
-    width:180px;
-    height: 42px;
-} */      
+.itemCountTableCont>table>tr>td:nth-of-type(2){
+  width:102px;
+ 
+  
+}
+.itemCountTableCont>table>tr>td:nth-of-type(3){
+  width: 131px;
+ 
+ 
+}
+.itemCountTableCont>table>tr>td:nth-of-type(4){
+    width:73px;
+}
+.itemCountTableCont>table>tr>td:nth-of-type(5){
+    width:73px;
+}
+.itemCountTableCont>table>tr>td:nth-of-type(6){
+    width:73px;
+    height:30px;
+}
 }
 </style>

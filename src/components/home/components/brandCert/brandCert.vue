@@ -2,7 +2,7 @@
      <div class="brandCert">
             <div class="CertInfo-tit">
                 <h2>品牌认证</h2>
-                <div class="cert-btn" @click="handleToBrandCertModel">去认证</div>
+                <div class="cert-btn" @click="handleToBrandCertModel" v-show="finishId==''?false:true">去认证</div>
             </div>
             <div class="CertInfo-content">
                     <table cellpadding="0" cellspacing="0">
@@ -114,6 +114,7 @@ export default {
                 uploadTwo:true,
                 finishId:"",
                 addbusinessLicensePhoto:false,
+                // ToBrandCert:false
             }
         },
         watch: {
@@ -145,6 +146,7 @@ export default {
                 }),
                 //选择需要认证的数据    
                 handleToCert($event,param){
+                    this.ToBrandCert=true;
                     var  trs = document.getElementsByClassName('trhover');
                     var len = trs.length;
                     for(var i=0;i<len;i++){
@@ -157,7 +159,7 @@ export default {
                     if(this.finishId !==""){
                             this.model=true;
                             //根据id来获取资料
-                            this.getInformationSubmittedApplicationFormByID(this.finishId);
+                            this.getInformationSubmittedApplicationFormByID(this.finishId); 
                             
                     }
                 },
@@ -198,8 +200,22 @@ export default {
                         _this.imgdataTwo=newUrl;
                         _this.addbusinessLicensePhoto=true;
                         _this.uploadTwo=false;
-                        
+
+                    var imgshopPhoto =document.getElementById('imgshopPhoto');
+                    _this.imgdata =imgshopPhoto.src;
+                     var param =JSON.stringify({
+                        "id":_this.finishId,
+                        "ShopPhoto":_this.imgdata,
+                        "ShopPhotoMD5":md5(_this.imgdata),
+                        "BusinessLicensePhotoMD5":md5(_this.imgdataTwo),
+                        "BusinessLicensePhoto":_this.imgdataTwo
+                    })
+                    _this.replenishApplicationFormInformation(param);  
                     }
+
+                
+                  
+
         },
         
          //删除错误上传
@@ -209,7 +225,7 @@ export default {
                this.imgdataTwo="";
                this.addbusinessLicensePhoto=false;
                this.uploadTwo=true;
-               
+   
          },
          
          //关闭模态框
@@ -218,29 +234,23 @@ export default {
              this.imgdata="";
              this.imgdataTwo="";
          },
-         //补充上传完
+         //认证
          handleTobrandCert(){
-                var addbusinessLicensePhoto = document.getElementsByClassName('imgdataTwo')[0];
-                if(addbusinessLicensePhoto!=='undefined'){
-                    this.imgdataTwo=addbusinessLicensePhoto.src
-                    var imgshopPhoto =document.getElementById('imgshopPhoto');
-                    this.imgdata =imgshopPhoto.src;
-                     var param =JSON.stringify({
-                        "id":this.finishId,
-                        "ShopPhoto":this.imgdata,
-                        "ShopPhotoMD5":md5(this.imgdata),
-                        "BusinessLicensePhotoMD5":md5(this.imgdataTwo),
-                        "BusinessLicensePhoto":this.imgdataTwo
-                    })
-                    this.replenishApplicationFormInformation(param);
-                }
             var paramTwo ={
                 "id":this.finishId
             }
+            if(this.finishId!==""){
             this.verifyApplicationFormInformation(paramTwo);
+                this.finishId=""
                 this.model= false;
                 this.imgdata="";
                 this.imgdataTwo="";
+                 var  trs = document.getElementsByClassName('trhover');
+                var len = trs.length;
+                for(var i=0;i<len;i++){
+                        trs[i].style.background = '';
+                }
+            }
          }
         },
 }
@@ -268,6 +278,7 @@ export default {
 .CertInfo-tit {
   margin-top: 80px;
   overflow: hidden;
+  height: 36px;
 }
 .CertInfo-tit > h2 {
   font-size: 24px;
@@ -548,6 +559,7 @@ export default {
 }
 .CertInfo-tit {
   margin-top: 58px;
+  height: 26px;
   overflow: hidden;
 }
 .CertInfo-tit > h2 {

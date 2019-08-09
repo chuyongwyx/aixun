@@ -20,10 +20,10 @@
                   </table>
             </div>
             <div class="footer">
-                    <button @click="handleToFinished">开通</button>
+                    <button @click="handleToFinished" :class="{'Notselect':dataId.length==0?true:false}"> <span v-show="openLoading==false?true:false">开通</span><span v-show="openLoading==false?false:true">开通中...</span>  </button>
             </div>
      </div>
-</template>
+</template> 
 
 <script>
 import Vuex  from 'vuex'
@@ -31,12 +31,34 @@ export default {
     name:"openCloudDoc",
     data() {
       return {
-           dataId:""
+           dataId:[],
+          //  没选中
+          openLoading:false,
+          //函数防抖
+          timer:null,
+          
       }
+    },
+    watch: {
+        success(newValue,oldValue){
+            // this.Notselect="background:rgba(88, 151, 255, 1);color:#fff";
+             //清空其他的复选框颜色
+             if(newValue==true){
+              this.openLoading=false;
+              var trs =document.getElementsByClassName('trhover');
+              var len =trs.length;
+              for(var i=0;i<len;i++){
+                trs[i].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_xuanzhong','icon1');
+                trs[i].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_weixuanzhong','icon');
+              }
+              this.dataId=[];
+            }
+        }
     },
     computed:{
         ...Vuex.mapState({
-            "GetVerifiedBrands":state=>state.openCloudDoc.GetVerifiedBrands
+            "GetVerifiedBrands":state=>state.openCloudDoc.GetVerifiedBrands,
+            "success":state=>state.openCloudDoc.success
         })
     },
     methods: {
@@ -48,37 +70,42 @@ export default {
           }),
           //选中需要开通的云单据 
           handleSelectedOpenCloudDoc($event,param){
-            //清空其他的复选框颜色
-            
-            var trs =document.getElementsByClassName('trhover');
-            var len =trs.length;
-            for(var i=0;i<len;i++){
-              trs[i].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_weixuanzhong');
-              trs[i].firstElementChild.firstElementChild.classList.add('icon');   
-                   trs[i].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_xuanzhong');
-                   trs[i].firstElementChild.firstElementChild.classList.remove('icon1');
-
-            }
-            if($event.target.className.indexOf('icon-fuxuankuang_weixuanzhong') !==-1){
+           
+           
+             if($event.target.className.indexOf('icon-fuxuankuang_weixuanzhong') !==-1){
                 $event.target.classList.remove('icon-fuxuankuang_weixuanzhong');
                 $event.target.classList.remove('icon');
                 $event.target.classList.add('icon-fuxuankuang_xuanzhong');
                 $event.target.classList.add('icon1');
-                 this.dataId =param.id;
+                 this.dataId.push(param.id);
             }else{
+                $event.target.classList.remove('icon-fuxuankuang_xuanzhong'); 
+                $event.target.classList.remove('icon1');
                 $event.target.classList.add('icon-fuxuankuang_weixuanzhong');
                 $event.target.classList.add('icon');
-                $event.target.classList.remove('icon-fuxuankuang_xuanzhong');
-                $event.target.classList.remove('icon1');
-                 this.dataId =""
-            }
+                 this.dataId.map((item,index)=>{
+                    if(item==param.id){
+                      this.dataId.splice(index,1);
+                    }
+                 })
+            }   
         },
         //开通云单据
         handleToFinished(){
-            var param = {
-                "id":this.dataId
-            }
-            this.openCloudOrder(param);
+          var _this = this;
+          if(this.timer){
+            clearTimeout(this.timer);
+          }
+         if(this.dataId.length!==0){
+            this.openLoading=true;
+             this.timer=setTimeout(()=>{
+                var param = {
+                 "IDs":_this.dataId
+               }
+             _this.openCloudOrder(param);
+           },300)
+            
+         }
         }
     },
     created(){
@@ -112,7 +139,7 @@ export default {
   table-layout:fixed;
   border-top: 1px solid #E7E7E7;
   border-left:1px solid #E7E7E7;
-  
+   
 }
 .cloudDoc-form>table>tr{
 
@@ -174,6 +201,14 @@ export default {
     outline: none;
     border:0;
     border-radius: 4px;
+}
+.footer .Notselect{
+    background:rgba(243,244,245,1);
+    color:#B7B8BA;
+  }
+.footer .Notselect:active{
+    background:rgba(243,244,245,1);
+    color:#B7B8BA;
 }
 .footer>button:hover{
   cursor: pointer;
@@ -276,6 +311,10 @@ export default {
 .footer>button:active{
   background: #6da4ff;
 }
+.footer .Notselect{
+    background:rgba(243,244,245,1);
+    color:#B7B8BA;
+  }
 .icon{
   color: #D4D4D4;
 }

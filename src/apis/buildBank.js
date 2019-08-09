@@ -29,3 +29,8 @@ export const refuseUserInfo =(param)=>{
 export const RevokeBuidlManager =(param)=>{
     return http("put","/apis/api/CCB/RevokeBankUser",param)
 }
+
+//查看办理人员附件
+export const  GetWorkingCarById =(param)=>{
+    return http("get","/apis/api/CCB/GetWorkingCardByID/?id="+param)
+} 

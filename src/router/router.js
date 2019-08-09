@@ -24,6 +24,53 @@ export default [
                   Auth:true,
             
                 },
+                children:[
+                    {
+                          path:'/',
+                          redirect:"/welcomehome"
+                    },
+                    {
+                      path:'/welcomehome',
+                      name:'welcomehome',
+                      component:(resovle)=>require(["../components/home/homeComponet/welcomehome.vue"],resovle),
+                      meta:{
+                        Auth:true,
+                      },
+                    },
+                    {
+                       path:'/payItem', 
+                       name:"payItem",
+                       component:(resovle)=>require(['../components/home/homeComponet/payItem.vue'],resovle), 
+                       meta:{
+                         Auth:true,
+                       }
+                    },
+                    {
+                      path:"/payQuery",
+                      name:"payQuery",
+                      component:(resovle)=>require(['../components/home/homeComponet/payQuery.vue'],resovle),
+                      meta:{
+                        Auth:true
+                      }
+                    },
+                    {
+                      path:"/intManage",
+                      name:"intManage",
+                      component:(resovle)=>require(['../components/home/homeComponet/intManage.vue'],resovle),
+                      meta:{
+                        Auth:true
+                      }
+                    },
+                    {
+                      path:"/abnormalMonitoring",
+                      name:"abnormalMonitoring",
+                      component:(resovle)=>require(['../components/home/homeComponet/abnormalMonitoring.vue'],resovle),
+                      meta:{
+                        Auth:true
+                      }
+                    },
+
+                ]
             },
             //新建申请单
             {

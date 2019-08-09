@@ -14,17 +14,17 @@
                                 <td>云支付收款账号</td>
                                 <td>收款银行</td>
                             </tr>
-                            <tr class="trhover" @click="handleDealItem">
-                                <td>2019/07/11</td>
-                                <td>Kt201909160001</td>
-                                <td>004001</td>
-                                <td>淘淘纺织</td>
-                                <td>淘淘纺织3号店</td>
-                                <td>131231232165546</td>
-                                <td>建行</td>
+                            <tr class="trhover" @click="handleDealItem($event,item,index)" v-for="(item,index) in dataList">
+                                <td>{{item.creationTime.substring(0,10)}}</td>
+                                <td>{{item.number}}</td>
+                                <td>{{item.projectNumber}}</td>
+                                <td>{{item.projectName}}</td>
+                                <td>{{item.brandName}}</td>
+                                <td>{{item.receivableAccountNumber}}</td>
+                                <td>{{item.bankName}}</td>
                             </tr>
                             
-                    </table>
+                    </table> 
         </div>
         <!-- 安排培训机构模态框 -->
        
@@ -40,13 +40,13 @@
                                     <div @click="handleClickUnNeedDeal" id="unNeedDeal"><span class="iconfont icon-radio"></span><span>无需安排培训机构</span></div>
                             </div>
                             <div v-if="training" class="traning-name">
-                                  <div>品牌名称:</div>
+                                  <div>培训机构名称:</div>
                                    <div class="selected">
                                         <span class="selected-options" id="selected-options"></span>
                                         <span class="iconfont icon-xiala1 icon" id="selected-icon" @click="handleSelectShow"></span>
-                                            <div class="select-options" v-if="selectModify" @click="handelToSelectOption($event)">
-                                                <div>
-                                                    <span>广州培训机构</span>
+                                            <div class="select-options" v-if="selectModify">
+                                                <div v-for="(item,index) in traningKinds" :data-id="item.id" @click="handelToSelectOption($event,item)">
+                                                    <span>{{item.name}}</span>
                                                 </div>
                                             </div>
                                 </div>
@@ -69,11 +69,25 @@ export default {
               selectModify:false,
               dealItemModel:false,
               NeedTraining:true,
-              training:true
+              training:true,
+              //申请单Id
+              id:"",
+              //培训机构id
+              trainingInstitutionID:"",
          }
-     },
+     }, 
+    computed: {
+        ...Vuex.mapState({
+                //页面的初始化数据
+                dataList:state=>state.organTrainingInst.dataList,
+                //培训机构种类
+                traningKinds:state=>state.organTrainingInst.traningKinds
+        }),  
+    },
     methods:{
          ...Vuex.mapActions({
+                //培训机构的信息
+              getOrgnTrainingInstInfo:"organTrainingInst/getOrgnTrainingInstInfo",
               //安排培训机构
               putArrangeTrainingInstitution :"organTrainingInst/putArrangeTrainingInstitution"
          }),
@@ -92,19 +106,27 @@ export default {
                 
             },
          //部门选中
-            handelToSelectOption($event){
+            handelToSelectOption($event,item){
                 var options =document.getElementById('selected-options');
                 options.innerText=$event.target.innerText;
+                this.trainingInstitutionID = item.id;
                 var opation =document.getElementById('selected-icon')
                 opation.classList.add('icon-xiala1');
                 opation.classList.remove('icon-shangla');
                 this.selectModify = false;
                 
-                
             },
         //指定任务
-            handleDealItem($event){
-                this.dealItemModel=true;
+            handleDealItem($event,param,index){
+                 var trs = document.getElementsByClassName('trhover');
+                var len =trs.length;
+                for(var i=0;i<len;i++){
+                            trs[i].style.background="";
+                    }
+                trs[index].style.background="rgba(237,238,239,1)";
+                    this.id =param.id;
+                    this.BtnHideaOrShow=true;
+                // this.dealItemModel=true;
             },
         //关闭模态框
          handleCloseDealItemModel(){
@@ -135,6 +157,7 @@ export default {
             other.classList.remove('icon-danxuankuangxuanzhong');
             other.classList.add('icon-radio');
             this.NeedTraining=false;
+            this.trainingInstitutionID="";
             this.training=false;
         },
       //存储安排的培训机构
@@ -142,11 +165,11 @@ export default {
           //没有获取到数据只能假设 培训机构的id为1 申请单id为1
           var param =JSON.stringify({
               //申请单Id
-              "id":1,
+              "id":this.id,
               //是否安排培训
               "NeedTraining":this. NeedTraining,
               //培训机构Id
-              "TrainingInstitutionID":1
+              "TrainingInstitutionID":this.trainingInstitutionID
           })
 
           //向后端发送请求
@@ -229,18 +252,20 @@ export default {
     height:100%;
     background:rgba(0,0,0,0.3);
     position: absolute;
+    z-index: 10;
     top: 0;
     left: 0;
 }
 .traning-content{
     width:500px;
-    height:330px;
+    height:300px;
     background:#fff;
     position: absolute;
+    z-index: 11;
     top: 50%;
     left: 50%;
     margin-left:-250px;
-    margin-top:-165px;
+    margin-top:-150px;
 }
 .traning-head{
   margin: 23px 0;

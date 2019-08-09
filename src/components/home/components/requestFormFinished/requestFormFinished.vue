@@ -23,7 +23,7 @@
           <td>受理人</td>
         </tr>
 
-        <tr class="trhover" v-for="(item,index) in dataList">
+        <tr class="trhover" v-for="(item,index) in dataList"  @click="handleToModel($event,item,index)">
           <td>{{item.creationTime.substring(0,10)}}</td>
           <td>{{item.number}}</td>
           <td :data-id="item.type">{{item.type==1?'云单据':'云条码'}}</td>
@@ -31,15 +31,20 @@
           <td>{{item.projectName}}</td>
           <td>{{item.linkman}}</td>
           <td>{{item.phoneNumber}}</td>
-          <td>{{item.remark}}</td>
-          <td
-            :data-id="item.status"
-            @click="handleToModel($event,item,index)"
-          >{{item.status==1?'未受理':item.status==2?'已受理':item.status==3?'完成':'关闭'}}</td>
+          <!-- <td>{{item.remark}}</td> -->
+          <td> 
+              <Poptip placement="bottom-start" trigger="hover" word-wrap class="tip-iview">
+              <span class="tip-iview-span">{{item.remark}}</span>
+              <div class="api" slot="content">
+                <p>{{item.remark}}</p>
+              </div>
+            </Poptip>
+          </td> 
+          <td :data-id="item.status">{{item.status==1?'未受理':item.status==2?'已受理':item.status==3?'完成':'关闭'}}</td>
           <td>{{item.acceptedUsername}}</td>
         </tr>
       </table>
-      <Page :total="count" :page-size="MaxResultCount" class="page" :current="page" @on-change="handleToDatalist" />
+      <Page :total="count" :page-size="MaxResultCount" class="page" :current="page" @on-change="handleToDatalist" v-show="count<=12?false:true"/>
     </div>
 
     <div class="accept-model" v-show="acceptModel">
@@ -127,19 +132,19 @@
         <div class="item-new">
           <div>
             <span>已认证的品牌</span>
-            <span>{{projectSituation.verifiedBrandName}}</span>
+            <span :title="projectSituation.verifiedBrandName">{{projectSituation.verifiedBrandName}}</span>
           </div>
           <div>
             <span>认证中的品牌</span>
-            <span>{{projectSituation.verifingBrandName}}</span>
+            <span :title="projectSituation.verifingBrandName">{{projectSituation.verifingBrandName}}</span>
           </div>
           <div>
             <span>已开通的支付</span>
-            <span>{{projectSituation.openedReceivableAccount}}</span>
+            <span :title="projectSituation.openedReceivableAccount">{{projectSituation.openedReceivableAccount}}</span>
           </div>
           <div>
             <span>开通中的支付</span>
-            <span>{{projectSituation.openningReceivableAccount}}</span>
+            <span :title="projectSituation.openningReceivableAccount">{{projectSituation.openningReceivableAccount}}</span>
           </div>
         </div>
       </div>
@@ -214,13 +219,13 @@ export default {
       index:"",
       //获取的申请单页数
       page: 1,
-      MaxResultCount: 15,
+      MaxResultCount: 12,
       Sorting: ""
     };
   },
   created() {
     var param = JSON.stringify({
-      SkipCount: this.page,
+      SkipCount: 0,
       MaxResultCount: this.MaxResultCount,
       Sorting: this.Sorting
     });
@@ -292,11 +297,13 @@ export default {
          this.btnTwo = false;
         this.btnOne = false;
       }
-      var len = $event.target.parentNode.parentNode.children.length;
-      for (var i = 0; i < len; i++) {
-        $event.target.parentNode.parentNode.children[i].style.background = "";
-      }
-      $event.target.parentNode.style.background = "rgba(237,238,239,1)";
+      var trs = document.getElementsByClassName('trhover');
+                var len =trs.length;
+                for(var i=0;i<len;i++){
+                    trs[i].style.background="";
+                }
+      trs[index].style.background="rgba(237,238,239,1)";
+    
     },
     //点击模态框中的受理按钮向后端发送受理
     handleToAcceptFinished() {
@@ -460,7 +467,7 @@ export default {
   handleToDatalist(page){
     this.page = page;
      var param = JSON.stringify({
-      SkipCount: this.page,
+      SkipCount: (this.page-1)*this.MaxResultCount,
       MaxResultCount: this.MaxResultCount,
       Sorting: this.Sorting
     });
@@ -505,7 +512,7 @@ export default {
     float: right;
     line-height: 36px;
     text-align: center;
-    margin-right: 64px;
+    /* margin-right: 64px; */
   }
   .accept-tit > .btnOne-head:active{
     background:#6da4ff;
@@ -514,7 +521,7 @@ export default {
     float: right;
     line-height: 36px;
     text-align: center;
-    margin-right: 64px;
+    /* margin-right: 64px; */
   }
   .accept-tit > .btnTwo-head > button {
     width: 122px;
@@ -533,12 +540,12 @@ export default {
     background: rgba(88, 151, 255, 1);
   }
   .accept-tabel {
-    margin-top: 49px;
+    margin-top: 30px;
     width: 100%;
     padding-right: 64px;
   }
   .accept-tabel > table {
-   
+   table-layout: fixed;
     width: 100%;
     border-top: 1px solid #e7e7e7;
     border-left: 1px solid #e7e7e7;
@@ -558,19 +565,62 @@ export default {
     background: rgba(241, 243, 246, 1);
     color: #888888;
   }
-  .accept-tabel > table > tr:nth-of-type(1)>td:nth-of-type(8){
-    text-align :center;
-  }
-  .accept-tabel > table > tr>td:nth-of-type(8){
-    max-width: 200px;
-    white-space: nowrap;
-    overflow: hidden;
-    box-sizing: border-box;
-    text-align: left;
-    padding:0 15px;
-    text-overflow: ellipsis;
-  }
-
+ .accept-tabel > table > tr:nth-of-type(1) > td {
+  line-height: 30px;
+  text-align: center;
+  font-size: 14px;
+  background: rgba(241, 243, 246, 1);
+  color: #888888;
+}
+.tip-iview{
+  width:100%;
+}
+.ivu-poptip-rel{
+  width: 100%;
+}
+.tip-iview-span{
+  text-align:left;
+  display: block;
+  height: 30px;
+  padding-top: 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width:50px;
+  margin: 0 auto;
+ line-height: 30px;
+}
+ .accept-tabel>table > tr > td:nth-of-type(1){
+    width: 130px;
+}
+ .accept-tabel>table > tr > td:nth-of-type(2){
+    width: 220px;
+}
+ .accept-tabel>table > tr > td:nth-of-type(3){
+    width: 100px;
+}
+ .accept-tabel>table > tr > td:nth-of-type(4){
+    width: 140px;
+}
+ .accept-tabel>table > tr > td:nth-of-type(5){
+    width:120px;
+}
+ .accept-tabel>table > tr > td:nth-of-type(6){
+    width: 110px;
+}
+ .accept-tabel>table > tr > td:nth-of-type(7){
+    width:150px;
+}
+ .accept-tabel>table > tr > td:nth-of-type(8){
+    width:100px;
+}
+ .accept-tabel>table > tr > td:nth-of-type(9){
+   width: 100px;
+}
+ .accept-tabel>table > tr > td:nth-of-type(10){
+  width:100px;
+}
+ 
   .trhover:hover {
     cursor: pointer;
     background: #edeeef;
@@ -724,6 +774,7 @@ export default {
     box-sizing: border-box;
     padding: 22px;
     font-size: 14px;
+    overflow:auto;
   }
   .accept-content3 > .remarks>div{
     margin-bottom: 10px;
@@ -751,7 +802,7 @@ export default {
   /* 项目情况 */
   .item-new {
     width: 420px;
-    height: 210px;
+    height: 170px;
     margin-left: 40px;
     border: 1px solid #eeeeee;
     box-sizing: border-box;
@@ -760,6 +811,7 @@ export default {
   .item-new > div {
     line-height: 1;
     margin-bottom: 19px;
+    overflow: hidden;
   }
   .item-new > div:nth-of-type(1) {
     margin-top: 27px;
@@ -767,11 +819,22 @@ export default {
   .item-new > div > span:nth-of-type(1) {
     font-size: 14px;
     color: #c3c4c6;
+    float:left;
   }
   .item-new > div > span:nth-of-type(2) {
     margin-left: 35px;
     font-size: 14px;
     color: #5b5b5b;
+    float: left;
+    width: 260px;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    height:14px;
+    line-height: 1; 
+    overflow: hidden;
+  }
+  .item-new > div > span:nth-of-type(2):hover{
+    cursor: pointer;
   }
 
   /* 引用单号 */
@@ -927,7 +990,7 @@ export default {
     float: right;
     line-height: 26px;
     text-align: center;
-    margin-right: 46px;
+    /* margin-right: 46px; */
   }
   .accept-tit > .btnOne-head:active{
     background:#6da4ff;
@@ -936,7 +999,7 @@ export default {
     float: right;
     line-height: 26px;
     text-align: center;
-    margin-right: 47px;
+    /* margin-right: 47px; */
   }
 
   .accept-tit > .btnTwo-head > button {
@@ -959,10 +1022,10 @@ export default {
   .accept-tabel {
     margin-top: 36px;
     width: 100%;
-    padding-right: 46px;
+    /* padding-right: 46px; */
   }
   .accept-tabel > table {
-    /* table-layout: fixed; */
+    table-layout: fixed;
     width: 100%;
     border-top: 1px solid #e7e7e7;
     border-left: 1px solid #e7e7e7;
@@ -975,26 +1038,63 @@ export default {
     font-size: 12px;
     color: #888888;
   }
-  .accept-tabel > table > tr:nth-of-type(1) > td {
-    line-height: 22px;
-    text-align: center;
 
-    font-size: 12px;
-    background: rgba(241, 243, 246, 1);
-    color: #888888;
-  }
-  .accept-tabel > table > tr:nth-of-type(1)>td:nth-of-type(8){
-    text-align :center;
-  }
-  .accept-tabel > table > tr>td:nth-of-type(8){
-    max-width: 200px;
-    white-space: nowrap;
-    overflow: hidden;
-    box-sizing: border-box;
-    text-align: left;
-    padding:0 15px;
-    text-overflow: ellipsis;
-  }
+  .tip-iview-span{
+  text-align:left;
+  display: block;
+  height: 22px;
+  padding-top: 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width:50px;
+  margin: 0 auto;
+ line-height: 22px;
+
+}
+
+.accept-tabel > table > tr:nth-of-type(1) > td {
+  line-height: 30px;
+  text-align: center;
+  font-size: 12px;
+  background: rgba(241, 243, 246, 1);
+  color: #888888;
+ 
+}
+
+.accept-tabel>table > tr > td:nth-of-type(1){
+    width: 94px;
+}
+.accept-tabel>table > tr > td:nth-of-type(2){
+    width: 160px;
+}
+.accept-tabel>table > tr > td:nth-of-type(3){
+    width: 73px;
+}
+.accept-tabel>table > tr > td:nth-of-type(4){
+    width: 102px;
+}
+.accept-tabel>table > tr > td:nth-of-type(5){
+    width:87px;
+}
+.accept-tabel>table > tr > td:nth-of-type(6){
+    width: 80px;
+}
+.accept-tabel>table > tr > td:nth-of-type(7){
+    width:109px;
+}
+.accept-tabel>table > tr > td:nth-of-type(8){
+    width:73px;
+    height: 22px;
+
+}
+.accept-tabel>table > tr > td:nth-of-type(9){
+   width: 73px;
+}
+.accept-tabel>table > tr > td:nth-of-type(10){
+  width:80px;
+}
+
   .trhover:hover {
     cursor: pointer;
     background: #edeeef;
@@ -1142,6 +1242,7 @@ export default {
     box-sizing: border-box;
     padding: 16px;
     font-size: 12px;
+    overflow: auto;
   }
   .accept-content3 > .remarks>div{
     margin-bottom: 7px;
@@ -1178,6 +1279,7 @@ export default {
   .item-new > div {
     line-height: 1;
     margin-bottom: 14px;
+    overflow: hidden;
   }
   .item-new > div:nth-of-type(1) {
     margin-top: 19px;
@@ -1185,11 +1287,19 @@ export default {
   .item-new > div > span:nth-of-type(1) {
     font-size: 12px;
     color: #c3c4c6;
+    float: left;
   }
   .item-new > div > span:nth-of-type(2) {
+    float:left;
     margin-left: 25px;
     font-size: 12px;
     color: #5b5b5b;
+    width:180px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 12px;
+    line-height: 1;
   }
 
   /* 引用单号 */

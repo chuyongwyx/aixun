@@ -8,16 +8,22 @@ export default{
     //开通云单据
     async openCloudOrder({commit,state},param){
         var paramStr = JSON.stringify(param);
+        state.success=false;
         var  dataInfo = await OpenCloudOrder(paramStr);
-        //如果返回成功则在vuex中删除对应的
-        if(dataInfo.success){
-            state.GetVerifiedBrands.map((item,index)=>{  
-                if(item.id ===param.id){
+        //如果返回成功则在vuex中删除他
+       if(dataInfo.success){
+        state.success=true;
+        var len = param.IDs.length;
+        for(var i=0;i<len;i++){
+            state.GetVerifiedBrands.map((item,index)=>{
+                 if(param.IDs[i]==item.id){
                     state.GetVerifiedBrands.splice(index,1)
-                }
+                 }
             })
-        }
 
+        }
+    }
+ 
 
     }
-}  
+}    

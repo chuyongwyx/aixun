@@ -18,6 +18,8 @@ setInterval(function(){
                             
                 var Token = 'Bearer'+' '+data.data.result.accessToken;
                 var RefreshToken = data.data.result.refreshToken;
+                Cookies.set('name',data.data.result.name,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
+                Cookies.set('email',data.data.result.emailAddress,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
                 Cookies.set("token",Token,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
                 Cookies.set("RefreshToken",RefreshToken,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
             })

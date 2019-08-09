@@ -44,7 +44,7 @@
         <tr v-for="(item) in this.buildBankDeal ">
           <td>{{item.name}}</td>
           <td>{{item.mobile}}</td>
-          <td :style="workCard">查看附件</td>
+          <td :style="workCard" @click="handleTofindCard">查看附件</td>
           <td class="status" :data-id="item.id" @click="handelBankDealShow">{{item.status}}</td>
         </tr>
       </table>
@@ -139,7 +139,15 @@
                     </div>
               </div>
           </div>
-    
+         <!-- 查看办理人员附件 -->
+         <div class="findDealCard" v-if="WorkingCarById">
+                <div class="findDealCardConent">
+                     <div><span>工作证</span><span class="iconfont icon-chuyidong" @click="handleColseFindDealCardConent"></span>  </div>
+                     <div class="CardImg">
+                          <img :src="findWorkingCard" alt="">
+                     </div>
+                </div>
+          </div>
 
   </div>
 </template>
@@ -157,6 +165,8 @@ export default {
       BuildBandShow: false,
       BuildBandManager:false,
       BuildBandDeal:false,
+      //办理人员附件
+      WorkingCarById:false,
       footerExamine:false,
       footerCancel:false,
       //负责人审核按钮颜色
@@ -177,7 +187,9 @@ export default {
       buildBankDeal: state => state.trainingOrg.buildBankDeal,
       buildBankWxER: state => state.trainingOrg.buildBankWxEr, 
       //单个用户信息
-      buildUserInfo: state=>state.trainingOrg.buidlUserInfo
+      buildUserInfo: state=>state.trainingOrg.buidlUserInfo,
+      //查看办理人员附件
+      findWorkingCard:state=>state.buildBankManager.findWorkingCard
     }),
   },
   methods: {
@@ -191,7 +203,9 @@ export default {
       //审核不通过
       refuseUserUnpass:"trainingOrg/refuseUserInfo",
       //撤销培训负责人
-      revokeBuidlManager:"buildBankManager/revokeBuidlManager"
+      revokeBuidlManager:"trainingOrg/revokeBuidlManager",
+      //查看办理人员附件
+      getWorkingCardByID:"trainingOrg/getWorkingCardByID",  
     }),
     //培训负责人切换
     handelToManager() {
@@ -266,6 +280,15 @@ export default {
         this.BuildBandManager=false;
         this.BuildBandDeal=false;
         this.getBuildBankManager();
+     },
+      //查看办理人员附件
+     handleTofindCard($event,param){
+        this.getWorkingCardByID(param.id);
+        this.WorkingCarById=true;
+     },
+     //关闭办理人员附件
+     handleColseFindDealCardConent(){
+        this.WorkingCarById=false;
      }
 
 
@@ -303,7 +326,7 @@ export default {
   line-height: 1;
 }
 .buildBank-form > table {
-  width: 590px;
+  width: 700px;
   table-layout: fixed;
   border-top: 1px solid #e7e7e7;
   border-left: 1px solid #e7e7e7;
@@ -493,6 +516,10 @@ export default {
         height:160px;
 
 }
+.workCard>img{
+    width: 100%;
+    height: 100%;
+}
 
 .bankManagerInfo .examine-active{
   color:#fff;
@@ -518,6 +545,52 @@ export default {
 }
 .footerModel>div:hover{
   cursor: pointer;
+}
+/* 查看办理人员附件 */
+.findDealCard{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,0.3);
+}
+.findDealCardConent{
+   width: 450px;
+   height: 450px;
+   position: absolute;
+   top:50%;
+   left:50%;
+   z-index:5;
+   background: #fff;
+   margin-left: -225px;
+   margin-top: -240px;
+   font-size: 20px;
+}
+.findDealCardConent>div:nth-of-type(1){
+  overflow: hidden;
+}
+.findDealCardConent>div:nth-of-type(1)>span:nth-of-type(1){
+  margin-left: 200px;
+  float: left;
+  margin-top: 30px;
+}
+.findDealCardConent>div:nth-of-type(1)>span:nth-of-type(2){
+  margin-top: 30px;
+  float: right;
+  font-size: 20px;
+  margin-right:30px;
+  color: #9A9A9A; 
+}
+.CardImg{
+  width: 278px;
+  height: 278px;
+  margin: 0 auto;
+  margin-top: 60px;
+}
+.CardImg>img{
+  width: 100%;
+  height: 100%;
 }
 }
 
@@ -730,6 +803,10 @@ export default {
         height:116px;
 
 }
+.workCard>img{
+        width: 100%;
+        height:100%;
+}
 
 .bankManagerInfo .examine-active{
   color:#fff;
@@ -755,6 +832,52 @@ export default {
 }
 .footerModel>div:hover{
   cursor: pointer;
+}
+/* 查看办理人员附件 */
+.findDealCard{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,0.3);
+}
+.findDealCardConent{
+   width: 328px;
+   height: 328px;
+   position: absolute;
+   top:50%;
+   left:50%;
+   z-index:5;
+   background: #fff;
+   margin-left: -164px;
+   margin-top: -164px;
+   font-size: 16px;
+}
+.findDealCardConent>div:nth-of-type(1){
+  overflow: hidden;
+}
+.findDealCardConent>div:nth-of-type(1)>span:nth-of-type(1){
+  margin-left: 146px;
+  float: left;
+  margin-top: 22px;
+}
+.findDealCardConent>div:nth-of-type(1)>span:nth-of-type(2){
+  margin-top: 22px;
+  float: right;
+  font-size: 14px;
+  margin-right:22px;
+  color: #9A9A9A; 
+}
+.CardImg{
+  width: 203px;
+  height: 203px;
+  margin: 0 auto;
+  margin-top: 44px;
+}
+.CardImg>img{
+  width: 100%;
+  height: 100%;
 }
 }
 </style>

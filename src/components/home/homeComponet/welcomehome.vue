@@ -4,7 +4,7 @@
                 <div class="background-img"><img src="../../../assets/homeBackground.png" alt=""></div>
                 <div class="background-tit">
                         <h2>欢迎来到</h2>
-                        <h3>爱讯内部管理系统</h3>
+                        <h3>爱迅内部管理系统</h3>
                 </div>
              </div>
     </div>

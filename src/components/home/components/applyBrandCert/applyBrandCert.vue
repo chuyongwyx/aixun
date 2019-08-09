@@ -15,7 +15,7 @@
                             </div>
                             <div  @click="handelSearchShow">
                                    <span class="iconfont icon-sousuo"></span> 
-                                     <div><span>选择项目</span></div>   
+                                     <div><span>选择项目</span></div>    
                             </div>
                         </div>
                 </div>
@@ -24,35 +24,42 @@
                 <div class="search-model" v-show="searchModel">
                         <div class="search-content">
                              <div class="search-tit"><span>搜索</span><span class="iconfont  icon-chuyidong" @click="handleSearchHide"></span></div>
-                             <div class="search-input"><div><input type="text" placeholder="请输入项目编号/项目名称"></div><div><button>搜索</button></div></div>
+                             <div class="search-input"><div><input type="text" placeholder="请输入项目编号/项目名称" v-model="searchVal"></div><div><button @click="handleToSearch">搜索</button></div></div>
                              <div class="search-form">
                                     <div><span>项目编号</span><span>项目名称</span></div>
                                     <!-- 下面是获取到的项目信息 -->
                                     <div class="projects-content">
-                                             <div class="search-item" v-for="(item,index) in projects"  @click="handleClickProject($event,item)"><span>{{item.name}}</span><span>{{item.projectNumber}}</span></div>
+                                            <div class="search-item" v-for="(item,index) in searchProjects"  @click="handleClickProject($event,item)"><span>{{item.name}}</span><span>{{item.projectNumber}}</span></div>
+                                             <div class="searchNot" v-show="searchNot">搜索不到该项目编号/名称,请重新搜索</div>
                                     </div>
                                    
                              </div>
-                        </div>
+                        </div> 
                 </div>
                 <div class="Verification">
                         
                             <div><span>品牌名称:</span></div>
                             <div>
                                 <input type="text" v-model="projectsNameTest" @focus="handleClose()">
-                                <!-- <p v-if="success" class="ableUser" id="ableUser">*品牌名称可使用</p> -->
-                                <!-- <p v-if="success===false?true:false" class="enAble">*品牌名称已被占用</p> -->
+                                <div class="opation-tip">
+                                        <div v-show="success">
+                                        <p  class="ableUser" id="ableUser" v-if="isUnique">*品牌名称可使用</p> <!--v-if="success"-->
+                                        <p v-if="isUnique===false?true:false" class="enAble">*品牌名称已被占用</p> 
+                                         </div>
+                                </div>
+                                
+                                
                                 
                             </div>
-                            <div><input  type="button" value="验证唯一性" @click="handelToTest" id="btn" :disabled="success" :class="{'disabled':success}" ></div>
+                            <div><input  type="button" value="验证唯一性" @click="handelToTest" id="btn" :disabled="success" :class="{'disabled':isUnique}" ></div>
                             <div class="tip" v-if="tip"><p>*最小2个字符，最长8个字符，不能全英文或者全数字</p></div>
                 </div>
                 <div class="footer">
-                     <button @click="handleSaveApplyBrandCert">保存</button>
+                     <button @click="handleSaveApplyBrandCert" :class="{'saveBtn':btnBg}"><span v-show="saveLoading==false?true:false">保存</span><span v-show="saveLoading==false?false:true">保存中...</span></button>
                 </div>
             </div>
 
-
+ 
 </template>
 <script>
 import Vuex  from  "vuex"
@@ -64,17 +71,44 @@ export default {
             tip:false,
             projectsNum:"",
             projectsName:"",
-            projectsNameTest:""
+            projectsNameTest:"",
+            searchVal:"",
+            //保存的loading
+            saveLoading:false,
+            //函数防抖
+            timer:null
         }
+    },
+    watch: {
+                closeWindow(newValue,oldValue){
+                            if(newValue){
+                                this.saveLoading=false;
+                                this.handleCloseRouter(this.$route.name)
+                                this.$router.push('/payItem');
+                                this.handleNotCloseWindow();
+                            }                      
+                 }
     },
     computed: {
         ...Vuex.mapState({
                 projects:state=>state.applyBrandCert.InitialAddDatas,
+                //请求是否成功
                 success:state=>state.applyBrandCert.success,
+                //名称是否被占用
+                isUnique:state=>state.applyBrandCert.isUnique,
+                //按钮颜色
+                btnBg:state=>state.applyBrandCert.btnBg,
+                //是否关闭窗口
+                closeWindow:state=>state.applyBrandCert.closeWindow,
+                //模糊查询出来的数据
+                searchProjects:state=>state.applyBrandCert.searchProjects,
+                //查不到
+                searchNot:state=>state.applyBrandCert.searchNot
         })
     },
     methods:{
         ...Vuex.mapActions({
+            //获取项目信息
             initialAddDatas:"applyBrandCert/initialAddDatas",
             //验证品牌唯一性
             checkBrandName:"applyBrandCert/checkBrandName",
@@ -83,22 +117,34 @@ export default {
             //新建申请单
             addApplicationForm:"applyBrandCert/addApplicationForm",
             //操作完毕关闭页面
-            handleCloseRouter:"home/handleCloseRouter"
+            handleCloseRouter:"home/handleCloseRouter",
+            //不关闭
+            handleNotCloseWindow:"applyBrandCert/handleCloseWindow",
+            //模糊查询
+            getSearchVal:"applyBrandCert/getSearchVal",
+            //清除查询到的数据
+            handleclickClearSearchData:"applyBrandCert/handleclickClearSearchData"
 
         }),
          //模态框的显示与隐藏
          handelSearchShow(){
-             
+             this.initialAddDatas();
             this.searchModel=true;
          },
         handleSearchHide(){
             this.searchModel=false;
+            //清除搜索到的东西
+            this.handleclickClearSearchData();
+            this.searchVal="";
         },
         //项目选中操作
         handleClickProject($event,item){
             this.projectsNum = item.projectNumber;
             this.projectsName =item.name;
             this.searchModel=false;
+            //清除搜索到的东西
+            this.handleclickClearSearchData();
+            this.searchVal="";
         },
         //验证项目唯一性
         handelToTest(){
@@ -118,20 +164,34 @@ export default {
       //得焦
       handleClose(){
           this.tip=false;
-          this.projectsNameTest='';
+        //   this.projectsNameTest='';
           this.clearDisable();
       },
+     //模糊查询
+      handleToSearch(){
+            if(this.searchVal!==''){
+                     this.getSearchVal(this.searchVal);
+            }
+                   
+     },
       //保存按钮就是新建申请单
       handleSaveApplyBrandCert(){
-          if(this.projectsNameTest!==''){
-                 var param =JSON.stringify({
-                 "ProjectNumber":this.projectsNum,
-                 "BrandName":this.projectsNameTest
-            })
-          this.addApplicationForm(param)
-          this.handleCloseRouter(this.$route.name)
-          this.$router.push('/home');
+           this.saveLoading =true;
+          var _this =this; 
+          if(this.timer){
+              clearTimeout(this.timer);
+              this.saveLoading=false;
           }
+         
+          if(this.projectsNameTest!==''){
+               this.timer =setTimeout(() => {
+                var param =JSON.stringify({
+                 "ProjectNumber":_this.projectsNum,
+                 "BrandName":_this.projectsNameTest
+            })
+             _this.addApplicationForm(param)
+          }, 300);      
+        }
          
       }
     },
@@ -257,6 +317,7 @@ export default {
          color: #5897FF;
          outline: none;
          border: 1px solid #5897FF;
+         border-radius: 2px;
      }
         /* 禁用 */
      .Verification>div:nth-of-type(3) .disabled{
@@ -269,7 +330,9 @@ export default {
         margin-left: 20px;
         color:red;
     }
-
+    .opation-tip{
+        height: 23px;
+    }
      .ableUser{
          color:#0CB709;
      }
@@ -277,13 +340,22 @@ export default {
          color:red;
      }
      .footer{
-          margin:0 auto;
+         margin:0 auto;
          margin-top: 390px;
          margin-bottom:98px;
-          width: 140px;
-          height: 48px;
+         width: 140px;
+         height: 48px;
         
      }
+     /* 按钮颜色 */
+      .footer> .saveBtn{
+        color:#B7B8BA;
+        background:rgba(243,244,245,1);
+      }
+      .footer> .saveBtn:active{
+           color:#B7B8BA;
+        background:rgba(243,244,245,1);
+      }
     .footer>button{
           background:#5897FF;
           width: 140px;
@@ -372,7 +444,11 @@ export default {
             height:100%;
              background:rgba(88,151,255,1);
              color: #fff;
+             border-radius: 4px;
              
+        }
+         .search-model .search-content .search-input>div:nth-of-type(2)>button:active{
+            background: #6da4ff;
         }
          .search-form{
             margin-top: 20px;
@@ -424,6 +500,20 @@ export default {
               font-size: 14px;
               text-align:center;
               line-height: 30px;
+        }
+         .searchNot{
+             background:rgba(0,0,0,0.3);
+             font-size: 14px;
+             position: absolute;
+             left: 50%;
+             margin-left: -110px;
+             color: #fff;
+             font-size: 12px;
+             padding: 6px;
+             width: 220px;
+             top:200px;
+             border-radius: 2px;
+             text-align: center;
         }
 
  
@@ -550,6 +640,9 @@ export default {
         margin-left: 15px;
         color:red;
     }
+    .opation-tip{
+        height: 18px;
+    }
      .ableUser{
          color:#0CB709;
      }
@@ -574,6 +667,15 @@ export default {
           border: 0;
           border-radius: 4px;
       } 
+       /* 按钮颜色 */
+    .footer>.saveBtn{
+        color:#B7B8BA;
+        background:rgba(243,244,245,1);
+      }
+    .footer> .saveBtn:active{
+           color:#B7B8BA;
+        background:rgba(243,244,245,1);
+      }
      .footer>button:active{
        background:#6da4ff;
      }
@@ -652,7 +754,10 @@ export default {
             height:100%;
              background:rgba(88,151,255,1);
              color: #fff;
-             
+             border-radius: 4px;
+        }
+        .search-model .search-content .search-input>div:nth-of-type(2)>button:active{
+            background: #6da4ff;
         }
          .search-form{
             margin-top: 15px;
@@ -713,6 +818,19 @@ export default {
             border:1px solid rgba(243,244,245,1);
             color: #B7B8BA;
     }
-
+    .searchNot{
+             background:rgba(0,0,0,0.3);
+             font-size: 14px;
+             position: absolute;
+             left: 50%;
+             margin-left: -110px;
+             color: #fff;
+             font-size: 12px;
+             padding: 6px;
+             width: 220px;
+             top:146px;
+             border-radius: 2px;
+             text-align: center;
+    }
 }
 </style>

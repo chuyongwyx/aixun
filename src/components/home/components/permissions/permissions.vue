@@ -23,7 +23,7 @@
         </div>
 
 
-        <!-- 这是设置权限部分 -->
+        <!-- 这是设置权限部分 --> 
          <div class="setPermissions" v-if="setPermissions">
                 <div class="setPermissions-head">
                         <h2>权限</h2>
@@ -45,26 +45,56 @@
                                 </tr>
                                 <tr>
                                     <td>云支付申请跟进总表</td>
-                                    <td><span class="iconfont icon-radio icon"></span></td>
-                                    <td><span class="iconfont icon-radio icon"></span></td>
-                                    <td><span class="iconfont icon-radio icon"></span></td>
+                                    <td @click="handleInquiryCloudApplicationFormSummaryStatement"  id="CloudPayInquiryCloudApplicationFormSummaryStatementInquiry">
+                                        <!-- 可查看所有 -->
+                                            <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPayInquiry.CloudApplicationFormSummaryStatement.Inquiry']"></span>
+                                            <span class="iconfont icon-radio icon" v-else></span>
+                                    </td>
+                                    <td @click="handleCloseCloudApplicationFormSummaryStatement" id="CloudPayInquiryCloudApplicationFormSummaryStatementClose">
+                                      <!-- 关闭 -->
+                                      <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPayInquiry.CloudApplicationFormSummaryStatement.Close']"></span>
+                                      <span class="iconfont icon-radio icon" v-else></span>
+                                      
+                                    </td>
+                                    <td @click="handleModifyRemarkCloudApplicationFormSummaryStatement" id="CloudPayInquiryCloudApplicationFormSummaryStatementModifyRemark">
+                                      <!-- 备注  -->
+                                      <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPayInquiry.CloudApplicationFormSummaryStatement.ModifyRemark']"></span>
+                                      <span class="iconfont icon-radio icon" v-else></span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>品牌认证申请跟进总表</td>
-                                    <td><span class="iconfont icon-radio icon"></span></td>
-                                    <td><span class="iconfont icon-radio icon"></span></td>
+                                    <td @click="handleInquiryBrandCertificationApplicationFormSummaryStatement" id="CloudPayInquiryBrandCertificationApplicationFormSummaryStatementInquiry"> 
+                                      <!-- 查看 -->
+                                      <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPayInquiry.BrandCertificationApplicationFormSummaryStatement.Inquiry']"></span>
+                                      <span class="iconfont icon-radio icon" v-else></span>
+                                    </td>
+                                    <td @click="handleCloseBrandCertificationApplicationFormSummaryStatement" id="CloudPayInquiryBrandCertificationApplicationFormSummaryStatementClose">
+                                      <!-- 关闭 -->
+                                      <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPayInquiry.BrandCertificationApplicationFormSummaryStatement.Close']"></span>
+                                      <span class="iconfont icon-radio icon" v-else></span>
+                                    </td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td>品牌总表</td>
-                                    <td><span class="iconfont icon-radio icon"></span></td>
+                                    <td @click="handleInquiryProjectBrandSummaryStatement" id="CloudPayInquiryProjectBrandSummaryStatementInquiry">
+                                      <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPayInquiry.ProjectBrandSummaryStatement.Inquiry']"></span>
+                                      <span class="iconfont icon-radio icon" v-else></span>
+                                    </td>
                                     <td></td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td>任务跟进表</td>
-                                    <td><span class="iconfont icon-radio icon"></span></td>
-                                    <td><span class="iconfont icon-radio icon"></span></td>
+                                    <td @click="handleInquiryReceivableAccountApplicationFormSummaryStatement" id="CloudPayInquiryReceivableAccountApplicationFormSummaryStatementInquiry">
+                                      <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPayInquiry.ReceivableAccountApplicationFormSummaryStatement.Inquiry']"></span>
+                                      <span class="iconfont icon-radio icon" v-else></span>
+                                    </td>
+                                    <td @click="handleCloseReceivableAccountApplicationFormSummaryStatement" id="CloudPayInquiryReceivableAccountApplicationFormSummaryStatementClose">  
+                                      <span class="iconfont icon-xuanzhong1 icon1" v-if="permissAllow['CloudPayInquiry.ReceivableAccountApplicationFormSummaryStatement.Close']"></span>
+                                      <span class="iconfont icon-radio icon" v-else></span>
+                                    </td>
                                     <td></td>
                                 </tr>
                         </table>
@@ -247,8 +277,44 @@ export default {
               $event.target.classList.add('icon-xuanzhong1');
           }
       },
-      //新建申请单
-      handleCreateCloudApplicationForm($event){
+      //云支付申请跟进总表
+      //查看权限
+      handleInquiryCloudApplicationFormSummaryStatement($event){
+           this.handleSelectIcon($event)
+      },
+      //关闭
+      handleCloseCloudApplicationFormSummaryStatement($event){
+           this.handleSelectIcon($event)
+      },
+      //备注修改
+      handleModifyRemarkCloudApplicationFormSummaryStatement($event){
+          this.handleSelectIcon($event)
+      },
+      //品牌认证申请总表
+      //查看
+      handleInquiryBrandCertificationApplicationFormSummaryStatement($event){
+          this.handleSelectIcon($event) 
+      },
+      //关闭
+      handleCloseBrandCertificationApplicationFormSummaryStatement($event){
+           this.handleSelectIcon($event) 
+      },
+
+      //品牌总表
+    handleInquiryProjectBrandSummaryStatement($event){
+           this.handleSelectIcon($event) 
+    },
+
+    //任务跟进总表
+    //查看
+    handleInquiryReceivableAccountApplicationFormSummaryStatement($event){
+        this.handleSelectIcon($event) 
+    },
+    handleCloseReceivableAccountApplicationFormSummaryStatement($event){
+         this.handleSelectIcon($event) 
+    },
+    //新建申请单
+     handleCreateCloudApplicationForm($event){
             this.handleSelectIcon($event)
       },
     //受理完成
@@ -297,6 +363,50 @@ export default {
       //查看每个块中的权限
       //设置权限
       var permissArray =[];
+      //云支付申请跟进总表
+      var CloudPayInquiryCloudApplicationFormSummaryStatementInquiry =document.getElementById('CloudPayInquiryCloudApplicationFormSummaryStatementInquiry');
+      if(CloudPayInquiryCloudApplicationFormSummaryStatementInquiry.children[0].className.indexOf('icon-radio')===-1){
+           permissArray.push('CloudPayInquiry.CloudApplicationFormSummaryStatement.Inquiry');
+      }
+
+      var CloudPayInquiryCloudApplicationFormSummaryStatementClose = document.getElementById('CloudPayInquiryCloudApplicationFormSummaryStatementClose');
+      if(CloudPayInquiryCloudApplicationFormSummaryStatementClose.children[0].className.indexOf('icon-radio')===-1){
+           permissArray.push('CloudPayInquiry.CloudApplicationFormSummaryStatement.Close');
+      }
+
+      var CloudPayInquiryCloudApplicationFormSummaryStatementModifyRemark= document.getElementById('CloudPayInquiryCloudApplicationFormSummaryStatementModifyRemark');
+      if(CloudPayInquiryCloudApplicationFormSummaryStatementModifyRemark.children[0].className.indexOf('icon-radio')===-1){
+          permissArray.push('CloudPayInquiry.CloudApplicationFormSummaryStatement.ModifyRemark');
+      }
+
+    //品牌认证申请跟进总表
+      var CloudPayInquiryBrandCertificationApplicationFormSummaryStatementInquiry = document.getElementById('CloudPayInquiryBrandCertificationApplicationFormSummaryStatementInquiry');
+      if(CloudPayInquiryBrandCertificationApplicationFormSummaryStatementInquiry.children[0].className.indexOf('icon-radio')===-1){
+         permissArray.push('CloudPayInquiry.BrandCertificationApplicationFormSummaryStatement.Inquiry');
+      }
+
+      var CloudPayInquiryBrandCertificationApplicationFormSummaryStatementClose = document.getElementById('CloudPayInquiryBrandCertificationApplicationFormSummaryStatementClose');
+      if(CloudPayInquiryBrandCertificationApplicationFormSummaryStatementClose.children[0].className.indexOf('icon-radio')===-1){
+           permissArray.push('CloudPayInquiry.BrandCertificationApplicationFormSummaryStatement.Close');
+
+      }
+
+    //品牌总表
+    var CloudPayInquiryProjectBrandSummaryStatementInquiry = document.getElementById('CloudPayInquiryProjectBrandSummaryStatementInquiry');
+    if(CloudPayInquiryProjectBrandSummaryStatementInquiry.children[0].className.indexOf('icon-radio')===-1){
+        permissArray.push('CloudPayInquiry.ProjectBrandSummaryStatement.Inquiry');
+    }
+    //任务跟进表
+    var CloudPayInquiryReceivableAccountApplicationFormSummaryStatementInquiry = document.getElementById('CloudPayInquiryReceivableAccountApplicationFormSummaryStatementInquiry');
+    if(CloudPayInquiryReceivableAccountApplicationFormSummaryStatementInquiry.children[0].className.indexOf('icon-radio')===-1){
+       permissArray.push('CloudPayInquiry.ReceivableAccountApplicationFormSummaryStatement.Inquiry');
+    }
+
+    var CloudPayInquiryReceivableAccountApplicationFormSummaryStatementClose =document.getElementById('CloudPayInquiryReceivableAccountApplicationFormSummaryStatementClose');
+    if(CloudPayInquiryReceivableAccountApplicationFormSummaryStatementClose.children[0].className.indexOf('icon-radio')===-1){
+         permissArray.push('CloudPayInquiry.ReceivableAccountApplicationFormSummaryStatement.Close');
+    }
+      
     //新建申请单id
       var CloudApplicationFormCreate= document.getElementById('CloudApplicationFormCreate');
          if(CloudApplicationFormCreate.children[0].className.indexOf('icon-radio')===-1){
@@ -362,8 +472,10 @@ export default {
                permissArray.push('SystemSetting.Permissions')
         }
       var param = JSON.stringify({
-          "name":permissArray
+          "UserID":this.userId,
+          "UserPermissions":permissArray
       })
+
        this.modifyUserPermission(param);
 
        //此时关闭着这个组件
@@ -577,6 +689,7 @@ export default {
   text-indent: 15px;
   font-size: 14px;
   color: #888888;
+  
 }
 
 .setPermissionsFormone > table tr>td:nth-of-type(1) {
@@ -599,11 +712,20 @@ export default {
 .icon{
         font-size:21px;
         color:#5897FF;
+        display:block;
     }
+.icon::before{
+      display: block;
+}
 .icon1{
+       
         font-size:18px;
         color: #5897FF;
         margin-left: -3px;
+        display:block;
+}
+.icon1::before{
+      display: block;
 }
 
 .setPermissionsFormone>table tr>td>img{
@@ -867,11 +989,19 @@ export default {
     
         font-size:20px;
         color:#5897FF;
+          display: block;
     }
+.icon::before{
+      display: block;
+}
 .icon1{
         font-size:18px;
         color: #5897FF;
         margin-left: -3px;
+          display: block;
+}
+.icon1::before{
+      display: block;
 }
 .setPermissionsFormone>table tr>td>img{
         display: block;

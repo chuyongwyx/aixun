@@ -7,4 +7,6 @@ export default{
       "buildBankWxEr":'',
       //单个用户信息
       "buidlUserInfo":'',
+      //办理人员附件
+     "findWorkingCard":''
 }

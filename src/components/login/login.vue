@@ -7,15 +7,13 @@
                      <div :class="{'login-actived':userLogin}"  @click="handleUserLogin">账号登陆</div>
                      <div :class="{'login-actived':wxLogin}"  @click="handleWxLogin">微信登陆</div>
                 </div> 
-               <transition name="fade" enter-active-class="animated slideInUp">
+              
                 <div class="login-user" v-show="userLogin">
-                        <div><span class="iconfont icon-UserSettings"></span><input type="text" placeholder="用户名" v-model="Username"></div>
+                        <div><span class="iconfont icon-UserSettings"></span><input type="text" placeholder="用户名" v-model="Username" id="userName" ></div>
                         <div><span class="iconfont icon-mima"></span><input type="passsword" placeholder="登录密码" v-model="UserPassword"></div>
                         <p :class="{'login-test':loginError}">*用户名或密码输入错误,请重新输入</p>
-                        <button @click="handelLogin">登录</button>
+                        <button @click="handelLogin"><span v-show="logining==false?true:false">登录</span><span v-show="logining==false?false:true">登录中...</span></button>
                 </div>
-               </transition>
-                <transition enter-active-class="animated slideInUp">
                 <div class="login-wx" v-show="wxLogin">
                         <div>微信扫一扫</div>
                         <div id="login_container">
@@ -23,7 +21,7 @@
                             <!-- <img :src="" alt=""> -->
                         </div>
                 </div>
-                </transition>
+               
             </div>
         </div>
     </div>
@@ -41,7 +39,8 @@ export default {
                     "Username":"",
                     "UserPassword":"",
                     "loginError":true,
-                    "wxEr":''
+                    "wxEr":'',
+                    "logining":false,
                     
             }
         },
@@ -52,7 +51,7 @@ export default {
             handleUserLogin(){
                 this.wxLogin=false;
                 this.userLogin =true;
-                
+                document.getElementById('userName').focus();
             },
             handleWxLogin(){
                 // this.getLoginWxEr();
@@ -63,6 +62,7 @@ export default {
             handelLogin(){
                 var UsernameOrEmailAddress = this.Username;
                 var Password = sha256(this.UserPassword).toLocaleUpperCase();
+                this.logining=true;
                 var param =JSON.stringify({
                     "usernameOrEmailAddress":UsernameOrEmailAddress,
                     "password":Password
@@ -77,17 +77,21 @@ export default {
                     data:param,
                     
                 }).then(function(data){                    
-                            var Token = 'Bearer'+' '+data.data.result.accessToken;
-                            var RefreshToken = data.data.result.refreshToken;
+                           var Token = 'Bearer'+' '+data.data.result.accessToken;
+                           var RefreshToken = data.data.result.refreshToken;
+                           Cookies.set('name',data.data.result.name,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
+                           Cookies.set('email',data.data.result.emailAddress,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
                             Cookies.set("token",Token,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
                             Cookies.set("RefreshToken",RefreshToken,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
                              _this.$router.push('/home');
+                             this.logining=false;
                 }).catch(function(err){
                         if(err.response.data.error.details ==='用户名或密码无效'){
                                  _this.loginError = false;
                         }else{
                             alert(err.response.data.error.message);
                         }
+                        this.logining=false;
                     
                 })
            
@@ -101,12 +105,13 @@ export default {
             })
         },
         created(){
+            
             if(Cookies.get('token')){
                 this.$router.push('/home');
             }
         },
         mounted(){
-           
+           document.getElementById('userName').focus();
         }
 
 }
@@ -118,6 +123,7 @@ export default {
             width:100%;
             height:100%;
             background: url('../../assets/login-background.png') no-repeat;
+            background-size:cover;
             position: relative;
     }
 
@@ -130,6 +136,7 @@ export default {
             margin-left:-652px;
             margin-top:-330px;
             background:url('../../assets/login.png') no-repeat;
+            background-size:cover;
     }
      .login>.login-content>.login-form{
           width:438px;
@@ -216,7 +223,7 @@ export default {
             width:438px;
             height: 75px;
             border: 0;
-            font-size: 25px;
+            font-size: 22px;
             color: #fff;
             /* margin-top: 63px; */
             background:#7AACFF;
@@ -256,6 +263,7 @@ export default {
             width:100%;
             height:100%;
             background: url('../../assets/login-background.png') no-repeat;
+             background-size:cover;
             position: relative;
     }
 
@@ -267,7 +275,8 @@ export default {
             left:50%;
             margin-left:-347px;
             margin-top:-176px;
-            background:url('../../assets/loginxiao.png') no-repeat;
+            background:url('../../assets/login.png') no-repeat;
+             background-size:cover;
     }
      .login>.login-content>.login-form{
           width:233px;

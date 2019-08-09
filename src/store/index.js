@@ -32,6 +32,14 @@ import organTrainingInst from "./organTrainingInst";
 import userAdmin from './userAdmin';
 //员工权限
 import  permissions from './permissions';
+//云支付申请跟进总表
+import summaryCloudPayment from './summaryCloudPayment';
+//申请品牌认证总表
+import generalApplicationBrandCert from "./generalApplicationBrandCert";
+//项目品牌总表
+import summaryBrands from "./summaryBrands"
+//云支付收款账号跟进总表
+import taskSummaryStatem from "./taskSummaryStatem";
 Vue.use(Vuex);
 
 let state = {};
@@ -61,7 +69,11 @@ const store = new Vuex.Store({
         brandCert,
         applyPayReceipt,
         openCloudDoc,
-        openCloudPay
+        openCloudPay,
+        summaryCloudPayment,
+        generalApplicationBrandCert,
+        taskSummaryStatem, 
+        summaryBrands
     }
 })
 

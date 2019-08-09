@@ -36,7 +36,7 @@
                                 <td>5</td>
                                 <td>2</td>
                                 <td>7</td>
-                                <td>查看详情</td>
+                                <td class="tdhover">查看详情</td>
                             </tr>
                             </table>
                             </div>
@@ -71,7 +71,7 @@
                                 <td>5</td>
                                 <td>2</td>
                                 <td>7</td>
-                                <td>查看详情</td>
+                                <td class="tdhover">查看详情</td>
                             </tr>
                             </table>
                             </div>
@@ -360,6 +360,10 @@ export default {
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+    .tdhover:hover{
+        text-decoration: underline;
+        cursor: pointer;
+    }
 }
 @media screen  and (max-width:1400px){
         .capitalFlow{
@@ -552,6 +556,10 @@ export default {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+    }
+    .tdhover:hover{
+        text-decoration: underline;
+        cursor: pointer;
     }
     }
 

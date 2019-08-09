@@ -30,3 +30,8 @@ export const RevokeBuidlManager =(param)=>{
     return http("put","/apis/api/GZTI/RevokeTrainingInstitutionUser",param)
 }
 
+//查看培训人员附件
+//查看办理人员附件
+export const  GetWorkingCarById =(param)=>{
+    return http("get","/apis/api/CCB/GetWorkingCardByID/?id="+param)
+} 
