@@ -95,6 +95,8 @@ export default {
       handleClearRouter: "home/handleClearRouter",
       handlePushRouter:"home/handlePushRouter",
       handleToRouterActive:"home/handleToRouterActive",
+      //退出云支付收款账号清除的数据
+      handleClickVuexApplyPayReceipt:"applyPayReceipt/handleClickVuexDataList",
       //退出申请品牌认证时将其vuex状态清除
       handleClickVuexApplyBrandCertData:"applyBrandCert/handleClickVuexApplyBrandCertData",
       //退出申请云支付功能总表时删除数据
@@ -104,7 +106,7 @@ export default {
       //退出时项目品牌总表
       handleClearVuexSummaryBrands:"summaryBrands/handleClearDataList",
       //申请云支付账号总表
-      handleClearVuexTaskSummaryStatem:"taskSummaryStatem/handleClearDataList"
+      handleClearVuexTaskSummaryStatem:"taskSummaryStatem/handleClearDataList" 
     }),
     handleToWeclome() {
       this.$router.push("/payItem");
@@ -129,10 +131,16 @@ export default {
         };
 
         this.handleClearRouter(param);
+
         //判断是否申请品牌认证
         if(name==="applyBrandCert"){
             this.handleClickVuexApplyBrandCertData();
         }
+        //判断是否是申请云支付收款账号
+        if(name==="applyPayReceipt"){
+            this.handleClickVuexApplyPayReceipt();
+        }
+
         //判断是否为申请云支付功能总表
       
         if(name==="summaryCloudPayments"){

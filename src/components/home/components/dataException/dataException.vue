@@ -2,7 +2,7 @@
     <div class="dataException">
             <div class="dataException-head">
                 <h2>数据同步异常</h2>
-                <div class="refresh"><span class="iconfont icon-shuaxin"></span><span>刷新</span></div>
+                <div class="refresh" @click="handleToDataFreshen"><span class="iconfont icon-shuaxin"></span><span>刷新</span></div>
             </div>
             <div class="exception">
                 <div :class="{'exception-active':payColud}" @click="handleToPayColude">
@@ -29,7 +29,7 @@
                         </tr>
                         <tr>
                         <td><span class="iconfont icon-fuxuankuang_weixuanzhong
-        "></span></td>
+        "  @click="handleToSelectedTrs"></span></td>
                         <td>25654516165465461365</td>
                         <td>6546464646546546</td>
                         <td>淘淘纺织</td>
@@ -85,6 +85,14 @@ export default {
             handleToBuildBill(){
                 this.payColud = false;
                 this.buildBill = true;
+            },
+            //刷新操作重新请求数据
+            handleToDataFreshen(){
+
+            },
+            //选中对应的数据
+            handleToSelectedTrs(){
+                
             }
         }
 }
@@ -171,12 +179,15 @@ export default {
         width: 100px;
         height: 35px;
         float: right;
-       
+        outline: none;
         border: 0;
         background: #E1E1E1;
         color: #fff;
         font-size: 14px;
         border-radius: 3px;
+    }
+    .samllBtn>button:hover{
+        cursor: pointer;
     }
     .samllBtnActive{
         background: #5897FF;
@@ -280,12 +291,16 @@ export default {
         width: 73px;
         height: 26px;
         float: right;
-       
+        outline:none;
         border: 0;
         background: #E1E1E1;
         color: #fff;
         font-size: 12px;
         border-radius: 3px;
+    }
+
+    .samllBtn>button:hover{
+        cursor:pointer;
     }
     .samllBtnActive{
         background: #5897FF;

@@ -246,7 +246,7 @@ export default {
       this.projectsNum = item.projectNumber;
       this.projectsName = item.name;
       //根据项目编号获取品牌名称
-      this.getBrandByProjectNumber(this.projectsNum);
+      this.getBrandByProjectNumber(this.projectsNum); 
 
       this.searchModel = false;
       //清除搜索到的东西

@@ -217,7 +217,7 @@ export default {
                     trs[i].style.background="";
             }
            trs[index].style.background="rgba(237,238,239,1)";
-          this.id =param.id;
+          this.id =item.id;
           if(item.progress==0 ||item.progress==8){
              this.btnForce= false;
           }else{

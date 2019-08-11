@@ -154,31 +154,33 @@
           <span>引用申请单号</span>
           <span class="iconfont icon-chuyidong" @click="handleCloseImport"></span>
         </div>
-        <div class="guide-form">
-          <table cellpadding="0" cellspacing="0">
-            <tr>
-              <td></td>
-              <td>申请单号</td>
-              <td>申请单类型</td>
-              <td>品牌名称</td>
-              <td>开户行</td>
-              <td>提交人</td>
-            </tr>
-            <tr v-for="(item,index) in importForms">
-              <td>
-                <span class="iconfont icon-fuxuankuang_weixuanzhong icon" @click="handleClickSelected($event,item)"></span>
-              </td>
-              <td>{{item.number}}</td>
-              <td>{{item.type}}</td>
-              <td>{{item.brandName}}</td>
-              <td>{{item.bankName}}</td>
-              <td :title="item.creatorUsername">{{item.creatorUsername}}</td>
-            </tr>
-          </table>
-          <div class="footer guide-footer">
-            <button @click="handleToAcceptRemark">引用</button>
-          </div>
-        </div>
+       <div class="guide-form">
+              <div>
+                <ul class="guide-nav">
+                  <li></li>
+                  <li>申请单号</li>
+                  <li>申请单类型</li>
+                  <li>品牌名称</li>
+                  <li>开户行</li>
+                  <li>提交人</li>
+                </ul>
+              </div>
+              <table cellpadding="0" cellspacing="0">
+                     <tr v-for="(item,index) in importForms">
+                      <td>
+                        <span class="iconfont icon-fuxuankuang_weixuanzhong icon" @click="handleClickSelected($event,item)" style="color:#5897FF;"></span>
+                      </td>
+                      <td>{{item.number}}</td>
+                      <td>{{item.type}}</td>
+                      <td>{{item.brandName}}</td>
+                      <td>{{item.bankName}}</td>
+                      <td :title="item.creatorUsername">{{item.creatorUsername}}</td>
+                    </tr>
+              </table>
+              <div class="footer guide-footer">
+                <button @click="handleToAcceptRemark">引用</button>
+              </div>
+         </div>
       </div>
     </div>
   </div>
@@ -272,8 +274,8 @@ export default {
     },
     //关闭项目情况模态框
     handleCloseProjectStatus() {
-      this.acceptModel = false;
-      this.acceptFinished = false;
+      this.acceptModel = true;
+      this.acceptFinished = true;
       this.acceptRemark = false;
       this.projectStatus = false;
       this.referenceSingleNumber = false;
@@ -875,13 +877,57 @@ export default {
     left: 50%;
     margin-left: -70px;
   }
+  .guide-nav{
+    width: 729px;
+    height:30px;
+    line-height: 30px;
+    text-align: left;
+    text-indent: 15px;
+    font-size: 14px;
+    background: rgba(241, 243, 246, 1);
+    color: #888888;
+    overflow: hidden;
+    border-top: 1px  solid #e7e7e7;
+    border-left:1px  solid #e7e7e7;
+  }
+  .guide-nav>li{
+    float: left;
+    border-right: 1px solid #e7e7e7;
+  }
+  .guide-nav>li:nth-of-type(1){
+     width: 43px;
+     height: 30px;
+  }
+  .guide-nav>li:nth-of-type(2){
+     width: 178px;
+     height: 30px;
+  }
+  .guide-nav>li:nth-of-type(3){
+     width: 129px;
+     height: 30px;
+  }
+  .guide-nav>li:nth-of-type(4){
+     width: 140px;
+     height: 30px;
+  }
+   .guide-nav>li:nth-of-type(5){
+     width: 106px;
+     height: 30px;
+  }
+   .guide-nav>li:nth-of-type(6){
+     width: 132px;
+     height: 30px;
+   }
   .accept-guide .guide-form > table {
     width: 729px;
+    height:249px;
     table-layout: fixed;
+    display: block;
+    overflow: auto;
     border-top: 1px solid #e7e7e7;
     border-left: 1px solid #e7e7e7;
   }
-  .accept-guide .guide-form > table > tr {
+  .accept-guide .guide-form > table > tr:nth-of-type(1) {
   }
   .accept-guide .guide-form > table > tr > td {
     border-bottom: 1px solid #e7e7e7;
@@ -893,12 +939,7 @@ export default {
     color: #888888;
   }
   .accept-guide .guide-form > table > tr:nth-of-type(1) > td {
-    line-height: 30px;
-    text-align: left;
-    text-indent: 15px;
-    font-size: 14px;
-    background: rgba(241, 243, 246, 1);
-    color: #888888;
+   
   }
   .accept-guide .guide-form > table > tr > td:nth-of-type(1) {
     width: 44px;
@@ -1341,12 +1382,59 @@ export default {
     left: 50%;
     margin-left: -60px;
   }
-  .accept-guide .guide-form > table {
+   .accept-guide .guide-form > table {
     width: 532px;
+    height: 173px;
     table-layout: fixed;
     border-top: 1px solid #e7e7e7;
     border-left: 1px solid #e7e7e7;
+    display: block;
+    overflow: auto;
   }
+  .guide-nav{
+   width: 532px;
+    height:22px;
+   line-height: 22px;
+    text-align: left;
+    text-indent: 15px;
+    font-size: 12px;
+    background: rgba(241, 243, 246, 1);
+    color: #888888;
+    overflow: hidden;
+    border-top: 1px  solid #e7e7e7;
+    border-left:1px  solid #e7e7e7;
+  }
+  .guide-nav>li{
+    float: left;
+    border-right: 1px solid #e7e7e7;
+  }
+  .guide-nav>li:nth-of-type(1){
+     width: 30px;
+     height: 22px;
+  }
+  .guide-nav>li:nth-of-type(2){
+     width: 131px;
+     height: 22px;
+  }
+  .guide-nav>li:nth-of-type(3){
+     width: 93px;
+     height: 22px;
+  }
+  .guide-nav>li:nth-of-type(4){
+     width: 102px;
+     height: 22px;
+  }
+   .guide-nav>li:nth-of-type(5){
+     width: 77px;
+     height: 22px;
+  }
+   .guide-nav>li:nth-of-type(6){
+     width: 98px;
+     height: 22px;
+   }
+
+
+
   .accept-guide .guide-form > table > tr {
   }
   .accept-guide .guide-form > table > tr > td {
@@ -1363,12 +1451,7 @@ export default {
     text-align: center;
   }
   .accept-guide .guide-form > table > tr:nth-of-type(1) > td {
-    line-height: 22px;
-    text-align: left;
-    text-indent: 15px;
-    font-size: 12px;
-    background: rgba(241, 243, 246, 1);
-    color: #888888;
+    
   }
   .accept-guide .guide-form > table > tr > td:nth-of-type(1) {
     width: 32px;

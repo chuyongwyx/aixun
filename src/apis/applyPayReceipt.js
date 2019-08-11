@@ -7,7 +7,7 @@ export const InitialAddDatas=()=>{
 
 //根据项目编号获取品牌
 export const GetBrandByProjectNumber =(param)=>{
-    return http("get","apis/api/ReceivableAccountApplicationForm/GetBrandByProjectNumber/?projectNumber="+param)
+    return http("get","/apis/api/ReceivableAccountApplicationForm/GetBrandByProjectNumber/?projectNumber="+param)
 }
 
 //新建申请单

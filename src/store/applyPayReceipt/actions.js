@@ -36,14 +36,19 @@ export default{
        }else{
            state.closeWindow=true
        }
-
+ 
     }, 
     //如果是否关闭当前窗口
     async handleCloseWindow({commit,state}){
         state.closeWindow =false;
     },
-    //清空查询出来数据
+    //清空模糊查询查询出来数据
     async  handleclickClearSearchData({commit,state}){
         state.searchProjects=[];
+   },
+
+   //路由关闭清除的数据
+   async  handleClickVuexDataList({commit,state}){
+     state.brands=[];
    }
 }   
