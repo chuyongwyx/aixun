@@ -21,7 +21,7 @@
                 </div> 
                 <!-- 这是搜索模态框 -->
               
-                <div class="search-model" v-show="searchModel">
+                <div class="search-model" v-show="searchModel" @keydown="handleEnterToSearch">
                         <div class="search-content">
                              <div class="search-tit"><span>搜索</span><span class="iconfont  icon-chuyidong" @click="handleSearchHide"></span></div>
                              <div class="search-input"><div><input type="text" placeholder="请输入项目编号/项目名称" v-model="searchVal"></div><div><button @click="handleToSearch">搜索</button></div></div>
@@ -36,12 +36,12 @@
                              </div> 
                         </div>
                 </div>
-              
+               
                 <div class="request-form">
                         <div>
                             <span>申请类型：</span>
                                 <div>
-                                     <Select v-model="modelType" class="select-iview" @on-change="handleType" size="large">
+                                     <Select v-model="modelType" clearable class="select-iview" @on-change="handleType" size="large">
                                         <Option v-for="item in requestType" :value="item.value" :key="item.value" class="select-option">{{ item.label }}</Option>
                                      </Select>
                                 </div>
@@ -78,9 +78,10 @@
 
                 </div>
                 <div class="save-btn">
-                        <button @click="handleSave" :data-info="closeWindow" :style="saveBtn"><span v-show="saveLoading==false?true:false">保存</span><span v-show="saveLoading==false?false:true">保存中...</span></button>
+                        <button @click="handleSave"  :style="saveBtn"><span v-show="saveLoading==false?true:false">保存</span><span v-show="saveLoading==false?false:true">保存中...</span></button>
                 </div>
-        </div>
+                <div class="save-success" v-show="saveSuccess"><img src="../../../../assets/saveSuccess.png" alt=""></div>
+        </div> 
 </template>
 <script>
 import Vuex from "vuex"
@@ -117,23 +118,34 @@ export default {
                 linkManTip:false,
                 linkPhoneTip:false,
                 linkEmailTip:false,
-                //保存的loading
-                saveLoading:false,
                 //函数防抖
-                timer:null
+                timer:null,
+                //保存成功状态
+                saveSuccess:false,
 
 
              }
          },
          watch: {
-                 closeWindow(newValue,oldValue){
-                        if(newValue){
-                            this.saveLoading=false;
-                             this.handleCloseRouter(this.$route.name)
-                             this.$router.push('/payItem');
-                             this.handleNotCloseWindow();
-                        }                  
-                 },
+                success(newValue,oldValue){
+                       if(newValue){
+                            this.projectsNum="";
+                            this.projectsName="";
+                            this.linkMan="";
+                            this.linkTel="";
+                            this.linkEmail="";
+                            this.remark="请输入备注...";
+                            this.tipText="color:#c5c8ce;";
+                            this.modelType="";
+                            this.saveSuccess=true;
+                            var _this = this;
+                            var timer2 =setTimeout(()=>{
+                                   _this.saveSuccess=false;
+                                   clearTimeout(timer2); 
+                            },1000)
+                           
+                       }
+                },
                 modelType(newValue,oldValue){
                     this.saveBtn="background:#5897FF;color: #fff;";
                 },
@@ -153,11 +165,14 @@ export default {
                 ...Vuex.mapState({
                     projects : state =>state.newRequestForm.projects,
                     //是否关闭窗口
-                    closeWindow:state=>state.newRequestForm.closeWindow,
                     //模糊查询出来的数据
                     searchProjects:state=>state.newRequestForm.searchProjects,
                     //查不到
-                    searchNot:state=>state.newRequestForm.searchNot
+                    searchNot:state=>state.newRequestForm.searchNot,
+                    //saveLoading状态
+                    saveLoading:state=>state.newRequestForm.saveLoading,
+                    //成功状态
+                    success:state=>state.newRequestForm.success,
                 })
          },
          methods: {
@@ -166,10 +181,6 @@ export default {
                     getInitialAddDatas:"newRequestForm/getInitialAddDatas",
                     //点击生成申请单
                     newRequestForm :"newRequestForm/newRequestForm",
-                    //关闭当前页面
-                    handleCloseRouter:"home/handleCloseRouter",
-                    //不关闭
-                    handleNotCloseWindow:"newRequestForm/handleCloseWindow",
                     //模糊查询
                     getSearchVal:"newRequestForm/getSearchVal",
                     //清除查询到的数据
@@ -209,6 +220,14 @@ export default {
                  }
                    
              },
+             //enter键查询
+             handleEnterToSearch($event){
+                 if($event.keyCode===13){
+                     if(this.searchVal!==''){
+                     this.getSearchVal(this.searchVal);
+                    }
+                 }
+             },
              //点击保存则新建一张申请单
              handleSave($event){
                     var _this = this;
@@ -228,11 +247,14 @@ export default {
                    if(this.linkEmail==""){
                        this.linkEmailTip=true;
                    }
-                   if(this.applyType!==""&&this.linkMan!==""&&this.linkTel!==""&&this.linkEmail!==""){
-                        this.saveLoading =true;
+                   //项目编号没有选择
+                   if(this.projectsNum==""){
+                       alert('请选择项目')
+                   }
+                   if(this.applyType!==""&&this.linkMan!==""&&this.linkTel!==""&&this.linkEmail!==""&&this.projectsNum!==""){
                         if(this.timer){
                             clearTimeout(this.timer);
-                            this.saveLoading=false;
+                           
                         }
                         this.timer=setTimeout(function(){
                               var remark ="";   
@@ -333,7 +355,7 @@ export default {
          float: left;
          font-size: 14px;
          line-height: 34px;
-         margin-right: 10px;
+         margin-right: 30px;
      }
       .item-select>div:nth-of-type(1) div{
           float: left;
@@ -448,7 +470,9 @@ export default {
             font-size:14px;
             resize:none; 
             outline: none;
-            text-indent: 7px;
+            padding-top: 7px;
+            padding-left: 8px;
+            border:1px solid rgba(232,235,240,1);
             color:#515A6E ;
         }
         .save-btn{
@@ -548,10 +572,13 @@ export default {
             outline: none;
             width: 100%;
             height:100%;
-             background:rgba(88,151,255,1);
-             color: #fff;
-             border-radius: 4px;
+            background:rgba(88,151,255,1);
+            color: #fff;
+            border-radius: 4px;
              
+        }
+        .search-model .search-content .search-input>div:nth-of-type(2)>button:hover{
+            cursor: pointer;
         }
         .search-model .search-content .search-input>div:nth-of-type(2)>button:active{
             background: #6da4ff;
@@ -621,6 +648,19 @@ export default {
              border-radius: 2px;
              text-align: center;
         }
+        .save-success{
+            position:fixed;
+            top: 50%;
+            left:50%;
+            width:200px;
+            height:50px;
+            margin-left:-100px;
+            margin-top:-25px;
+        }
+        .save-success>img{
+            width:100%;
+            height:100%;
+        }
 
     }
 
@@ -663,7 +703,7 @@ export default {
          float: left;
          font-size: 12px;
          line-height: 34px;
-         margin-right: 7px;
+         margin-right: 14px;
      }
       .item-select>div:nth-of-type(1) div{
           float: left;
@@ -765,22 +805,25 @@ export default {
             height: 93px;
             font-size:14px;
             resize:none; 
-            text-indent: 10px;
+            padding-left: 8px;
+            padding-top: 5px;
             color:#515A6E ;
             outline: none;
+            border:1px solid rgba(232,235,240,1);
         }   
         .save-btn{
                 width:102px;
                 height:35px;
                 float:left;
                 margin-left: 459px;
-                margin-top: 103px;
+                margin-top:50px;
         }
          .save-btn>button{
                 width:100%;
                 height:100%;
                 outline: none;
                 background:#5897FF;
+                border-radius: 4px;
                 color: #fff;
                 border: 0;
          }
@@ -940,6 +983,19 @@ export default {
              top:146px;
              border-radius: 2px;
              text-align: center;
+        }
+        .save-success{
+            position:fixed;
+            top: 50%;
+            left:50%;
+            width:160px;
+            height:40px;
+            margin-left:-80px;
+            margin-top:-20px;
+        }
+        .save-success>img{
+            width:100%;
+            height:100%;
         }
 
     }

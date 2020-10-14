@@ -43,5 +43,8 @@ export default{
                 "SystemSetting.Users":false,
                 //权限
                 "SystemSetting.Permissions":false,
-        }
+        },
+        //保存成功
+        "saveSuccess":false,
+        "saveLoading":false,
 }

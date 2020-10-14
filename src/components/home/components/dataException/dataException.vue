@@ -17,7 +17,7 @@
             <!-- 云支付订单 --> 
             <div class="from-table  payColudManager" v-if="payColud">
                 <div class="payColud-form">
-                    <div class="samllBtn"><button>同步</button></div>
+                    <div class="samllBtn"><button @click="handlePayColudManagerSame">同步</button></div>
                     <table cellpadding="0" cellspacing="0">
                         <tr>
                         <td></td>
@@ -27,9 +27,8 @@
                         <td>订单状态更新时间</td>
                         <td>账套制单情况</td>
                         </tr>
-                        <tr>
-                        <td><span class="iconfont icon-fuxuankuang_weixuanzhong
-        "  @click="handleToSelectedTrs"></span></td>
+                        <tr  @click="handleToSelectedTrs($event,item,index)" class="trshover">
+                        <td><span class="iconfont icon-fuxuankuang_weixuanzhong icon"></span></td>
                         <td>25654516165465461365</td>
                         <td>6546464646546546</td>
                         <td>淘淘纺织</td>
@@ -43,7 +42,7 @@
             <!-- 银行流水账单 -->
              <div class="from-table  payColudManager" v-if="buildBill">
                 <div class="payColud-form">
-                    <div class="samllBtn"><button>同步</button></div>
+                    <div class="samllBtn"><button @click="handleToBanksSame">同步</button></div>
                     <table cellpadding="0" cellspacing="0">
                         <tr>
                         <td></td>
@@ -53,9 +52,8 @@
                         <td>品牌名称</td>
                         <td>更新时间</td>
                         </tr>
-                        <tr>
-                        <td><span class="iconfont icon-fuxuankuang_weixuanzhong
-        "></span></td>
+                        <tr @click="handleToBanksData($event,item,index)" class="trsHoverTwo">
+                        <td><span class="iconfont icon-fuxuankuang_weixuanzhong icon"></span></td>
                         <td>25654516165465461365</td>
                         <td>6546464646546546</td>
                         <td>建行</td>
@@ -91,9 +89,39 @@ export default {
 
             },
             //选中对应的数据
-            handleToSelectedTrs(){
+            handleToSelectedTrs($event,item,index){
+                var trs = document.getElementsByClassName('trshover');
                 
-            }
+                if(trs[0].firstElementChild.firstElementChild.className.indexOf('icon-fuxuankuang_weixuanzhong')!==-1){
+                    trs[0].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_weixuanzhong','icon');
+                     trs[0].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_xuanzhong','icon1');
+                }else{
+                     trs[0].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_xuanzhong','icon1');
+                     trs[0].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_weixuanzhong','icon');
+                }
+            },
+
+            //选中对应的数据
+           handleToBanksData($event){
+                var trs = document.getElementsByClassName('trsHoverTwo'); 
+               if(trs[0].firstElementChild.firstElementChild.className.indexOf('icon-fuxuankuang_weixuanzhong')!==-1){
+                     trs[0].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_weixuanzhong','icon');
+                     trs[0].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_xuanzhong','icon1');
+                }else{
+                     trs[0].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_xuanzhong','icon1');
+                     trs[0].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_weixuanzhong','icon');
+                }
+
+           },
+
+           //云支付订单同步
+           handlePayColudManagerSame(){
+                console.log('云支付订单异常')
+           },
+           //银行流水账单数据同步
+           handleToBanksSame(){
+               console.log('银行流水异常');
+           }
         }
 }
 </script>
@@ -172,7 +200,7 @@ export default {
     .samllBtn{
         width: 100%;
         overflow: hidden;
-        margin-bottom:24px;
+        margin-bottom:14px;
         
     }
     .samllBtn>button{
@@ -202,6 +230,12 @@ export default {
     font-size: 14px;
     color: #888888;
     }
+    .payColud-form > table > tr > td:nth-of-type(1){
+        padding-right: 0;
+        text-align: center;
+        text-indent: 0;
+        width: 60px;
+    }
     .payColud-form > table > tr:nth-of-type(1) > td {
     line-height: 41px;
     text-align: left;
@@ -209,6 +243,20 @@ export default {
     font-size: 14px;
     background: rgba(241, 243, 246, 1);
     color: #888888;
+    }
+   .icon{
+    color: #D4D4D4;
+    }
+    .icon1{
+    color: #5897FF;
+    }
+    .trshover:hover{
+        background:#e8eaec;
+        cursor: pointer;
+    }
+    .trsHoverTwo:hover{
+        background:#e8eaec;
+        cursor: pointer;
     }
 }
 @media screen  and (max-width:1400px){
@@ -284,7 +332,7 @@ export default {
     .samllBtn{
         width: 100%;
         overflow: hidden;
-        margin-bottom:18px;
+        margin-bottom:14px;
         
     }
     .samllBtn>button{
@@ -315,6 +363,12 @@ export default {
     font-size: 12px;
     color: #888888;
     }
+    .payColud-form > table > tr > td:nth-of-type(1){
+        padding-right: 0;
+        text-indent: 0;
+        width:40px;
+        text-align: center;
+    }
     .payColud-form > table > tr:nth-of-type(1) > td {
     line-height: 30px;
     text-align: left;
@@ -323,7 +377,20 @@ export default {
     background: rgba(241, 243, 246, 1);
     color: #888888;
     }
-    
+    .icon{
+    color: #D4D4D4;
+    }
+    .icon1{
+    color: #5897FF;
+    }
+    .trshover:hover{
+        background:#e8eaec;
+        cursor: pointer;
+    }
+    .trsHoverTwo:hover{
+        background:#e8eaec;
+        cursor: pointer;
+    }
 }
 
 </style>

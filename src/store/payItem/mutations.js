@@ -4,8 +4,8 @@ export default{
         state.AcceptingCloudApplicationFormCount =params.result.acceptingCloudApplicationFormCount;
         state.ApplyingBrandCertificationApplicationFormCount=params.result.applyingBrandCertificationApplicationFormCount;
         state.InformationSubmittedBrandCertificationApplicationFormCount=params.result.informationSubmittedBrandCertificationApplicationFormCount;
-        state.VerifiedBrandCertificationApplicationFormCount=params.result.openedCloudOrderBrandCertificationApplicationFormCount;
-        state.OpenedCloudOrderBrandCertificationApplicationFormCount=params.result.settedReceivableAccountApplicationFormCount;
-        state.SettedReceivableAccountApplicationFormCount=params.result.verifiedBrandCertificationApplicationFormCount;
+        state.VerifiedBrandCertificationApplicationFormCount=params.result.verifiedBrandCertificationApplicationFormCount;
+        state.OpenedCloudOrderBrandCertificationApplicationFormCount=params.result.openedCloudOrderBrandCertificationApplicationFormCount;
+        state.SettedReceivableAccountApplicationFormCount=params.result.settedReceivableAccountApplicationFormCount;
     }
-}
+} 

@@ -33,7 +33,7 @@
                             <div @click="handelBack"><span class="goback">返回上一级</span></div>
                             <div><span class="iconfont icon-xiangyou"></span></div>
                             <div><span>{{ModifyDepartmentName}}</span><span>{{ModifyName}}</span></div>
-                            <div><button @click="handlePermission">保存</button></div>
+                            <div><button @click="handlePermission"><span v-show="saveLoading==false?true:false">保存</span><span v-show="saveLoading==false?false:true">保存中...</span></button></div>
 
                       </div>
                         <table cellpadding="0" cellspacing="0">
@@ -182,7 +182,7 @@
                             </div>
                     </div>
 
-                    <div class="formTr">
+                    <div class="formTr lastformTr">
                         <div>内部管理:</div>
                             <div class="formselect">
                                 <div>
@@ -205,6 +205,7 @@
                 </div>
             
         </div>
+         <div class="save-success" v-show="saveSuccessTip"><img src="../../../../assets/saveSuccess.png" alt=""></div>
     </div>
 </template>
 <script>
@@ -218,12 +219,31 @@ export default {
           ModifyName:"",
           ModifyDepartmentName:"",
           userId:"",
+          saveSuccessTip:false
        }
+     },
+     watch: {
+           saveSuccess(newValue,oldValue){
+              if(newValue){
+              this.saveSuccessTip=true;                  
+              //此时关闭着这个组件
+              var _this= this;
+              var timerTwo = setTimeout(()=>{
+                clearTimeout(timerTwo);
+                 _this.saveSuccessTip=false;
+                 _this.userPermissions =true,
+                 _this.setPermissions=false 
+              },500)
+             
+            }
+           }
      },
      computed:{
         ...Vuex.mapState({
               permissionUser:state=>state.permissions.permissionUser,
-              permissAllow:state=>state.permissions.permissAllow
+              permissAllow:state=>state.permissions.permissAllow,
+              saveSuccess:state=>state.permissions.saveSuccess,
+              saveLoading:state=>state.permissions.saveLoading
         })
      }, 
      methods:{
@@ -232,12 +252,13 @@ export default {
             //获取用户权限
             getUserPermissionDatas:"permissions/getUserPermissionDatas",
             //设置用户权限
-            modifyUserPermission:"permissions/modifyUserPermission"
+            modifyUserPermission:"permissions/modifyUserPermission",
+            //用户操作权限
+            opationPermission:"permissions/opationPermission"
        }),
        //切换到设置权限
-        handleToSetPermission($event){
-          
-          if(this.userId){
+        handleToSetPermission($event){ 
+          if(this.userId !==""){
               this.getUserPermissionDatas(this.userId);
               this.userPermissions =false,
               this.setPermissions=true
@@ -261,101 +282,357 @@ export default {
          this.ModifyDepartmentName= param.departmentName
          this.ModifyName=param.name
       },
-      //选择权限操作
-      handleSelectIcon($event){
-           if($event.target.className.indexOf('icon1')!==-1){
-              //现在是有权限,让他没有权限
-              $event.target.classList.remove('icon1');
-              $event.target.classList.remove('icon-xuanzhong1');
-              $event.target.classList.add('icon');
-              $event.target.classList.add('icon-radio');
-
-          }else{
-              $event.target.classList.remove('icon');
-              $event.target.classList.remove('icon-radio');
-              $event.target.classList.add('icon1');
-              $event.target.classList.add('icon-xuanzhong1');
-          }
-      },
       //云支付申请跟进总表
       //查看权限
       handleInquiryCloudApplicationFormSummaryStatement($event){
-           this.handleSelectIcon($event)
+            if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPayInquiry.CloudApplicationFormSummaryStatement.Inquiry":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPayInquiry.CloudApplicationFormSummaryStatement.Inquiry":true
+             }
+               this.opationPermission(param);
+              
+                
+          }
+        
+
       },
       //关闭
       handleCloseCloudApplicationFormSummaryStatement($event){
-           this.handleSelectIcon($event)
+             if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPayInquiry.CloudApplicationFormSummaryStatement.Close":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPayInquiry.CloudApplicationFormSummaryStatement.Close":true
+             }
+               this.opationPermission(param);
+              
+                
+          }
       },
       //备注修改
       handleModifyRemarkCloudApplicationFormSummaryStatement($event){
-          this.handleSelectIcon($event)
+         if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPayInquiry.CloudApplicationFormSummaryStatement.ModifyRemark":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPayInquiry.CloudApplicationFormSummaryStatement.ModifyRemark":true
+             }
+               this.opationPermission(param);
+              
+                
+          }
       },
       //品牌认证申请总表
       //查看
       handleInquiryBrandCertificationApplicationFormSummaryStatement($event){
-          this.handleSelectIcon($event) 
+          if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPayInquiry.BrandCertificationApplicationFormSummaryStatement.Inquiry":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPayInquiry.BrandCertificationApplicationFormSummaryStatement.Inquiry":true
+             }
+               this.opationPermission(param);
+              
+                
+          }
       },
       //关闭
       handleCloseBrandCertificationApplicationFormSummaryStatement($event){
-           this.handleSelectIcon($event) 
+         if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPayInquiry.BrandCertificationApplicationFormSummaryStatement.Close":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPayInquiry.BrandCertificationApplicationFormSummaryStatement.Close":true
+             }
+               this.opationPermission(param);
+              
+                
+          } 
       },
 
       //品牌总表
     handleInquiryProjectBrandSummaryStatement($event){
-           this.handleSelectIcon($event) 
+          if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPayInquiry.ProjectBrandSummaryStatement.Inquiry":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPayInquiry.ProjectBrandSummaryStatement.Inquiry":true
+             }
+               this.opationPermission(param);
+              
+                
+          } 
     },
 
     //任务跟进总表
     //查看
     handleInquiryReceivableAccountApplicationFormSummaryStatement($event){
-        this.handleSelectIcon($event) 
+        if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPayInquiry.ReceivableAccountApplicationFormSummaryStatement.Inquiry":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPayInquiry.ReceivableAccountApplicationFormSummaryStatement.Inquiry":true
+             }
+               this.opationPermission(param);
+              
+                
+          } 
     },
     handleCloseReceivableAccountApplicationFormSummaryStatement($event){
-         this.handleSelectIcon($event) 
+       if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPayInquiry.ReceivableAccountApplicationFormSummaryStatement.Close":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPayInquiry.ReceivableAccountApplicationFormSummaryStatement.Close":true
+             }
+               this.opationPermission(param);
+              
+                
+          } 
     },
     //新建申请单
      handleCreateCloudApplicationForm($event){
-            this.handleSelectIcon($event)
+             if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPay.CloudApplicationForm.Create":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPay.CloudApplicationForm.Create":true
+             }
+               this.opationPermission(param);    
+          } 
+
+           
       },
     //受理完成
     handleAcceptAndFinishCloudApplicationForm($event){
-          this.handleSelectIcon($event)
-    },
+           if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPay.CloudApplicationForm.AcceptAndFinish":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPay.CloudApplicationForm.AcceptAndFinish":true
+             }
+               this.opationPermission(param);    
+          } 
+    }, 
     //申请品牌认证
     handleCreateBrandCertificationApplicationForm($event){
-        this.handleSelectIcon($event)
+       if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPay.BrandCertificationApplicationForm.Create":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPay.BrandCertificationApplicationForm.Create":true
+             }
+               this.opationPermission(param);    
+          } 
+        
     },
     //提交认证资料
     handleUploadBrandCertificationApplicationForm($event){
-         this.handleSelectIcon($event)
+         if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPay.BrandCertificationApplicationForm.Upload":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPay.BrandCertificationApplicationForm.Upload":true
+             }
+               this.opationPermission(param);    
+          } 
     },
     //品牌认证
     handleVerifyBrandCertificationApplicationForm($event){
-         this.handleSelectIcon($event)
+        if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPay.BrandCertificationApplicationForm.Verify":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPay.BrandCertificationApplicationForm.Verify":true
+             }
+               this.opationPermission(param);    
+          } 
     },
     //开通云单据
     handleOpenOrderBrandCertificationApplicationForm($event){
-        this.handleSelectIcon($event)
+       if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPay.BrandCertificationApplicationForm.OpenOrder":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPay.BrandCertificationApplicationForm.OpenOrder":true
+             }
+               this.opationPermission(param);    
+          } 
     },
     //开通云支付 
     handleOpenPayBrandCertificationApplicationForm($event){
-      this.handleSelectIcon($event)
+     if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPay.BrandCertificationApplicationForm.OpenPay":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPay.BrandCertificationApplicationForm.OpenPay":true
+             }
+               this.opationPermission(param);    
+          } 
     },
     //申请云支付收款账号
     handleCreateApplicationFormFollowUp($event){
-     this.handleSelectIcon($event)
+     if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPay.ApplicationFormFollowUp.Create":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPay.ApplicationFormFollowUp.Create":true
+             }
+               this.opationPermission(param);    
+          } 
     },
     //安排培训机构
     handleArrangeTrainingInstitution($event){
-      this.handleSelectIcon($event)
+      if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "CloudPay.ApplicationFormFollowUp.ArrangeTrainingInstitution":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "CloudPay.ApplicationFormFollowUp.ArrangeTrainingInstitution":true
+             }
+               this.opationPermission(param);    
+          } 
     },
     //人员
     handleUsersSystemSetting($event){
-      this.handleSelectIcon($event)
+      // this.handleSelectIcon($event)
+       if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "SystemSetting.Users":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "SystemSetting.Users":true
+             }
+               this.opationPermission(param);    
+          } 
+      
     },
     //权限
     handlePermissionsSystemSetting($event){
-     this.handleSelectIcon($event)
+    //  this.handleSelectIcon($event)
+     if($event.target.className.indexOf('icon1')!==-1){
+              //现在是有权限,让他没有权限
+              var param ={
+                  "SystemSetting.Permissions":false
+              }
+               this.opationPermission(param);
+                           
+
+          }else{
+             var param ={
+                 "SystemSetting.Permissions":true
+             }
+               this.opationPermission(param);    
+          } 
+    
     },
 
     //最后保存操作
@@ -477,10 +754,15 @@ export default {
       })
 
        this.modifyUserPermission(param);
+       //保存成功后Id清空数据清空
+       this.userId="";
+         var trs = document.getElementsByClassName('trhover');
+          var len = trs.length;
+          for(var i=0;i<len;i++){
+             trs[i].style.background=''
+          }
 
-       //此时关闭着这个组件
-        this.userPermissions =true,
-        this.setPermissions=false
+      
     }
      },
 
@@ -535,6 +817,12 @@ export default {
 }
 .addUserAdminActive{
   background: #5897ff;
+}
+.addUserAdminActive:hover{
+  cursor: pointer;
+}
+.addUserAdminActive:active{
+  background: #6da4ff;
 }
 .disable{
   background: #E1E1E1;
@@ -670,6 +958,12 @@ export default {
   color: #fff;
   border-radius: 4px;
 }
+.userSetForm>div:nth-of-type(4)>button:hover{
+  cursor: pointer;
+}
+.userSetForm>div:nth-of-type(4)>button:active{
+  background: #6da4ff;
+}
 .setPermissionsFormone {
  
   margin-left: 89px;
@@ -735,7 +1029,7 @@ export default {
         margin-left: 15px;
 }
 .Bill{
-        margin-top: 52px;
+        margin-top: 30px;
         padding-left: 110px;
         margin-bottom: 12px;    
         font-size: 14px;
@@ -771,6 +1065,22 @@ export default {
    
     
 }
+.lastformTr{
+  margin-bottom: 8px;
+}
+.save-success{
+            position:fixed;
+            top: 50%;
+            left:50%;
+            width:200px;
+            height:50px;
+            margin-left:-100px;
+            margin-top:-25px;
+        }
+.save-success>img{
+            width:100%;
+            height:100%;
+        }
 }
 @media screen  and (max-width:1400px) {
   .user-Permissions{
@@ -809,6 +1119,12 @@ export default {
 }
 .addUserAdminActive{
   background: #5897ff;
+}
+.addUserAdminActive:hover{
+  cursor: pointer;
+}
+.addUserAdminActive:active{
+  background: #6da4ff;
 }
 .disable{
   background: #E1E1E1;
@@ -946,6 +1262,12 @@ export default {
   color: #fff;
   border-radius: 4px;
 }
+.userSetForm>div:nth-of-type(4)>button:hover{
+  cursor: pointer;
+}
+.userSetForm>div:nth-of-type(4)>button:active{
+  background: #6da4ff;
+}
 
 .setPermissionsFormone {
  
@@ -1010,7 +1332,7 @@ export default {
         margin-left: 15px;
 }
 .Bill{
-        margin-top: 38px;
+        margin-top: 22px;
         padding-left: 80px;
         margin-bottom: 12px;    
         font-size: 12px;
@@ -1044,5 +1366,21 @@ export default {
 .formselect>div>div:nth-of-type(1){
   width:27px;
 }
+.lastformTr{
+  margin-bottom: 5px;
+}
+.save-success{
+            position:fixed;
+            top: 50%;
+            left:50%;
+            width:160px;
+            height:40px;
+            margin-left:-80px;
+            margin-top:-20px;
+}
+.save-success>img{
+            width:100%;
+            height:100%;
+        }
 }
 </style>

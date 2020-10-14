@@ -25,7 +25,7 @@
                                 <td>{{item.informationSubmittedUsername}}</td>
                             </tr>
                             
-                    </table>
+                    </table> 
             </div>
 
             <!-- 认证模态框 -->
@@ -37,24 +37,24 @@
                             <span class="iconfont icon-chuyidong" @click="handleCloseModel"></span>
                         </div>
                         <div class="data-body">
-                                <div class="applyNumber apply">
+                                <div class="applyNumber apply clearBox">
                                      <div><span>申请单号:</span></div>
                                      <div>{{getInformationSubmitteIdList.number}}</div>
                                 </div>
-                                <div class="applyName apply">
+                                <div class="applyName apply clearBox">
                                       <div><span>品牌名称:</span></div>
                                       <div>{{getInformationSubmitteIdList.brandName}}</div>
                                 </div>
-                                <div class="submitName apply">
+                                <div class="submitName apply clearBox">
                                       <div><span>提交人:</span></div>
                                       <div>{{getInformationSubmitteIdList.informationSubmittedUsername}}</div>
 
                                 </div>
-                                <div class="shopImg apply">
+                                <div class="shopImg apply clearBox">
                                         <div><span>*</span><span>门店照片:</span></div>
                                         <div class="showImg">
                                                 <div  class="getImg">
-                                                    <img :src="imgdata?imgdata:getInformationSubmitteIdList.shopPhoto" alt="" id="imgshopPhoto">
+                                                    <img :src="imgdata?imgdata:getInformationSubmitteIdList.shopPhoto" alt="" id="imgshopPhoto" @click="handleToShowImgShow">
                                                 </div>
                                                 <div class="reupload">
                                                         <span class="iconfont icon-tupian"></span>
@@ -67,10 +67,10 @@
                                 </div>
 
                                 <!-- 营业执照 -->
-                                <div class="apply business-license">
+                                <div class="apply business-license clearBox">
                                         <div>营业执照:</div>
                                                 <div class="showImgTwo" v-if="getInformationSubmitteIdList.businessLicensePhoto">
-                                                    <img :src="imgdataTwo?imgdataTwo:getInformationSubmitteIdList.businessLicensePhoto" alt="" class="imgdataTwo">
+                                                    <img :src="imgdataTwo?imgdataTwo:getInformationSubmitteIdList.businessLicensePhoto" alt="" class="imgdataTwo" @click="handleToShowImgShowTwo">
                                                     <div class="reupload">
                                                             <span class="iconfont icon-tupian"></span>
                                                             <span>重新上传</span>
@@ -79,12 +79,12 @@
                                                 </div>
                                                 <div class="showImgTwoAgin" v-else>
                                                      <div class="getImg" v-if="addbusinessLicensePhoto">
-                                                        <img :src="imgdataTwo" alt="" class="imgdataTwo">
+                                                        <img :src="imgdataTwo" alt="" class="imgdataTwo" @click="handleToShowImgShowTwo">
                                                         <div class="imgdelTwo" @click="handleDelUpload"><span class="iconfont icon-shanchu"></span><span>删除</span></div>
                                                     </div>
                                                     <div class="addchuan" v-show="uploadTwo">
-                                                            <span>补充上传</span>
-                                                            <input type="file" id="file" accept="image/jpg,image/png,image/jpeg,image/gif" @change="handeladdreupload($event)">
+                                                            <span id="suppUpload">补充上传</span>
+                                                            <input type="file" id="file" accept="image/jpg,image/png,image/jpeg,image/gif" @change="handeladdreupload($event)" @mouseover="handleMouseSuppUpload" @mouseout="handleMouseOutSuppload">
                                                     </div>
                                                    
                                                 </div>
@@ -92,11 +92,24 @@
                                        
                                 </div>
                                 <!-- 提交页脚 -->
-                                <div class="footer">
+                                <div class="footer" clearBox>
                                         <button @click="handleTobrandCert">认证通过</button>
                                 </div>
                         </div>
                 </div> 
+
+                  <!-- 门店大图 -->
+                            <div class="imgShowBig" v-show="imgShowBig" id="imgShowBig">
+                                    
+                                    <img :src="imgdata?imgdata:getInformationSubmitteIdList.shopPhoto" alt="" id="imgShowBigMain"> 
+                                    <div style="width:20px;height:20px;background:rgba(0,0,0,0.2);text-align:center;line-height:20px;" id="imgShowBigIcon" @click="handleTocloseimgShowBig"><span class="iconfont icon-chuyidong"></span></div>
+                            </div> 
+
+                    <!-- 营业执照大图 -->
+                        <div class="imgShowBigTwo" v-show="imgShowBigTwo" id="imgShowBigTwo">
+                                     <img :src="imgdataTwo?imgdataTwo:getInformationSubmitteIdList.businessLicensePhoto" alt="" id="imgShowBigTwoMain"> 
+                                    <div style="width:20px;height:20px;background:rgba(0,0,0,0.2);text-align:center;line-height:20px;" id="imgShowBigTwoIcon" @click="handleTocloseimgShowBigTwo"><span class="iconfont icon-chuyidong"></span></div>
+                        </div>
             </div>
      </div>
 </template>
@@ -115,6 +128,10 @@ export default {
                 finishId:"",
                 addbusinessLicensePhoto:false,
                 // ToBrandCert:false
+                 //门店大图
+                imgShowBig:false,
+                //营业执照大图
+                imgShowBigTwo:false
             }
         },
         watch: {
@@ -138,8 +155,12 @@ export default {
                      getInformationForms:"brandCert/getInformationSubmittedApplicationForms",
                      //根据id获取认证资料
                      getInformationSubmittedApplicationFormByID:"brandCert/getInformationSubmittedApplicationFormByID",
-                     //补充上传资料
-                     replenishApplicationFormInformation:"brandCert/replenishApplicationFormInformation",
+                     //重新上传门店资料
+                     replenishShopPhoto:"brandCert/replenishShopPhoto",
+                     //补充上传营业执照
+                     replenishBusinessLicensePhoto:"brandCert/replenishBusinessLicensePhoto",
+                     //删除营业执照
+                     deleteBusinessLicensePhoto:"brandCert/deleteBusinessLicensePhoto",
                      //认证通过
                      verifyApplicationFormInformation:"brandCert/verifyApplicationFormInformation"
 
@@ -173,6 +194,14 @@ export default {
                         // 图片base64化
                         var newUrl = this.result;
                         _this.imgdata=newUrl;
+                        //重新上传门店照片
+                        var param =JSON.stringify({
+                            "id":_this.finishId,
+                            "ShopPhoto":_this.imgdata,
+                            "ShopPhotoMD5":md5(_this.imgdata),
+                        })
+                        _this.replenishShopPhoto(param)
+
                        
                     }
                 },
@@ -186,6 +215,14 @@ export default {
                         // 图片base64化
                         var newUrl = this.result;
                         _this.imgdataTwo=newUrl;
+                        //重新上传再走上补充上传
+                         var param =JSON.stringify({
+                        "id":_this.finishId,
+                        "BusinessLicensePhotoMD5":md5(_this.imgdataTwo),
+                        "BusinessLicensePhoto":_this.imgdataTwo
+                    })
+                     _this.replenishBusinessLicensePhoto(param);
+
                     }
             },
             //营业执照的补充上传
@@ -202,15 +239,12 @@ export default {
                         _this.uploadTwo=false;
 
                     var imgshopPhoto =document.getElementById('imgshopPhoto');
-                    _this.imgdata =imgshopPhoto.src;
                      var param =JSON.stringify({
                         "id":_this.finishId,
-                        "ShopPhoto":_this.imgdata,
-                        "ShopPhotoMD5":md5(_this.imgdata),
                         "BusinessLicensePhotoMD5":md5(_this.imgdataTwo),
                         "BusinessLicensePhoto":_this.imgdataTwo
                     })
-                    _this.replenishApplicationFormInformation(param);  
+                     _this.replenishBusinessLicensePhoto(param);  
                     }
 
                 
@@ -220,12 +254,17 @@ export default {
         
          //删除错误上传
          handleDelUpload(){
-               var file = document.getElementById('file')
+               var file = document.getElementById('file');
+               var param ={
+                   "id":this.finishId
+               }
+               this.deleteBusinessLicensePhoto(param);
                file.value='';
                this.imgdataTwo="";
                this.addbusinessLicensePhoto=false;
                this.uploadTwo=true;
-   
+
+
          },
          
          //关闭模态框
@@ -251,8 +290,77 @@ export default {
                         trs[i].style.background = '';
                 }
             }
+         },
+         //鼠标滑过
+         handleMouseSuppUpload($event){
+                var  suppUpload = document.getElementById('suppUpload');
+                suppUpload.style.textDecoration="underline";
+                $event.target.style.cursor="pointer"; 
+                 console.log($event.target.style.cursor);
+         },
+         handleMouseOutSuppload($event){
+              var  suppUpload = document.getElementById('suppUpload');
+                suppUpload.style.textDecoration="none";
+                $event.target.style.cursor="pointer";
+         },
+           //显示大图
+         handleToShowImgShow(){
+               var imgShowBig = document.getElementById('imgShowBig');
+               var imgShowBigMain = document.getElementById('imgShowBigMain');
+               var imgShowBigIcon = document.getElementById('imgShowBigIcon');
+
+               this.imgShowBig=true;
+               var w= document.documentElement.clientWidth*0.6 ;
+               var h = document.documentElement.clientHeight*0.8;
+                imgShowBig.style.width=w+'px';
+                imgShowBig.style.height =h+'px';
+                imgShowBig.style.top = document.documentElement.clientHeight*0.5 - h*0.5 +'px';
+                imgShowBig.style.left =document.documentElement.clientWidth*0.5-w*0.5 +'px';
+                //图片的最大高度宽度不超过
+                imgShowBigMain.style.maxWidth =w+'px';
+                imgShowBigMain.style.maxHeight=h+'px';
+                imgShowBigMain.style.top =h*0.5-imgShowBigMain.height*0.5+"px";
+                imgShowBigMain.style.left =w*0.5-imgShowBigMain.width*0.5+'px';
+                //字体图标
+                imgShowBigIcon.style.color='#fff';
+                imgShowBigIcon.style.position="absolute";
+                imgShowBigIcon.style.top =h*0.5-imgShowBigMain.height*0.5+20+"px";
+                imgShowBigIcon.style.left =w*0.5-imgShowBigMain.width*0.5+imgShowBigMain.width*0.9+'px';
+         },
+
+         //关闭大图
+         handleTocloseimgShowBig(){
+              this.imgShowBig=false;
+         },
+
+          handleToShowImgShowTwo(){
+               var imgShowBig = document.getElementById('imgShowBigTwo');
+               var imgShowBigMain = document.getElementById('imgShowBigTwoMain');
+               var imgShowBigIcon = document.getElementById('imgShowBigTwoIcon');
+               this.imgShowBigTwo=true;
+               var w= document.documentElement.clientWidth*0.6 ;
+               var h = document.documentElement.clientHeight*0.8;
+                imgShowBig.style.width=w+'px';
+                imgShowBig.style.height =h+'px';
+                imgShowBig.style.top = document.documentElement.clientHeight*0.5 - h*0.5 +'px';
+                imgShowBig.style.left =document.documentElement.clientWidth*0.5-w*0.5 +'px';
+                //图片的最大高度宽度不超过
+                imgShowBigMain.style.maxWidth =w+'px';
+                imgShowBigMain.style.maxHeight=h+'px';
+                imgShowBigMain.style.top =h*0.5-imgShowBigMain.height*0.5+"px";
+                imgShowBigMain.style.left =w*0.5-imgShowBigMain.width*0.5+'px';
+                //字体图标
+                imgShowBigIcon.style.color='#fff';
+                imgShowBigIcon.style.position="absolute";
+                imgShowBigIcon.style.top =h*0.5-imgShowBigMain.height*0.5+20+"px";
+                imgShowBigIcon.style.left =w*0.5-imgShowBigMain.width*0.5+imgShowBigMain.width*0.9+'px';
+         },
+         handleTocloseimgShowBigTwo(){
+              this.imgShowBigTwo=false;
          }
         },
+
+      
 }
 </script>
 
@@ -393,8 +501,16 @@ export default {
 .data-body{
 
 }
+.clearBox:after{
+   content:".";
+   display:block;
+   clear:both;
+   height:0; 
+   overflow:hidden; 
+   visibility:hidden;
+}
 .apply{
-    overflow: hidden;
+    /* overflow: hidden; */
     margin-left:46px;
     margin-bottom:20px;
 }
@@ -410,13 +526,18 @@ export default {
 }
 .apply>div:nth-of-type(1){
     width: 101px;
-    text-align: right;
+    text-align: left;
 }
 .apply>div:nth-of-type(2){
     margin-left:41px;
 }
 .shopImg{
-
+   
+}
+.shopImg>div:nth-of-type(1){
+    margin-left:-16px;
+    width:117px;
+    
 }
 .shopImg>div:nth-of-type(1)>span:nth-of-type(1){
     color: red;
@@ -428,6 +549,9 @@ export default {
     border-radius:4px;
     position:relative;
 
+}
+.showImg:hover{
+    cursor: pointer;
 }
 .getImg{
     width:180px;
@@ -459,6 +583,9 @@ export default {
   width: 100%;
     height:34px;
 }
+.reupload>input:hover{
+cursor: pointer;
+}
 
 /* 营业执照 */
 .showImgTwoAgin{
@@ -482,6 +609,9 @@ export default {
     height:160px;
     border-radius:4px;
     position: relative;
+}
+.showImgTwo:hover{
+    cursor: pointer;
 }
 .showImgTwo>img{
     width:100%;
@@ -514,6 +644,9 @@ export default {
   width: 100%;
   height:34px;
 }
+.addchuan>input:hover{
+    cursor: pointer;
+}
 .addchuan>span{
    color: #5897FF; 
 }
@@ -535,6 +668,29 @@ export default {
     border:0;
     border-radius:4px;
     font-size: 14px;
+}
+.footer>button:hover{
+    cursor: pointer;
+}
+.footer>button:active{
+    background: #6da4ff;
+}
+/* 显示门店大图 */
+.imgShowBig{
+    position: absolute;
+    z-index: 12;    
+}
+.imgShowBig>img{
+    position: absolute;
+}
+.imgShowBigTwo{
+    position: absolute;
+    z-index: 12;
+   
+    
+}
+.imgShowBigTwo>img{
+    position: absolute;
 }
 
 }
@@ -676,9 +832,17 @@ export default {
 
 }
 .apply{
-    overflow: hidden;
+    /* overflow: hidden; */
     margin-left:33px;
     margin-bottom:14px;
+}
+.clearBox:after{
+   content:".";
+   display:block;
+   clear:both;
+   height:0; 
+   overflow:hidden; 
+   visibility:hidden;
 }
 .submitName{
     border-bottom:1px solid #F8F8F8;
@@ -692,13 +856,17 @@ export default {
 }
 .apply>div:nth-of-type(1){
     width: 74px;
-    text-align: right;
+    text-align: left;
 }
 .apply>div:nth-of-type(2){
     margin-left:30px;
 }
 .shopImg{
 
+}
+.shopImg>div:nth-of-type(1){
+    margin-left: -14px;
+    width: 88px;
 }
 .shopImg>div:nth-of-type(1)>span:nth-of-type(1){
     color: red;
@@ -710,6 +878,9 @@ export default {
     border-radius:4px;
     position:relative;
 
+}
+.showImg:hover{
+    cursor: pointer;
 }
 .getImg{
     width:131px;
@@ -741,6 +912,9 @@ export default {
     width: 100%;
     height:25px;
 }
+.reupload>input:hover{
+    cursor: pointer;
+}
 
 /* 营业执照 */
 .showImgTwoAgin{
@@ -765,6 +939,9 @@ export default {
     border-radius:4px;
     position: relative;
 }
+.showImgTwo:hover{
+    cursor: pointer;
+}
 .showImgTwo>img{
     width:100%;
     height:100%;
@@ -777,6 +954,7 @@ export default {
     left:0;
     color:#fff;
     text-align: center;  
+    background:rgba(0,0,0,0.3);
 }
 .imgdelTwo:hover{
     cursor: pointer;
@@ -792,6 +970,9 @@ export default {
   left:0;
   width: 100%;
   height:25px;
+}
+.addchuan>input:hover{
+    cursor: pointer;
 }
 .addchuan>span{
    color: #5897FF; 
@@ -814,6 +995,32 @@ export default {
     border:0;
     border-radius:4px;
     font-size: 12px;
+}
+.footer>button:hover{
+    cursor: pointer;
+}
+.footer>button:active{
+    background: #6da4ff;
+}
+/* 显示门店大图 */
+.imgShowBig{
+    position: absolute;
+    z-index: 12;
+   
+    
+}
+.imgShowBig>img{
+    position: absolute;
+}
+.imgShowBigTwo{
+    position: absolute;
+    z-index: 12;
+   
+    
+}
+.imgShowBigTwo>img{
+    position: absolute;
+ 
 }
 }
 </style>    

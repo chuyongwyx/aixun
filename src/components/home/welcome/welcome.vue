@@ -6,7 +6,7 @@
                                     <div class="pay-items" :class='{"nav-active":payItems}' @click="handelToItem"><span class="iconfont icon-zhifu"></span><span>云支付项目</span></div>
                                     <div class="pay-query" :class='{"nav-active":payQuery}'  @click="handelToSearch"><span class="iconfont icon-chaxun1"></span><span>云支付查询</span></div>
                                     <div class="pay-abnormalMonitoring" :class='{"nav-active":payAbnormalMonitoring}' @click="handelToMonitoring"><span class="iconfont icon-shebeileijiankongdian"></span><span>云支付异常监控</span></div>
-                                    <div class="Int-manage" :class='{"nav-active":IntManage}' @click="handelToManage" ><span class="iconfont icon-guanli"></span><span>系统设置</span></div>
+                                    <div class="Int-manage" :class='{"nav-active":IntManage}' @click="handelToManage" ><span class="iconfont icon-guanli"></span><span>内部管理</span></div>
                                 </div>
                                 <div class="nav-right">
                                         <router-view></router-view>  
@@ -22,7 +22,7 @@ import Vuex from 'vuex';
 export default {
     data(){
         return{
-                payItems:false,
+                payItems:true,
                 payQuery:false,
                 IntManage:false,
                 payAbnormalMonitoring:false,        
@@ -37,38 +37,51 @@ export default {
         handelToItem(){
              this.payItems = true;
              this.payQuery =false;
-             this.IntManage= false;
-             this.payAbnormalMonitoring=false;
-             this.$router.push('/payItem');
-             this.hanlePayItemMessage();
+            this.IntManage= false;
+            this.payAbnormalMonitoring=false;
+            if(this.$route.name !=="payItem"){
+                   
+                    this.$router.push('/payItem');
+                    // this.hanlePayItemMessage();
+            }
+             
         },
         handelToSearch(){
              this.payItems = false;
              this.payQuery =true;
              this.IntManage= false;
              this.payAbnormalMonitoring=false;
+            if(this.$route.name !=="payQuery"){
             
               this.$router.push('/payQuery');
+            }
+             
         },
         handelToMonitoring(){
              this.payItems = false;
              this.payQuery =false;
              this.IntManage= false;
              this.payAbnormalMonitoring=true;
+            if(this.$route.name !=="abnormalMonitoring"){
+            
             this.$router.push('/abnormalMonitoring')
+            }
         },
         handelToManage(){
              this. payItems = false;
              this.payQuery =false;
              this.payAbnormalMonitoring=false;
              this.IntManage= true;
+            if(this.$route.name !=="intManage"){
+            
             this.$router.push('/intManage');
+            }
         },
 
        
     },
     created(){
-      
+      this.hanlePayItemMessage();
     }
 }
 </script>

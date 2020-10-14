@@ -20,7 +20,11 @@ export default{
         },
         //修改内部人员新
         async replaceUserInfo({commit,state},params){
-            let userReplace = await  replaceUser(params)
+            let userReplace = await  replaceUser(params);
+            if(userReplace.success){
+                let userAdmin = await userAdminInfo();
+                commit("getUserAdmininfo",userAdmin)
+            }
         },
         //删除内部人员
         async handleDeleteUser({commit,state},params){

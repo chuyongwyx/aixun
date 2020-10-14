@@ -5,15 +5,17 @@ export default{
          var dataList = await GetOpenedCloudOrderBrands();
          commit("handleToDataList",dataList)   
      },
- //开通云单据
+ //开通云支付
     async openCloudPay({commit,state},param){
         var paramStr = JSON.stringify(param);
         state.success = false;
+        state.openLoading=true;
         var  dataInfo = await OpenCloudPay(paramStr);
        
         //如果返回成功则在vuex中删除对应的
         if(dataInfo.success){
             var len = param.IDs.length;
+            state.openLoading=false;
             state.success = true;
             for(var i=0;i<len;i++){
                 state.GetOpenedCloudOrderBrands.map((item,index)=>{
@@ -24,8 +26,10 @@ export default{
 
 
             }
+        }else{
+            state.openLoading=false;
         } 
 
 
-    }
+    } 
 }   

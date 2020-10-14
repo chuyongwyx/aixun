@@ -17,11 +17,10 @@
                                    <span class="iconfont icon-sousuo"></span> 
                                      <div><span>选择项目</span></div>    
                             </div>
-                        </div>
+                        </div> 
                 </div>
                  <!-- 这是搜索模态框 -->
-              
-                <div class="search-model" v-show="searchModel">
+                <div class="search-model" v-show="searchModel" @keydown="handleEnterToSearch">
                         <div class="search-content">
                              <div class="search-tit"><span>搜索</span><span class="iconfont  icon-chuyidong" @click="handleSearchHide"></span></div>
                              <div class="search-input"><div><input type="text" placeholder="请输入项目编号/项目名称" v-model="searchVal"></div><div><button @click="handleToSearch">搜索</button></div></div>
@@ -57,10 +56,11 @@
                 <div class="footer">
                      <button @click="handleSaveApplyBrandCert" :class="{'saveBtn':btnBg}"><span v-show="saveLoading==false?true:false">保存</span><span v-show="saveLoading==false?false:true">保存中...</span></button>
                 </div>
+                <div class="save-success" v-show="saveSuccessTip"><img src="../../../../assets/saveSuccess.png" alt=""></div>
             </div>
-
+   
  
-</template>
+</template> 
 <script>
 import Vuex  from  "vuex"
 export default {
@@ -73,21 +73,25 @@ export default {
             projectsName:"",
             projectsNameTest:"",
             searchVal:"",
-            //保存的loading
-            saveLoading:false,
+            saveSuccessTip:false,
             //函数防抖
             timer:null
         }
     },
     watch: {
-                closeWindow(newValue,oldValue){
-                            if(newValue){
-                                this.saveLoading=false;
-                                this.handleCloseRouter(this.$route.name)
-                                this.$router.push('/payItem');
-                                this.handleNotCloseWindow();
-                            }                      
-                 }
+               saveSuccess(newValue,oldValue){
+                    if(newValue){
+                        this.projectsNum="";
+                        this.projectsName="";
+                        this.projectsNameTest="";
+                        this.saveSuccessTip=true;
+                        var _this = this;
+                        var timerTwo = setTimeout(()=>{
+                                _this.saveSuccessTip=false;
+                                 clearTimeout(timerTwo); 
+                        },1000)
+                    }
+               }
     },
     computed: {
         ...Vuex.mapState({
@@ -98,12 +102,14 @@ export default {
                 isUnique:state=>state.applyBrandCert.isUnique,
                 //按钮颜色
                 btnBg:state=>state.applyBrandCert.btnBg,
-                //是否关闭窗口
-                closeWindow:state=>state.applyBrandCert.closeWindow,
                 //模糊查询出来的数据
                 searchProjects:state=>state.applyBrandCert.searchProjects,
                 //查不到
-                searchNot:state=>state.applyBrandCert.searchNot
+                searchNot:state=>state.applyBrandCert.searchNot,
+                //loading状态
+                saveLoading:state=>state.applyBrandCert.saveLoading,
+                //新建表单成功
+                saveSuccess:state=>state.applyBrandCert.saveSuccess
         })
     },
     methods:{
@@ -116,10 +122,6 @@ export default {
             clearDisable:"applyBrandCert/clearDisable",
             //新建申请单
             addApplicationForm:"applyBrandCert/addApplicationForm",
-            //操作完毕关闭页面
-            handleCloseRouter:"home/handleCloseRouter",
-            //不关闭
-            handleNotCloseWindow:"applyBrandCert/handleCloseWindow",
             //模糊查询
             getSearchVal:"applyBrandCert/getSearchVal",
             //清除查询到的数据
@@ -148,11 +150,13 @@ export default {
         },
         //验证项目唯一性
         handelToTest(){
+            this.projectsNameTest = this.projectsNameTest.trim();
             var re1 =/^[0-9]{2,8}$/;
             var re2 =/^[a-zA-Z]{2,8}$/
-            if(re1.test(this.projectsNameTest)||re2.test(this.projectsNameTest)){
+            if(re1.test(this.projectsNameTest)||re2.test(this.projectsNameTest)||this.projectsNameTest.length<2){
                     this.tip=true;
-                }else if(this.projectsNameTest.length<=8 && this.projectsNameTest.length>0){
+                }else if(this.projectsNameTest.length<=8 && this.projectsNameTest.length>1){
+                    
                       var param =JSON.stringify({
                          "BrandName":this.projectsNameTest
                         })
@@ -174,16 +178,27 @@ export default {
             }
                    
      },
+     //enter点击查询
+     handleEnterToSearch($event){
+          if($event.keyCode===13){
+                     if(this.searchVal!==''){
+                     this.getSearchVal(this.searchVal);
+                    }
+                 }
+     },
       //保存按钮就是新建申请单
       handleSaveApplyBrandCert(){
-           this.saveLoading =true;
+      
           var _this =this; 
           if(this.timer){
               clearTimeout(this.timer);
-              this.saveLoading=false;
+          
+          }
+          if(this.projectsNum==""){
+              alert('请选择项目');
           }
          
-          if(this.projectsNameTest!==''){
+          if(this.projectsNameTest!==''&&this.projectsNum!==""){
                this.timer =setTimeout(() => {
                 var param =JSON.stringify({
                  "ProjectNumber":_this.projectsNum,
@@ -332,6 +347,7 @@ export default {
     }
     .opation-tip{
         height: 23px;
+        margin-top:8px; 
     }
      .ableUser{
          color:#0CB709;
@@ -447,6 +463,9 @@ export default {
              border-radius: 4px;
              
         }
+         .search-model .search-content .search-input>div:nth-of-type(2)>button:hover{
+             cursor: pointer;
+         }
          .search-model .search-content .search-input>div:nth-of-type(2)>button:active{
             background: #6da4ff;
         }
@@ -515,7 +534,19 @@ export default {
              border-radius: 2px;
              text-align: center;
         }
-
+          .save-success{
+            position:fixed;
+            top: 50%;
+            left:50%;
+            width:200px;
+            height:50px;
+            margin-left:-100px;
+            margin-top:-25px;
+        }
+        .save-success>img{
+            width:100%;
+            height:100%;
+        }
  
 }
 
@@ -642,6 +673,7 @@ export default {
     }
     .opation-tip{
         height: 18px;
+        margin-top:6px;
     }
      .ableUser{
          color:#0CB709;
@@ -651,7 +683,7 @@ export default {
      }
      .footer{
           margin:0 auto;
-         margin-top: 285px;
+         margin-top: 240px;
          margin-bottom:71px;
           width: 102px;
           height: 35px;
@@ -756,6 +788,9 @@ export default {
              color: #fff;
              border-radius: 4px;
         }
+         .search-model .search-content .search-input>div:nth-of-type(2)>button:hover{
+             cursor: pointer;
+         }
         .search-model .search-content .search-input>div:nth-of-type(2)>button:active{
             background: #6da4ff;
         }
@@ -832,5 +867,18 @@ export default {
              border-radius: 2px;
              text-align: center;
     }
+       .save-success{
+            position:fixed;
+            top: 50%;
+            left:50%;
+            width:160px;
+            height:40px;
+            margin-left:-80px;
+            margin-top:-20px;
+        }
+        .save-success>img{
+            width:100%;
+            height:100%;
+        }
 }
 </style>

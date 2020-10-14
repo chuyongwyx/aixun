@@ -1,4 +1,4 @@
-import {GetInformationSubmittedApplicationForms,GetInformationSubmittedApplicationFormByID,ReplenishApplicationFormInformation,VerifyApplicationFormInformation} from "../../apis/BrandCertificationAllApi"
+import {GetInformationSubmittedApplicationForms,GetInformationSubmittedApplicationFormByID,ReplenishShopPhoto,ReplenishBusinessLicensePhoto,DeleteBusinessLicensePhoto,VerifyApplicationFormInformation} from "../../apis/BrandCertificationAllApi"
 export default{
     //获取已提交资料的申请单
     async getInformationSubmittedApplicationForms({commit,state}){
@@ -11,10 +11,19 @@ export default{
         commit("handleToIdDataList",dataList)
     },
 
-   //补充上传资料
-    async replenishApplicationFormInformation({commit,state},param){
-        var dataInfo = await ReplenishApplicationFormInformation(param);
-    },
+   //重新上传门店资料
+   async replenishShopPhoto({commit,state},param){
+        var dataInfo = await ReplenishShopPhoto(param)
+   },
+
+   //补充上传营业执照
+   async replenishBusinessLicensePhoto({commit,state},param){
+        var dataInfo = await ReplenishBusinessLicensePhoto(param);
+   },
+   //删除营业执照
+   async deleteBusinessLicensePhoto({commit,state},param){
+        var dataInfo = await DeleteBusinessLicensePhoto(param);
+   },
   //认证通过
    async verifyApplicationFormInformation({commit,state},param){
        var paramTwo =JSON.stringify(param) 

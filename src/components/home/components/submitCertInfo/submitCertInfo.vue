@@ -50,22 +50,23 @@
                                                 <div class="fileMock"><span class="iconfont icon-tupian"></span><span>点击上传</span></div>
                                              </div>
                                             <div v-if="imgshow" class="dataImg">
-                                                    <img :src="imgdata"  class="img">
+                                                    <img :src="imgdata"  class="img" @click="handleToShowImgShow">
                                                    <div @click="handelDelImg" class="imgdel"><span class="iconfont icon-shanchu"></span><span>删除</span></div>
                                             </div>
-                                        </div>   
+                                        </div>
+                                          
                                 </div>
 
                                 <!-- 营业执照 -->
                                 <div class="apply business-license">
-                                        <div>营业执照</div>
+                                        <div>营业执照:</div>
                                          <div class="showImgTwo">
                                              <div class="fileshangTwo" v-show="uploadTwo">
                                 	            <input type="file" class="fileTwo" id="fileTwo" accept="image/jpg,image/png,image/jpeg,image/gif" @change="handleLoadBusiness($event)">
                                                 <div class="fileMockTwo"><span class="iconfont icon-tupian"></span><span>点击上传</span></div>
                                              </div>
                                             <div v-if="imgshowTwo" class="dataImgTwo">
-                                                    <img :src="imgdataTwo"  class="img">
+                                                    <img :src="imgdataTwo"  class="img" @click="handleToShowImgShowTwo">
                                                    <div @click="handelDelBusinessImg" class="imgdelTwo"><span class="iconfont icon-shanchu"></span><span>删除</span></div>
                                             </div>
                                         </div>   
@@ -76,6 +77,18 @@
                                 </div>
                         </div>
                     </div>
+                    <!-- 门店大图 -->
+                            <div class="imgShowBig" v-show="imgShowBig" id="imgShowBig">
+                                    
+                                    <img :src="imgdata" alt="" id="imgShowBigMain"> 
+                                    <div style="width:20px;height:20px;background:rgba(0,0,0,0.2);text-align:center;line-height:20px;" id="imgShowBigIcon" @click="handleTocloseimgShowBig"><span class="iconfont icon-chuyidong"></span></div>
+                            </div> 
+
+                    <!-- 营业执照大图 -->
+                        <div class="imgShowBigTwo" v-show="imgShowBigTwo" id="imgShowBigTwo">
+                                     <img :src="imgdataTwo" alt="" id="imgShowBigTwoMain"> 
+                                    <div style="width:20px;height:20px;background:rgba(0,0,0,0.2);text-align:center;line-height:20px;" id="imgShowBigTwoIcon" @click="handleTocloseimgShowBigTwo"><span class="iconfont icon-chuyidong"></span></div>
+                        </div>
             </div>
         </div>
 </template> 
@@ -99,6 +112,10 @@ export default {
                 applyBrandName:"",
                 //提交资料按钮
                 // submitData:false,
+                //门店大图
+                imgShowBig:false,
+                //营业执照大图
+                imgShowBigTwo:false
             }
         },
         computed:{
@@ -107,10 +124,11 @@ export default {
             })
         },
         created(){
-          
+            this.GetApplyingApplicationForms();
          },
          methods:{
              ...Vuex.mapActions({
+                 GetApplyingApplicationForms:"submitCertInfo/getApplyingApplicationForms",
                  uploadApplicationFormInformation:"submitCertInfo/uploadApplicationFormInformation"
              }),
             //选中申请的数据
@@ -153,9 +171,10 @@ export default {
              //清除门店图片
              handelDelImg(){
                  this.imgshow = false;
-                 this. upload=true;
+                 this.upload=true;
                  var file =  document.getElementById('file')
                  file.value='';
+                 this.imgdata ="";
              },
             //  上传营业执照
             handleLoadBusiness($event){
@@ -174,13 +193,24 @@ export default {
             //删除营业执照
             handelDelBusinessImg($event){
                      this.imgshowTwo = false;
-                     this. uploadTwo=true;
+                     this.uploadTwo=true;
                     var file =  document.getElementById('fileTwo')
                     file.value='';
+                    this.imgdataTwo="";
             },
             // 隐藏模态框
             handleDataModelHide(){
                  this.submitDataModel =false;
+                 var file =  document.getElementById('fileTwo')
+                 file.value='';
+                 this.imgdataTwo="";
+                var fileOne =  document.getElementById('file')
+                 fileOne.value='';
+                 this.imgdata ="";
+                 this.uploadTwo=true;
+                this.imgshowTwo = false;
+                this.imgshow = false;
+                this.upload=true;
             },
             //提交申请资料
             handleToSubmitFormInfo(){
@@ -191,6 +221,9 @@ export default {
                      "BusinessLicensePhoto":this.imgdataTwo,
                      "BusinessLicensePhotoMD5":md5(this.imgdataTwo),
                 } 
+                if(this.imgdata==""){
+                    alert('请上传门店照片');
+                }
                 if(this.imgdata!==""){
                     this.uploadApplicationFormInformation(param);
                     this.imgdata="";
@@ -217,7 +250,63 @@ export default {
                     }
 
             }
-         } 
+         },
+
+         //显示大图
+         handleToShowImgShow(){
+               var imgShowBig = document.getElementById('imgShowBig');
+               var imgShowBigMain = document.getElementById('imgShowBigMain');
+               var imgShowBigIcon = document.getElementById('imgShowBigIcon');
+
+               this.imgShowBig=true;
+               var w= document.documentElement.clientWidth*0.6 ;
+               var h = document.documentElement.clientHeight*0.8;
+                imgShowBig.style.width=w+'px';
+                imgShowBig.style.height =h+'px';
+                imgShowBig.style.top = document.documentElement.clientHeight*0.5 - h*0.5 +'px';
+                imgShowBig.style.left =document.documentElement.clientWidth*0.5-w*0.5 +'px';
+                //图片的最大高度宽度不超过
+                imgShowBigMain.style.maxWidth =w+'px';
+                imgShowBigMain.style.maxHeight=h+'px';
+                imgShowBigMain.style.top =h*0.5-imgShowBigMain.height*0.5+"px";
+                imgShowBigMain.style.left =w*0.5-imgShowBigMain.width*0.5+'px';
+                //字体图标
+                imgShowBigIcon.style.color='#fff';
+                imgShowBigIcon.style.position="absolute";
+                imgShowBigIcon.style.top =h*0.5-imgShowBigMain.height*0.5+20+"px";
+                imgShowBigIcon.style.left =w*0.5-imgShowBigMain.width*0.5+imgShowBigMain.width*0.9+'px';
+         },
+
+         //关闭大图
+         handleTocloseimgShowBig(){
+              this.imgShowBig=false;
+         },
+
+          handleToShowImgShowTwo(){
+               var imgShowBig = document.getElementById('imgShowBigTwo');
+               var imgShowBigMain = document.getElementById('imgShowBigTwoMain');
+               var imgShowBigIcon = document.getElementById('imgShowBigTwoIcon');
+               this.imgShowBigTwo=true;
+               var w= document.documentElement.clientWidth*0.6 ;
+               var h = document.documentElement.clientHeight*0.8;
+                imgShowBig.style.width=w+'px';
+                imgShowBig.style.height =h+'px';
+                imgShowBig.style.top = document.documentElement.clientHeight*0.5 - h*0.5 +'px';
+                imgShowBig.style.left =document.documentElement.clientWidth*0.5-w*0.5 +'px';
+                //图片的最大高度宽度不超过
+                imgShowBigMain.style.maxWidth =w+'px';
+                imgShowBigMain.style.maxHeight=h+'px';
+                imgShowBigMain.style.top =h*0.5-imgShowBigMain.height*0.5+"px";
+                imgShowBigMain.style.left =w*0.5-imgShowBigMain.width*0.5+'px';
+                //字体图标
+                imgShowBigIcon.style.color='#fff';
+                imgShowBigIcon.style.position="absolute";
+                imgShowBigIcon.style.top =h*0.5-imgShowBigMain.height*0.5+20+"px";
+                imgShowBigIcon.style.left =w*0.5-imgShowBigMain.width*0.5+imgShowBigMain.width*0.9+'px';
+         },
+         handleTocloseimgShowBigTwo(){
+              this.imgShowBigTwo=false;
+         }
 }
 }
 </script>
@@ -388,12 +477,15 @@ export default {
 }
 .file{
     position: absolute;
-    top:0;
-    left:0;
+    top:-51px;
+    left:-61px;
     opacity: 0;
-    width:60px;
-    height:64px;
+    width:180px;
+    height:160px;
 
+}
+.file:hover{
+    cursor: pointer;
 }
 .fileshang{
     position: relative;
@@ -458,12 +550,15 @@ export default {
 }
 .fileTwo{
     position: absolute;
-    top:0;
-    left:0;
+     top:-51px;
+    left:-61px;
     opacity: 0;
-    width:60px;
-    height:64px;
+    width:180px;
+    height:160px;
 
+}
+.fileTwo:hover{
+    cursor: pointer;
 }
 .fileshangTwo{
     position: relative;
@@ -535,8 +630,29 @@ export default {
     border-radius:4px;
     font-size: 14px; 
 }
+.footer>button:hover{
+    cursor: pointer;
+}
 .footer>button:active{
     background: #6da4ff;
+}
+
+/* 显示门店大图 */
+.imgShowBig{
+    position: absolute;
+    z-index: 12;    
+}
+.imgShowBig>img{
+    position: absolute;
+}
+.imgShowBigTwo{
+    position: absolute;
+    z-index: 12;
+   
+    
+}
+.imgShowBigTwo>img{
+    position: absolute;
 }
 }
 
@@ -701,20 +817,23 @@ export default {
 }
 .file{
     position: absolute;
-    top:0;
-    left:0;
+    top:-37px;
+    left:-42px;
     opacity: 0;
-    width:44px;
-    height:47px;
+    width:131px;
+    height:116px;
 
+}
+.file:hover{
+    cursor: pointer;
 }
 .fileshang{
     position: relative;
     margin-top: 36px;
-    margin-left:44px;
+    margin-left:40px;
 }
 .fileMock{
-    width:44px;
+    width:50px;
     text-align: center;
     
 }
@@ -771,20 +890,23 @@ export default {
 }
 .fileTwo{
     position: absolute;
-    top:0;
-    left:0;
+    top:-37px;
+    left:-42px;
     opacity: 0;
-    width:44px;
-    height:46px;
+    width:131px;
+    height:116px;
 
+}
+.fileTwo:hover{
+    cursor: pointer;
 }
 .fileshangTwo{
     position: relative;
     margin-top: 36px;
-    margin-left:44px;
+    margin-left:40px;
 }
 .fileMockTwo{
-    width:44px;
+    width:50px;
     text-align: center;
     
 }
@@ -848,5 +970,32 @@ export default {
     font-size: 12px;
    
 }  
+
+.footer>button:hover{
+    cursor: pointer;
+}
+.footer>button:active{
+    background: #6da4ff;
+}
+/* 显示门店大图 */
+.imgShowBig{
+    position: absolute;
+    z-index: 12;
+   
+    
+}
+.imgShowBig>img{
+    position: absolute;
+}
+.imgShowBigTwo{
+    position: absolute;
+    z-index: 12;
+   
+    
+}
+.imgShowBigTwo>img{
+    position: absolute;
+ 
+}
 }
 </style>

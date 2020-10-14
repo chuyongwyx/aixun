@@ -174,7 +174,7 @@ export default {
     .day{
         width: 100%;
         overflow: hidden;
-        margin-bottom:25px;
+        margin-bottom:10px;
         
     }
     .day>span{
@@ -268,7 +268,7 @@ export default {
     .day{
         width: 100%;
         overflow: hidden;
-        margin-bottom:18px;
+        margin-bottom:7px;
         
     }
     .day>span{

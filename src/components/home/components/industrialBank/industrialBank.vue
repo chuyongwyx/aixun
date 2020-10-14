@@ -1,7 +1,7 @@
 <template>
   <div class="buildBank">
     <div class="buildBank-head">
-      <h2>建行</h2>
+      <h2>兴业</h2>
     </div>
     <div class="buildBankManage">
       <div :class="{'build-active':ManagerShow}" @click="handelToManager">
@@ -63,7 +63,7 @@
             <span class="iconfont icon-chuyidong" @click="handelToAddHide"></span>
           </div>
           <div class="wx-tit">
-            <p>微信扫一扫,成为建行负责人</p>
+            <p>扫一扫成为兴业负责人</p>
           </div>
           <div class="wx-er">
             <img :src="buildBankWxER" alt />
@@ -149,7 +149,7 @@ import Cookies from "js-cookie";
 import axios from 'axios';
 let Base64 = require("js-base64").Base64;
 export default {
-  name:"buildBank",
+  name:"industrialBank",
   data() {
     return {
       ManagerShow: true,
@@ -179,29 +179,29 @@ export default {
   },
   computed:{
     ...Vuex.mapState({
-      buildBankManager: state => state.buildBankManager.buildBankManager,
-      buildBankDeal: state => state.buildBankManager.buildBankDeal,
-      buildBankWxER: state => state.buildBankManager.buildBankWxEr, 
+      buildBankManager: state => state.industrialBank.buildBankManager,
+      buildBankDeal: state => state.industrialBank.buildBankDeal,
+      buildBankWxER: state => state.industrialBank.buildBankWxEr, 
       //单个用户信息
-      buildUserInfo: state=>state.buildBankManager.buidlUserInfo,
+      buildUserInfo: state=>state.industrialBank.buidlUserInfo,
       //查看办理人员附件
-      findWorkingCard:state=>state.buildBankManager.findWorkingCard
+      findWorkingCard:state=>state.industrialBank.findWorkingCard
   })
   },
   methods: {
     ...Vuex.mapActions({
-      getbuildManagerWxEr: "buildBankManager/getbuildManagerWxEr",
-      getBuildUserInfo: "buildBankManager/getBankUserInfo",
+      getbuildManagerWxEr: "industrialBank/getbuildManagerWxEr",
+      getBuildUserInfo: "industrialBank/getBankUserInfo",
       //获取建行用户信息
-      getBuildBankManager: 'buildBankManager/getBuildBankManager',
+      getBuildBankManager: 'industrialBank/getBuildBankManager',
       // 审核建行用户信息
-      putExaminePass:"buildBankManager/putExaminePass",
+      putExaminePass:"industrialBank/putExaminePass",
       //审核不通过
-      refuseUserUnpass:"buildBankManager/refuseUserInfo",
+      refuseUserUnpass:"industrialBank/refuseUserInfo",
       //撤销建行负责人
-      revokeBuidlManager:"buildBankManager/revokeBuidlManager",
+      revokeBuidlManager:"industrialBank/revokeBuidlManager",
       //查看办理人员附件
-      getWorkingCardByID:"buildBankManager/getWorkingCardByID",
+      getWorkingCardByID:"industrialBank/getWorkingCardByID",
     }),
     //银行负责人切换
     handelToManager() {
@@ -239,9 +239,6 @@ export default {
     //隐藏建行负责人模态框
      handelBankMangerHide(){
          this.BuildBandManager=false;
-         this.opeationTip=false;
-
-
      },
      //隐藏建行处理人状态信息
     handelBankDealHide(){
@@ -626,7 +623,7 @@ export default {
   width:420px;
   height:220px;
   margin-left:-210px;
-  margin-top: -110px;
+  margin-top: -80px;
   background:rgba(255,255,255,1);
   box-shadow:0px 4px 21px 0px rgba(199, 198, 198, 0.35);
 }
@@ -977,7 +974,7 @@ export default {
   width:306px;
   height:160px;
   margin-left:-153px;
-  margin-top: -80px;
+  margin-top: -58px;
   background:rgba(255,255,255,1);
   box-shadow:0px 4px 21px 0px rgba(199, 198, 198, 0.35);
 }

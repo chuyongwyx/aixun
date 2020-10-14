@@ -8,7 +8,7 @@ setInterval(function(){
             });
             axios({
                 method:"post",
-                url:"/apis/api/Account/RefreshAccessToken",
+                url:"http://is-test.aserweb.com:50102/api/Account/RefreshAccessToken",
                 headers: {
                         'Content-Type':'application/json',
                 },
@@ -24,3 +24,4 @@ setInterval(function(){
                 Cookies.set("RefreshToken",RefreshToken,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
             })
 },3600000);
+ 

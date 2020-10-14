@@ -1,13 +1,13 @@
 <template>
         <div class="Monitoring">
                 <Badge :count="4">
-                             <a href="##" class="demo-badge" @click="handleToDataException">数据同步异常</a>
+                             <a  class="demo-badge"  href="http://is-test.aserweb.com:50101/#/dataException" target="_blank">数据同步异常</a>
                 </Badge>
                  <Badge :count="3">
-                             <a href="##" class="demo-badge" @click="handleToAbnormalCapitalFlow">资金流水核对异常</a>
+                             <a  class="demo-badge" href="http://is-test.aserweb.com:50101/#/abnormalCapitalFlow" target="_blank">资金流水核对异常</a>
                 </Badge>
                  <Badge :count="3">
-                             <a href="##" class="demo-badge" @click="handleToAbnormalAccountBalance">账套余额异常</a>
+                             <a  class="demo-badge" href="http://is-test.aserweb.com:50101/#/abnormalAccountBalance" target="_blank">账套余额异常</a>
                 </Badge>
         </div>
 </template>
@@ -23,44 +23,7 @@ export default {
 
       },
       methods:{
-            ...Vuex.mapActions({
-                    //缓存路由
-                     handlePushRouter:"home/handlePushRouter",
-            }),
-         //数据同步异常
-          handleToDataException($event){
-               var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/dataException",
-                                "name":"dataException"
-                }
-                
-                 this.handlePushRouter(paramRouter);
-                 this.$router.push('/dataException');
-          },
-          //资金流水核对异常
-          handleToAbnormalCapitalFlow($event){
-               var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/abnormalCapitalFlow",
-                                "name":"abnormalCapitalFlow"
-                }
-                
-                 this.handlePushRouter(paramRouter);
-                 this.$router.push('/abnormalCapitalFlow');
-          },
-          //账户余额异常
-          handleToAbnormalAccountBalance($event){
-                   var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/abnormalAccountBalance",
-                                "name":"abnormalAccountBalance"
-                }
-                
-                 this.handlePushRouter(paramRouter);
-                 this.$router.push('/abnormalAccountBalance');
-          }
-      },
+      }
 }
 </script>
 <style scoped>
@@ -89,7 +52,8 @@ export default {
          
     }
     .demo-badge:hover{
-        color: #333;
+        color: #5897FF;
+        border:1px solid #5897FF;
     }
     .ivu-badge{
           cursor: pointer;
@@ -120,7 +84,8 @@ export default {
          
     }
     .demo-badge:hover{
-        color: #333;
+          color: #5897FF;
+        border:1px solid #5897FF;
     }
     .ivu-badge{
           cursor: pointer;

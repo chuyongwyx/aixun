@@ -20,15 +20,27 @@ export default{
         //审核培训用户信息
         async putExaminePass({commit,state},param){
             let userData = await ExaminePass(param);
+            if(userData.success){
+                let bankManagerData = await buildBankManager();
+                commit("getBuildBankManager",bankManagerData)
+            }
         
         },
         //拒绝培训用户信息
         async refuseUserInfo({commit,state},param){
-            let refuserUerInfo = await refuseUserInfo(param);
+            let refuserUserInfo = await refuseUserInfo(param);
+            if(refuserUserInfo.success){
+                let bankManagerData = await buildBankManager();
+                commit("getBuildBankManager",bankManagerData)
+            }
         },
         //撤销培训负责人
         async revokeBuidlManager({commit,state},param){
-            let RevokeManagerInfo = await RevokeBuidlManager(param);
+            let revokeManagerInfo = await RevokeBuidlManager(param);
+            if(revokeManagerInfo.success){
+                let bankManagerData = await buildBankManager();
+                commit("getBuildBankManager",bankManagerData)
+            }
         },
         //查看办理人员附件
         async getWorkingCardByID({commit,state},param){

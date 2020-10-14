@@ -3,10 +3,20 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>内部系统</title>
+    <link rel="icon" href="title.ico" type="image/x-icon">
+    <title></title>
   </head>
   <body>
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
 </html>
+<script>  
+    window.onbeforeunload=function(e){
+      if(window.location.href =='http://is-test.aserweb.com:50101/#/intManage'|| window.location.href=="http://is-test.aserweb.com:50101/#/payItem"||window.location.href=="http://is-test.aserweb.com:50101/#/payQuery"||window.location.href=="http://is-test.aserweb.com:50101/#/abnormalMonitoring"||window.location.href=="http://is-test.aserweb.com:50101/#/welcomehome"){
+        var e = window.event||e;  
+    　　e.returnValue=("确定离开当前页面吗？");
+      }        
+    　　
+    } 
+</script>

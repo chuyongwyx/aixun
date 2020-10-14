@@ -61,17 +61,20 @@
         </div>
         <div class="opations" v-show="selectShow" @click="handleClickOpations($event)">
           <div>
-            <span class="opation" data-id="1">未受理</span>
+              <span class="opation" data-id="all">全部</span>
           </div>
           <div>
-            <span class="opation" data-id="2">已受理</span>
+            <span class="opation" data-id="1">进行中</span>
           </div>
           <div>
-            <span class="opation" data-id="3">完成</span>
+            <span class="opation" data-id="2">已完成</span>
           </div>
           <div>
+            <span class="opation" data-id="3">强制关闭</span>
+          </div>
+          <!-- <div>
             <span class="opation" data-id="4">关闭</span>
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="search-btn">
@@ -115,11 +118,11 @@
               </Poptip>
             
           </td>
-          <td :data-id="item.status">{{item.status==1?'申请中':item.status==2?'待认证':item.status==3?'已认证':'强制关闭'}}</td>
+          <td :data-id="item.status">{{item.status==1?'进行中':item.status==2?'已完成':'强制关闭'}}</td>
           <td>{{item.progress}}/{{item.totalProgress}}</td>
         </tr>
       </table>
-        <Page :total="count" :page-size="MaxResultCount" class="page" :current="page" @on-change="handleToDatalist" v-show="count<=14?false:true"/>
+        <Page :total="count" :page-size="MaxResultCount" class="page" :current="page" @on-change="handleToDatalist" v-show="count<=11?false:true"/>
     </div>
 
       <!-- 关闭的原因备注 -->
@@ -152,7 +155,7 @@ export default {
       openEnd: false,
       dateEnd: "",
       selectShow: false,
-      selected: "未受理",
+      selected: "全部",
       closeModel:false,
       //强制关闭的按钮
       btnForce:false,
@@ -160,10 +163,38 @@ export default {
       closeRemark:"请输入原因...",
        //提示文字颜色
       tipText:"color:#c5c8ce;",
-      selectedId:1,
-      MaxResultCount:14,
+      selectedId:"all",
+      MaxResultCount:11,
       page:1,
     };
+  },
+  mounted(){
+      var today = new Date();
+      today.setTime(today.getTime());
+      var year= today.getFullYear();
+      var month =parseInt(today.getMonth()+1)<10?'0'+parseInt(today.getMonth()+1):today.getMonth()+1;
+      var day = parseInt(today.getDate())<10?'0'+parseInt(today.getDate()):today.getDate();  
+      var end =year +"-" +month + "-" +day;
+      this.dateEnd =end;
+     
+      //七天之前
+      // var sevenAgo = new Date(today);
+      //  sevenAgo.setDate(today.getDate()-7);
+      //  var year2 =sevenAgo.getFullYear();
+      //  var month2 =parseInt(sevenAgo.getMonth()+1)<10?'0'+parseInt(sevenAgo.getMonth()+1):sevenAgo.getMonth()+1;
+      //  var day2 = parseInt(sevenAgo.getDate())<10?'0'+parseInt(sevenAgo.getDate()):sevenAgo.getDate();
+        this.dateStart =year +"-"+month+"-"+ day ;
+
+       var param = JSON.stringify({
+          "MaxResultCount":this.MaxResultCount,
+          "SkipCount":0,
+          "Sorting":"",
+          "StartDate":this.dateStart,
+          "EndDate":this.dateEnd,
+          "Status":""
+      })
+      this.getApplicationForms(param);
+
   },
   computed: {
     ...Vuex.mapState({
@@ -248,6 +279,23 @@ export default {
     },
     //查询对应的信息
     handleToSearchForm(){
+         var trs = document.getElementsByClassName('trhover');
+          var len =trs.length;
+          for(var i=0;i<len;i++){
+                    trs[i].style.background="";
+            }
+
+      if(this.selectedId=="all"){
+             var param = JSON.stringify({
+          "MaxResultCount":this.MaxResultCount,
+          "SkipCount":0, 
+          "Sorting":"",
+          "StartDate":this.dateStart,
+          "EndDate":this.dateEnd,
+          "Status":""
+        })
+        this.getApplicationForms(param);
+        }else{
         var param = JSON.stringify({
           "MaxResultCount":this.MaxResultCount,
           "SkipCount":0, 
@@ -257,23 +305,51 @@ export default {
           "Status":this.selectedId
       })
       this.getApplicationForms(param);
+     }
+     this.btnForce=false;
     },
     //分页
     handleToDatalist(page){
           this.page = page;
-          var param = JSON.stringify({
-            "MaxResultCount":this.MaxResultCount,
-            "SkipCount":(this.page-1)*this.MaxResultCount,
-            "Sorting":"",
-            "StartDate":this.dateStart,
-            "EndDate":this.dateEnd,
-            "Status":this.selectedId
-        })
-        this.getApplicationForms(param);
+           var trs = document.getElementsByClassName('trhover');
+            var len =trs.length;
+            for(var i=0;i<len;i++){
+                    trs[i].style.background="";
+            }
+          if(this.selectedId=="all"){
+              var param = JSON.stringify({
+              "MaxResultCount":this.MaxResultCount,
+              "SkipCount":(this.page-1)*this.MaxResultCount,
+              "Sorting":"",
+              "StartDate":this.dateStart,
+              "EndDate":this.dateEnd,
+              "Status":""
+           })
+          this.getApplicationForms(param);
+
+
+          }else{
+             var param = JSON.stringify({
+              "MaxResultCount":this.MaxResultCount,
+              "SkipCount":(this.page-1)*this.MaxResultCount,
+              "Sorting":"",
+              "StartDate":this.dateStart,
+              "EndDate":this.dateEnd,
+              "Status":this.selectedId
+           })
+          this.getApplicationForms(param);
+          }
+         this.btnForce=false;
     },
    //确定向后台发送关闭的备注
     handleTocloseRemark(){
-      if(this.closeRemark!=='请输入原因...'){
+       if(this.closeRemark=='请输入原因...'||this.closeRemark==""){
+          alert('请输入关闭原因');
+      }
+      if(this.closeRemark.length>100){
+          alert('请输入少于100字');
+      }
+      if(this.closeRemark!=='请输入原因...'&&this.closeRemark!==""&&this.closeRemark.length<=100){
             var param = {
                 "id":this.id,
                 "CloseRemark":this.closeRemark
@@ -443,7 +519,7 @@ export default {
   line-height: 36px;
 }
 .appCloudeForm {
-  margin-top: 49px;
+  margin-top: 25px;
   width: 100%;
   padding-right: 64px;
   margin-left: 67px;
@@ -457,14 +533,14 @@ export default {
 .appCloudeForm > table > tr > td {
   border-bottom: 1px solid #e7e7e7;
   border-right: 1px solid #e7e7e7;
-  line-height: 42px;
+  line-height: 30px;
   text-align: center;
 
   font-size: 14px;
   color: #888888;
 }
 .appCloudeForm > table > tr:nth-of-type(1) > td {
-  line-height: 42px;
+  line-height: 30px;
   text-align: center;
   font-size: 14px;
   background: rgba(241, 243, 246, 1);
@@ -478,7 +554,7 @@ export default {
   
   display: block;
   height: 30px;
-  padding-top: 8px;
+  padding-top: 6px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -860,7 +936,7 @@ export default {
 .appCloudeForm > table > tr > td {
   border-bottom: 1px solid #e7e7e7;
   border-right: 1px solid #e7e7e7;
-  line-height: 30px;
+  line-height: 22px;
   text-align: center;
 
   font-size: 12px;
@@ -868,6 +944,7 @@ export default {
 }
 .appCloudeForm > table > tr:nth-of-type(1) > td {
   line-height: 30px;
+  height: 30px;
   text-align: center;
   font-size: 12px;
   background: rgba(241, 243, 246, 1);
@@ -882,14 +959,14 @@ export default {
 .tip-iview-span{
   text-align:center;
   display: block;
-  height: 22px;
-  padding-top:6px;
+  height: 18px;
+  padding-top:5px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   width:50px;
   margin: 0 auto;
- line-height: 22px;
+ line-height: 18px;
 
 }
  .accept-tabel>table > tr > td:nth-of-type(1){
@@ -934,7 +1011,7 @@ export default {
     position: absolute;
     left: 0;
     right: 0;
-    bottom:100px;
+    bottom:50px;
 }
 /* 模态框的显示隐藏 */
 .ClouPayModel {

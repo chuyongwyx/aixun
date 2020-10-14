@@ -1,15 +1,15 @@
 <template>
         <div class="pay-query-r">
                 <div>
-                         <div @click="handleTosummaryCloudPayments">申请云支付功能总表</div>
+                         <div><a href="http://is-test.aserweb.com:50101/#/summaryCloudPayments" target="_blank" >申请云支付功能总表</a></div>
                 </div>
                 <div>
-                         <div @click="handleToGeneralApplicationBrandCert">申请品牌认证总表</div>
-                         <div @click="handleToSummaryBrands">项目品牌总表</div>        
+                         <div><a href="http://is-test.aserweb.com:50101/#/generalApplicationBrandCert" target="_blank">申请品牌认证总表</a></div>
+                         <div><a href="http://is-test.aserweb.com:50101/#/summaryBrands" target="_blank">项目品牌总表</a></div>        
                 </div>
                
                 <div>
-                        <div @click="handleToTaskSummaryStatem">申请云支付账号总表</div>
+                        <div><a href="http://is-test.aserweb.com:50101/#/taskSummaryStatem" target="_blank"> 申请云支付账号总表</a></div>
                 </div>
         </div>
 </template>
@@ -22,45 +22,6 @@ export default {
                 }
         },
         methods:{
-                ...Vuex.mapActions({
-                        handlePushRouter:"home/handlePushRouter"
-                }),
-                handleTosummaryCloudPayments($event){
-                          var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/summaryCloudPayments",
-                                "name":"summaryCloudPayments"
-                         }
-                          this.handlePushRouter(paramRouter);
-                        this.$router.push('/summaryCloudPayments');
-                },
-                handleToGeneralApplicationBrandCert($event){
-                         var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/generalApplicationBrandCert",
-                                "name":"generalApplicationBrandCert"
-                         }
-                        this.handlePushRouter(paramRouter);
-                        this.$router.push('/generalApplicationBrandCert');
-                },
-                handleToSummaryBrands($event){
-                          var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/summaryBrands",
-                                "name":"summaryBrands"
-                         }
-                        this.handlePushRouter(paramRouter);
-                        this.$router.push('/summaryBrands');
-                },
-                handleToTaskSummaryStatem($event){
-                         var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/taskSummaryStatem",
-                                "name":"taskSummaryStatem"
-                         }
-                        this.handlePushRouter(paramRouter);
-                        this.$router.push('/taskSummaryStatem');
-                }
         }
 }
 </script>
@@ -72,7 +33,8 @@ export default {
          .pay-query-r>div{
                  overflow: hidden;
          }
-         .pay-query-r>div>div{
+         .pay-query-r>div>div a{
+                  display:block;
                  float: left;
                  margin-right: 30px;
                  padding:15px 18px 14px 16px;
@@ -80,12 +42,15 @@ export default {
                  border-radius:10px;
                  margin-top: 28px;
                  font-size: 16px;
+                 color: #333;
          }
        .pay-query-r>div:last-of-type{
                margin-bottom: 28px;
        }
-       .pay-query-r>div>div:hover{
+       .pay-query-r>div>div a:hover{
                cursor: pointer;
+               color: #5897FF;
+               border:1px solid #5897FF;
        }
 }
 
@@ -96,7 +61,8 @@ export default {
          .pay-query-r>div{
                  overflow: hidden;
          }
-         .pay-query-r>div>div{
+         .pay-query-r>div>div a{
+                 display:block;
                  float: left;
                  margin-right: 21px;
                  padding:11px 13px 10px 12px;
@@ -104,12 +70,15 @@ export default {
                  border-radius:7px;
                  margin-top: 20px;
                  font-size: 14px;
+                 color: #333;
          }
        .pay-query-r>div:last-of-type{
                margin-bottom: 20px;
        }
-       .pay-query-r>div>div:hover{
+       .pay-query-r>div>div a:hover{
                cursor: pointer;
+               color: #5897FF;
+               border:1px solid #5897FF;
        } 
 }
 </style>

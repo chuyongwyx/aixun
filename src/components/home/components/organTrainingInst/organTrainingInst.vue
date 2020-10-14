@@ -76,6 +76,9 @@ export default {
               trainingInstitutionID:"",
          }
      }, 
+     created(){
+            this.getSettedApplicationForms();
+     },
     computed: {
         ...Vuex.mapState({
                 //页面的初始化数据
@@ -84,8 +87,10 @@ export default {
                 traningKinds:state=>state.organTrainingInst.traningKinds
         }),  
     },
-    methods:{
+    methods:{ 
          ...Vuex.mapActions({
+             //获取已有培训机构信息
+            getSettedApplicationForms:"organTrainingInst/getSettedApplicationForms",
                 //培训机构的信息
               getOrgnTrainingInstInfo:"organTrainingInst/getOrgnTrainingInstInfo",
               //安排培训机构

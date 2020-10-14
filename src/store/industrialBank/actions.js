@@ -1,4 +1,4 @@
-import {buildBankManager ,buildBankManagerWxEr,builBankUserInfo,ExaminePass,refuseUserInfo,RevokeBuidlManager,GetWorkingCarById} from '../../apis/buildBank';
+import {buildBankManager ,buildBankManagerWxEr,builBankUserInfo,ExaminePass,refuseUserInfo,RevokeBuidlManager,GetWorkingCarById} from '../../apis/industrialBank';
 let  Base64 = require('js-base64').Base64;
 export default{
         //获取建行用户

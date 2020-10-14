@@ -12,11 +12,13 @@
             <span class="iconfont icon-xiala1"></span>
           </th>
           <th>人员名称</th>
+          <th>邮箱地址</th>
           <th>操作</th>
         </caption>
         <tr v-for="(item,index) in userAdmin">
           <td>{{item.DepartmentName}}</td>
           <td>{{item.name}}</td>
+          <td>{{item.emailAddress}}</td>
           <td>
             <span @click="handleuserAdModify($event)" :data-id="item.id" class="tdhover">编辑</span>
             <span @click="handleUserDelete" :data-id="item.id" class="tdhover">删除</span>
@@ -36,7 +38,7 @@
             <span class="iconfont icon-chuyidong" @click="handleAdduserHide"></span>
           </div>
           <div class="adduser-content">
-              <div>
+              <!-- <div>
               <div>
                 <span>部门:</span>
               </div>
@@ -58,7 +60,7 @@
                 </div>
             
               </div>
-            </div>
+            </div> -->
 
             <div>
               <div>人员名称：</div>
@@ -66,12 +68,12 @@
                 <input type="text" v-model="addName" placeholder="请输入人员名称..."/>
               </div>
             </div>
-            <div>
+            <!-- <div>
               <div>用户名：</div>
               <div class="border-box">
                 <input type="text" v-model="addUserName" placeholder="请输入用户名..."/>
               </div>
-            </div>
+            </div> -->
             <div>
               <div>邮箱：</div>
               <div class="border-box">
@@ -82,7 +84,7 @@
             <div>
                   <label for=""  class="Modifyuse"  @click="handleToAddStartUse">
                        <span class="iconfont icon-xuanzhong2 user-icon" id="startUseOne"></span>
-                      <span>启动</span>
+                      <span>启用</span>
                   </label>  
             </div>
             </div>
@@ -98,7 +100,7 @@
             <span class="iconfont icon-chuyidong" @click="handleToModelHide"></span>
           </div>
           <div class="adduser-content">
-            <div>
+            <!-- <div>
               <div>
                 <span>部门:</span>
               </div>
@@ -117,7 +119,7 @@
                 </div>
             
               </div>
-            </div>
+            </div> -->
 
             <div>
               <div>人员名称：</div>
@@ -125,30 +127,24 @@
                 <input type="text" v-model="userInfoById.name"/>
               </div>
             </div>
-            <div>
+            <!-- <div>
               <div>用户名：</div>
               <div class="border-box">
                 <input type="text" v-model="userInfoById.userName"/>
               </div>
-            </div>
-            <div>
+            </div> -->
+            <!-- <div>
               <div>邮箱：</div>
               <div class="border-box">
                 <input type="text" v-model="userInfoById.emailAddress" />
               </div>
-            </div>
-            <div>
-              <div v-if="userInfoById.isActive">
-                  <label for="" class="Modifyuse" @click="handleToStopUse">
-                    <span class="iconfont icon-selected user-icon"  id="stopUse"></span> 
+            </div> -->
+            <div :data-id="userInfoById.isActive" id="modifyAct">
+              <div>
+                  <label for="" class="Modifyuse" @click="handleToUse">
+                    <span class="iconfont  user-icon" :class="userInfoById.isActive==true?'icon-selected':'icon-xuanzhong2'"  id="stopUse"></span> 
                     <span>停用</span>
                   </label>
-              </div>
-              <div  v-else>
-                  <label for="" @click="handleToStartUse" class="Modifyuse">
-                       <span class="iconfont icon-xuanzhong2 user-icon" id="startUse"></span>
-                      <span>启动</span>
-                  </label>  
               </div>
             </div>
           </div>
@@ -176,8 +172,8 @@ export default {
       addName:'',
       addEmailAddress:'',
       DepartmentID:"",
-      //修改userAdmin的数据
-      ModifyIsActive:'',
+      //编辑也要Id
+      ModifyId:"",
     
     };
   },
@@ -190,8 +186,13 @@ export default {
 
 
   },
+  created() {
+     this.getUserAdmin();
+  },
   methods: {
       ...Vuex.mapActions({
+          //获取内部人员
+          getUserAdmin: 'userAdmin/getUserAdmininfo',
           //获取单个用户信息
           getUserById:"userAdmin/getUserByIdInfo",
           //添加用户信息
@@ -207,6 +208,7 @@ export default {
       handleuserAdModify($event){
             var Id = $event.target.getAttribute('data-id');
              this.getUserById(Id);
+              this.ModifyId = Id;
             this.userAdminModel=true;
             this.userModify=true;
            
@@ -228,52 +230,16 @@ export default {
          this.userModify=false;
       },
       //点击修改框中的停用
-      handleToStopUse($event){
+      handleToUse($event){
           //此时字体图标变暗
           var iconId = document.getElementById('stopUse')
          if(iconId.classList.value.indexOf('icon-xuanzhong2') === -1){
               iconId.classList.add('icon-xuanzhong2');
               iconId.classList.remove('icon-selected');
-              iconId.nextElementSibling.innerText="启动"
-              this.ModifyIsActive=false;
         }else{
               iconId.classList.remove('icon-xuanzhong2');
               iconId.classList.add('icon-selected');
-              iconId.nextElementSibling.innerText="停用"
-              this.ModifyIsActive=true;
         }
-      },
-      //点击修改框中的启用
-      handleToStartUse($event){
-        var iconId = document.getElementById('startUse')
-        if(iconId.classList.value.indexOf('icon-xuanzhong2') === -1){
-              iconId.classList.add('icon-xuanzhong2');
-              iconId.classList.remove('icon-selected');
-              iconId.nextElementSibling.innerText="启动"
-              this.ModifyIsActive=false;
-        }else{
-              iconId.classList.remove('icon-xuanzhong2');
-              iconId.classList.add('icon-selected');
-              iconId.nextElementSibling.innerText="停用"
-              this.ModifyIsActive=true;
-        }
-      },
-      //修改中点击显示下拉修改框
-      handleSelectShow($event){
-          if( this.selectModify==true){
-              this.selectModify=false;
-              $event.target.classList.add('icon-xiala1');
-               $event.target.classList.remove('icon-shangla');
-              // console.log($event.target);
-             
-              
-          }else{
-              this.selectModify=true;
-               $event.target.classList.remove('icon-xiala1');
-               $event.target.classList.add('icon-shangla');
-          }
-
-         
       },
     //部门选中
     handelToSelectOption($event){
@@ -288,14 +254,27 @@ export default {
     },
       //点击编辑框中的保存按钮就是修改信息
       handleModifySave($event){
-          //由于vuex中的数据不能及时更新会慢一步这里统一获取必须加判断
-             var param =JSON.stringify({
+          var use = document.getElementById('stopUse')
+          var IsActive=""
+          if(use.className.indexOf('icon-selected')!==-1){
+              IsActive=true;
+          }else{
+              IsActive=false;
+          } 
+          var param =JSON.stringify({
+                    "id":this.ModifyId,
                     "Name":this.userInfoById.name,
-                    "IsActive": this.IsActive
-             })
-              this.replaceUserInfo(param);
-              this.userAdminModel=false;
-              this.userModify=false;
+                    "PhoneNumber":"",
+                    "IsActive":IsActive
+          })
+          //  console.log(IsActive);
+          this.replaceUserInfo(param);
+          this.userAdminModel=false;
+          this.userModify=false;
+
+
+      
+            
       },
     
       //添加人员显示下拉框
@@ -332,12 +311,12 @@ export default {
         if(iconId.classList.value.indexOf('icon-xuanzhong2') === -1){
               iconId.classList.add('icon-xuanzhong2');
               iconId.classList.remove('icon-selected');
-              iconId.nextElementSibling.innerText="启动"
+            
               this.addIsActive=false;
         }else{
               iconId.classList.remove('icon-xuanzhong2');
               iconId.classList.add('icon-selected');
-              iconId.nextElementSibling.innerText="停用"
+            
               this.addIsActive=true;
         }
 
@@ -345,21 +324,21 @@ export default {
       //添加用户
     handleToAddSave(){
   
-     var DepartmentIdText = document.getElementById('selected-optionsOne').innerText;
-      if(DepartmentIdText==='研发部'){
-         this.DepartmentID =1
-      }else if(DepartmentIdText==='市场部'){
-        this.DepartmentID =2
-      }else if(DepartmentIdText==='财务部'){
-        this.DepartmentID=3
-      };
+    //  var DepartmentIdText = document.getElementById('selected-optionsOne').innerText;
+    //   if(DepartmentIdText==='研发部'){
+    //      this.DepartmentID =1
+    //   }else if(DepartmentIdText==='市场部'){
+    //     this.DepartmentID =2
+    //   }else if(DepartmentIdText==='财务部'){
+    //     this.DepartmentID=3
+    //   };
 
       //字段PhoneNumber预留暂时不用
       var params = JSON.stringify({
-          "UserName":this.addUserName,
+          // "UserName":this.addUserName,
           "Name":this.addName,
           "EmailAddress":this.addEmailAddress,
-          "DepartmentID":this.DepartmentID,
+          // "DepartmentID":this.DepartmentID,
           "IsActive":this.addIsActive
       })
       this.addUserInfo(params);
@@ -380,7 +359,10 @@ export default {
     },
     //重置密码
     handleResetPassWord($event,param){
-       this.resetPsw(param);
+      var params =JSON.stringify({
+         id:param
+      })
+      this.resetPsw(params);
     }
      
 
@@ -395,7 +377,7 @@ export default {
   margin:0 auto;
 }
 .userAdmin-head {
-  width: 529px;
+  width: 731px;
   margin-left: 89px;
   margin-top: 75px;
   overflow: hidden;
@@ -425,7 +407,7 @@ export default {
   margin-top: 49px;
 }
 .userAdminForm > table {
-  width: 529px;
+  width: 700px;
   table-layout: fixed;
   border-top: 1px solid #e7e7e7;
   border-left: 1px solid #e7e7e7;
@@ -443,7 +425,7 @@ export default {
   text-decoration: underline;
 }
 .userAdminForm > caption {
-  width: 529px;
+  width: 700px;
   height: 42px;
 }
 
@@ -462,13 +444,16 @@ export default {
   font-size: 14px;
 }
 .userAdminForm > table th:nth-of-type(1) {
-  width: 151px;
+  width: 150px;
 }
 .userAdminForm > table th:nth-of-type(2) {
   width: 180px;
 }
 .userAdminForm > table th:nth-of-type(3) {
-  width: 200px;
+  width: 180px;
+}
+.userAdminForm > table th:nth-of-type(4){
+  width:221px;
 }
 .userAdminForm > table th:nth-of-type(1)> span:nth-of-type(2) {
   float: right;
@@ -483,19 +468,25 @@ export default {
   width: 180px;
 }
 .userAdminForm > table > tr > td:nth-of-type(3) {
+  width: 180px;
+}
+.userAdminForm > table > tr > td:nth-of-type(4){
   text-indent: 0;
-  width: 200px;
+  width: 220px;
   color: #7aacff;
 }
-.userAdminForm > table > tr > td:nth-of-type(3) > span {
+.userAdminForm > table > tr > td:nth-of-type(4) > span {
   margin-left: 19px;
 }
-.userAdminForm > table > tr > td:nth-of-type(3) > span:hover {
+.userAdminForm > table > tr > td:nth-of-type(4) > span:hover {
   cursor: pointer;
 }
 /* 新增管理员 */
 .addUserAdmin:hover {
   cursor: pointer;
+}
+.addUserAdmin:active{
+   background: #6da4ff;
 }
 /* 新增模态框 */
 .userAdmin-model {
@@ -627,6 +618,12 @@ export default {
   outline: none;
   border-radius: 4px;
 }
+.adduserAdmin-footer > button:hover{
+  cursor: pointer;
+}
+.adduserAdmin-footer >button:active{
+  background: #6da4ff;
+}
 }
 
 @media screen and (max-width:1400px){
@@ -635,7 +632,7 @@ export default {
   margin:0 auto;
 }
 .userAdmin-head {
-  width: 386px;
+  width:610px;
   margin-left: 67px;
   margin-top: 55px;
   overflow: hidden;
@@ -665,7 +662,7 @@ export default {
   margin-top: 35px;
 }
 .userAdminForm > table {
-  width: 386px;
+  width: 500px;
   table-layout: fixed;
   border-top: 1px solid #e7e7e7;
   border-left: 1px solid #e7e7e7;
@@ -680,7 +677,7 @@ export default {
   color: #888888;
 }
 .userAdminForm > caption {
-  width: 386px;
+  width: 500px;
   height: 30px;
 }
 
@@ -702,12 +699,15 @@ export default {
   text-decoration: underline;
 }
 .userAdminForm > table th:nth-of-type(1) {
-  width: 110px;
+  width: 160px;
 }
 .userAdminForm > table th:nth-of-type(2) {
   width: 131px;
 }
 .userAdminForm > table th:nth-of-type(3) {
+  width: 160px;
+}
+.userAdminForm > table th:nth-of-type(4) {
   width: 160px;
 }
 .userAdminForm > table th:nth-of-type(1)> span:nth-of-type(2) {
@@ -717,20 +717,23 @@ export default {
   margin-right: 10px;
 }
 .userAdminForm > table > tr > td:nth-of-type(1) {
-  width: 109px;
+  width: 160px;
 }
 .userAdminForm > table > tr > td:nth-of-type(2) {
   width: 131px;
 }
-.userAdminForm > table > tr > td:nth-of-type(3) {
+.userAdminForm > table > tr > td:nth-of-type(3  ) {
+  width: 160px;
+}
+.userAdminForm > table > tr > td:nth-of-type(4) {
   text-indent: 0;
   width: 160px;
   color: #7aacff;
 }
-.userAdminForm > table > tr > td:nth-of-type(3) > span {
+.userAdminForm > table > tr > td:nth-of-type(4) > span {
   margin-left: 14px;
 }
-.userAdminForm > table > tr > td:nth-of-type(3) > span:hover {
+.userAdminForm > table > tr > td:nth-of-type(4) > span:hover {
   cursor: pointer;
 }
 /* 新增管理员 */
@@ -866,6 +869,12 @@ export default {
   border: 0;
   outline: none;
   border-radius: 4px;
+}
+.adduserAdmin-footer > button:hover{
+  cursor: pointer;
+}
+.adduserAdmin-footer>button:active{
+  background: #6da4ff;
 }
 }
 </style>

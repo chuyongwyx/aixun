@@ -6,14 +6,17 @@ export default [
         {
           path: '/login',
           name: 'login',
-          component: (resolve)=>require(["../components/login/login.vue"],resolve)
+          component: (resolve)=>require(["../components/login/login.vue"],resolve),
+          meta:{
+             title:'爱迅内部系统' 
+          }
         },
         {
           path:'/home',
           name:'home',
           component:(resolve)=>require(["../components/home/home.vue"],resolve),
           meta:{
-            Auth:true
+            Auth:true,
           },
           children:[
             {
@@ -22,7 +25,7 @@ export default [
                 component:(resovle)=>require(["../components/home/welcome/welcome.vue"],resovle),
                 meta:{
                   Auth:true,
-            
+                  title:'爱迅内部系统'
                 },
                 children:[
                     {
@@ -35,6 +38,7 @@ export default [
                       component:(resovle)=>require(["../components/home/homeComponet/welcomehome.vue"],resovle),
                       meta:{
                         Auth:true,
+                        title:'爱迅内部系统'
                       },
                     },
                     {
@@ -43,6 +47,7 @@ export default [
                        component:(resovle)=>require(['../components/home/homeComponet/payItem.vue'],resovle), 
                        meta:{
                          Auth:true,
+                         title:'爱迅内部系统'
                        }
                     },
                     {
@@ -50,7 +55,8 @@ export default [
                       name:"payQuery",
                       component:(resovle)=>require(['../components/home/homeComponet/payQuery.vue'],resovle),
                       meta:{
-                        Auth:true
+                        Auth:true,
+                        title:'爱迅内部系统'
                       }
                     },
                     {
@@ -58,7 +64,8 @@ export default [
                       name:"intManage",
                       component:(resovle)=>require(['../components/home/homeComponet/intManage.vue'],resovle),
                       meta:{
-                        Auth:true
+                        Auth:true,
+                        title:'爱迅内部系统'
                       }
                     },
                     {
@@ -66,7 +73,8 @@ export default [
                       name:"abnormalMonitoring",
                       component:(resovle)=>require(['../components/home/homeComponet/abnormalMonitoring.vue'],resovle),
                       meta:{
-                        Auth:true
+                        Auth:true,
+                        title:'爱迅内部系统'
                       }
                     },
 
@@ -79,17 +87,18 @@ export default [
                 component:(resovle)=>require(["../components/home/components/newRequestForm/newRequestForm.vue"],resovle),
                 meta:{
                   Auth:true,
-            
+                  title:'新建申请单-爱迅'
                 },
                
             },
             //受理完成申请单
-            {
+            { 
                 path:"/requestFormFinished",
                 name:"requestFormFinished",
                 component:(resovle)=>require(["../components/home/components/requestFormFinished/requestFormFinished.vue"],resovle),
                 meta:{
-                  Auth:true, 
+                  Auth:true,
+                  title:'受理完成申请单-爱迅' 
                   
                 },
             },
@@ -100,6 +109,7 @@ export default [
               component:(resovle)=>require(["../components/home/components/applyBrandCert/applyBrandCert.vue"],resovle),
               meta:{
                 Auth:true,
+                title:'申请品牌认证-爱迅'
                 
               },
              },
@@ -110,6 +120,7 @@ export default [
               component:(resovle)=>require(["../components/home/components/submitCertInfo/submitCertInfo.vue"],resovle),
               meta:{
                 Auth:true,
+                title:'提交认证资料-爱迅'
                 
               },
             },
@@ -120,6 +131,7 @@ export default [
               component:(resovle)=>require(["../components/home/components/brandCert/brandCert.vue"],resovle),
               meta:{
                 Auth:true,
+                title:'品牌认证-爱迅'
               
               },
             },
@@ -130,6 +142,7 @@ export default [
               component:(resovle)=>require(["../components/home/components/openCloudDoc/openCloudDoc"],resovle),
               meta:{
                 Auth:true,
+                title:'开通云单据-爱迅'
               
               },
             },
@@ -140,6 +153,7 @@ export default [
               component:(resovle)=>require(["../components/home/components/openCloudPay/openCloudPay.vue"],resovle),
               meta:{
                 Auth:true,
+                title:'开通云支付-爱迅'
               
               }
             },
@@ -150,7 +164,8 @@ export default [
               component:(resovle)=>require(["../components/home/components/applyPayReceipt/applyPayReceipt.vue"],resovle),
               meta:{
                 Auth:true, 
-                keepAlive:true
+                keepAlive:true,
+                title:'申请云支付收款账号-爱迅'
               },
             },
             //安排培训人员
@@ -160,7 +175,7 @@ export default [
               component:(resovle)=>require(["../components/home/components/organTrainingInst/organTrainingInst.vue"],resovle),
               meta:{
                 Auth:true,
-                
+                title:"安排培训机构-爱迅"
               },
             },       
             //建行
@@ -170,8 +185,19 @@ export default [
                 component:(resovle)=>require(["../components/home/components/buildBank/buildBank.vue"],resovle),
                 meta:{
                   Auth:true,
+                  title:"建行-爱迅"
                 
                 },
+            },
+            //兴业
+            {
+                path:"/industrialBank",
+                name:"industrialBank",
+                component:(resovle)=>require(["../components/home/components/industrialBank/industrialBank.vue"],resovle),
+                meta:{
+                  Auth:true,
+                  title:"兴业-爱迅"
+                }
             },
             //广州培训机构
             {
@@ -180,6 +206,7 @@ export default [
               component:(resovle)=>require(["../components/home/components/trainingOrg/trainingOrg.vue"],resovle),
               meta:{
                 Auth:true,
+                title:"广州培训-爱迅"
               },
             },
             //云支付申请总表
@@ -189,6 +216,7 @@ export default [
               component:(resovle)=>require(["../components/home/components/summaryCloudPayments/summaryCloudPayments.vue"],resovle),
               meta:{
                 Auth:true,
+                title:'申请云支付功能总表-爱迅'
               },
             },
             //品牌认证申请总表
@@ -198,6 +226,7 @@ export default [
               component:(resovle)=>require(["../components/home/components/generalApplicationBrandCert/generalApplicationBrandCert.vue"],resovle),
               meta:{
                 Auth:true,
+                title:'申请品牌认证总表-爱迅'
               },
             },
             //品牌总表
@@ -207,6 +236,7 @@ export default [
               component:(resolve)=>require(["../components/home/components/summaryBrands/summaryBrands.vue"],resolve),
               meta:{
                 Auth:true,
+                title:'项目品牌总表-爱迅'
               },
             },
             //任务跟进总表
@@ -216,6 +246,7 @@ export default [
               component:(resolve)=>require(["../components/home/components/taskSummaryStatem/taskSummaryStatem.vue"],resolve),
               meta:{
                 Auth:true,
+                title:'申请云支付账号总表-爱迅'
               },
             },
             //数据同步异常
@@ -225,6 +256,7 @@ export default [
               component:(resolve)=>require(["../components/home/components/dataException/dataException.vue"],resolve),
               meta:{
                  Auth:true,
+                 title:'数据同步异常-爱迅'
               }
             },
             //资金流水核对异常
@@ -234,6 +266,7 @@ export default [
               component:(resolve)=>require(["../components/home/components/abnormalCapitalFlow/abnormalCapitalFlow.vue"],resolve),
               meta:{
                 Auth:true,
+                title:'资金流水核对异常-爱迅'
               }
 
             },
@@ -244,6 +277,7 @@ export default [
               component:(resolve)=>require(["../components/home/components/abnormalAccountBalance/abnormalAccountBalance.vue"],resolve),
               meta:{
                 Auth:true,
+                title:"账套余额异常-爱迅"
               }
             },
 
@@ -254,6 +288,7 @@ export default [
               component:(resovle)=>require(["../components/home/components/userAdmin/userAdmin.vue"],resovle),
               meta:{
                 Auth:true,
+                title:'人员-爱迅'
               },
               
             },//权限页面
@@ -263,6 +298,7 @@ export default [
               component:(resovle)=>require(["../components/home/components/permissions/permissions.vue"],resovle),
               meta:{
                 Auth:true,
+                title:'权限-爱迅'
               },
             },
             //设置权限

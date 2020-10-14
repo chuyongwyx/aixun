@@ -23,7 +23,7 @@
     </div>
     <!-- 这是搜索模态框 -->
 
-    <div class="search-model" v-show="searchModel">
+    <div class="search-model" v-show="searchModel" @keydown="handleEnterToSearch">
       <div class="search-content">
         <div class="search-tit">
           <span>搜索</span>
@@ -67,12 +67,12 @@
           </div>
         </div>
         <div class="tip-footer">
-          <div>
-            <span class="iconfont icon icon-xuanzhong2" @click="handelSelectTip" id="iconTip"></span>
+          <div @click="handelSelectTip">
+            <span class="iconfont icon icon-xuanzhong2"  id="iconTip"></span>
             <span>我已经确认无误</span>
           </div>
           <div>
-            <button @click="handleApply">确定</button>
+            <button @click="handleApply" :style="tipBtn">确定</button>
           </div>
         </div>
       </div>
@@ -82,7 +82,7 @@
       <div>
         <span>品牌名称：</span>
         <div>
-          <Select v-model="modelType" class="select-iview"  @on-change="handleType" size="large">
+          <Select v-model="modelType" class="select-iview"  clearable @on-change="handleType" size="large">
             <Option
               v-for="item in brands"
               :value="item.value"
@@ -96,7 +96,7 @@
       <div>
         <span>收款银行:</span>
         <div class="bankName">
-          <Select v-model="modelBankType" class="select-iview" :label-in-value="true" @on-change="handleTypeBank" size="large">
+          <Select v-model="modelBankType" clearable class="select-iview" :label-in-value="true" @on-change="handleTypeBank" size="large">
             <Option
               v-for="item in banks"
               :value="item.value"
@@ -129,8 +129,9 @@
       </div>
     </div>
     <div class="save-btn">
-      <button @click="handelTip" :style="saveBtn"><span v-show="saveLoding==false?true:false">保存</span><span v-show="saveLoding==false?false:true">保存中...</span></button>
+      <button @click="handelTip" :style="saveBtn"><span v-show="saveLoading==false?true:false">保存</span><span v-show="saveLoading==false?false:true">保存中...</span></button>
     </div>
+     <div class="save-success" v-show="saveSuccessTip"><img src="../../../../assets/saveSuccess.png" alt=""></div>
   </div>
 </template>
 <script>
@@ -159,10 +160,12 @@ export default {
       sure:false,
       //文本框提示文字
       tipText:"color:#c5c8ce;",
+      //提示按钮灰色
+      tipBtn:"color:#B7B8BA;background:rgba(243,244,245,1);",
       //按钮颜色
       saveBtn:"color:#B7B8BA;background:rgba(243,244,245,1);",
       //保存的loading操作
-      saveLoding:false,
+      // saveLoding:false,
       //函数防抖
       timer:null,
       //输入框漏选
@@ -170,18 +173,31 @@ export default {
       banksNameTip:false,
       LinkManNameTip:false,
       LinkPhoneTip:false,
+      //保存成功提示
+      saveSuccessTip:false
     };
   },
   watch: {
-      closeWindow(newValue,oldValue){
-                        if(newValue){
-                            this.saveLoding=false;
-                             this.handleCloseRouter(this.$route.name)
-                             this.$router.push('/payItem');
-                             this.handleNotCloseWindow();
-                        }                  
-                 },
-
+        saveSuccess(newValue,oldValue){
+            if(newValue){
+                  this.projectsNum="";
+                  this.projectsName="";
+                 //品牌类型
+                  this.modelType= "";
+                  //银行
+                  this.modelBankType="";
+                  this.Linkman="";
+                  this.phoneNumber="";
+                  this.Address="请输入地址...";
+                  this.tipText="color:#c5c8ce;"
+                  this.saveSuccessTip=true;
+                  var _this=this;
+                  var timerTwo = setTimeout(()=>{
+                     _this.saveSuccessTip=false;
+                     clearTimeout(timerTwo)
+                  },1000)
+            }
+        },
         modelType(newValue,oldValue){
                   this.saveBtn="background:#5897FF;color: #fff;";
         },
@@ -206,12 +222,16 @@ export default {
       brands : state=>state.applyPayReceipt.brands,
       //银行
       banks:state=>state.applyPayReceipt.banks,
-      //是否关闭窗口
-      closeWindow:state=>state.applyPayReceipt.closeWindow,
       //模糊查询出来的数据
       searchProjects:state=>state.applyPayReceipt.searchProjects,
       //查不到
-      searchNot:state=>state.applyPayReceipt.searchNot
+      searchNot:state=>state.applyPayReceipt.searchNot,
+      //loading状态
+      saveLoading:state=>state.applyPayReceipt.saveLoading,
+      //保存的状态
+      saveSuccess:state=>state.applyPayReceipt.saveSuccess
+
+     
     })
   },
   methods: {
@@ -221,14 +241,10 @@ export default {
       getBrandByProjectNumber:"applyPayReceipt/getBrandByProjectNumber",
       //新建申请单
       addApplicationForm:"applyPayReceipt/addApplicationForm",
-      //关闭当前页面
-      handleCloseRouter:"home/handleCloseRouter",
-      //不关闭
-      handleNotCloseWindow:"applyPayReceipt/handleCloseWindow",
       //模糊查询
       getSearchVal:"applyPayReceipt/getSearchVal",
       //清除查询到的数据
-      handleclickClearSearchData:"applyPayReceipt/handleclickClearSearchData"
+      handleclickClearSearchData:"applyPayReceipt/handleclickClearSearchData",
     }),
     //搜索模态框的显示与隐藏
     handelSearchShow() {
@@ -254,7 +270,7 @@ export default {
       this.searchVal="";
     },
     //选中品牌类型
-    handleType(value){
+    handleType(value){ 
       this.brandsId =parseInt(value.substring(0,value.indexOf(',')));
       this.brandsNameTip=false;
     },
@@ -283,7 +299,11 @@ export default {
       if(this.phoneNumber==""){
          this.LinkPhoneTip=true; 
       }
-      if(this.banksId!=="" && this.brandsId!=="" && this.Linkman!=="" &&this.phoneNumber!==""){
+      //项目没有选择
+      if(this.projectsNum==""){
+        alert('请选择项目');
+      }
+      if(this.banksId!=="" && this.brandsId!=="" && this.Linkman!=="" &&this.phoneNumber!==""&&this.projectsNum!==""){
           this.tipModel = true;
       }
       
@@ -293,14 +313,19 @@ export default {
     },
     //提示框中的选中
     handelSelectTip($event){
-        if($event.target.className.indexOf('icon-xuanzhong2')===-1){
-             $event.target.classList.remove('icon-selected');
-             $event.target.classList.add('icon-xuanzhong2');
+        var iconTip = document.getElementById('iconTip');
+
+        if(iconTip.className.indexOf('icon-xuanzhong2')===-1){
+             iconTip.classList.remove('icon-selected');
+             iconTip.classList.add('icon-xuanzhong2');
              this.sure=false;
+              this.tipBtn="color:#B7B8BA;background:rgba(243,244,245,1);"
+            
         }else{
-          $event.target.classList.remove('icon-xuanzhong2')
-          $event.target.classList.add('icon-selected');
+          iconTip.classList.remove('icon-xuanzhong2')
+          iconTip.classList.add('icon-selected');
           this.sure = true;
+           this.tipBtn="background:#5897FF;color:#fff;"
         }
     },
      //模糊查询
@@ -310,6 +335,14 @@ export default {
                  }
                    
     },
+    //enter点击查询
+     handleEnterToSearch($event){
+          if($event.keyCode===13){
+                     if(this.searchVal!==''){
+                     this.getSearchVal(this.searchVal);
+                    }
+                 }
+     },
     //申请云支付收款账号
     handleApply(){
         var address ="" ;
@@ -322,10 +355,10 @@ export default {
             }
         if(this.timer){
           clearTimeout(this.timer);
-          this.saveLoding=false;
+          // this.saveLoding=false;
         }
           this.timer=setTimeout(() => {
-              _this.saveLoding=true;
+              // _this.saveLoding=true;
                var param =JSON.stringify({
                 "ProjectNumber":_this.projectsNum,
                 "BrandID":_this.brandsId,
@@ -408,7 +441,7 @@ export default {
          float: left;
          font-size: 14px;
          line-height: 34px;
-         margin-right: 10px;
+         margin-right: 30px;
      }
       .item-select>div:nth-of-type(1) div{
           float: left;
@@ -522,8 +555,10 @@ export default {
             font-size:14px;
             resize:none; 
             outline: none;
-            text-indent: 7px;
+            padding-top: 7px;
+            padding-left: 8px;
             color:#515A6E ;
+             border:1px solid rgba(232,235,240,1);
         }   
         .save-btn{
                 width:140px;
@@ -541,6 +576,9 @@ export default {
                 border: 0;
                 border-radius: 4px;
          }
+          .save-btn>button:hover{
+            cursor: pointer;
+          }
          .save-btn>button:active{
              background: #6da4ff;
 
@@ -610,7 +648,7 @@ export default {
     margin-left: 18px;
     border-radius: 2px;
   }
-  .search-model .search-content .search-input > div:nth-of-type(2) > button {
+  .search-model .search-content .search-input > div:nth-of-type(2) > button{
     border: 0;
     outline: none;
     width: 100%;
@@ -618,6 +656,9 @@ export default {
     background: rgba(88, 151, 255, 1);
     color: #fff;
     border-radius: 4px;
+  }
+  .search-model .search-content .search-input > div:nth-of-type(2) > button:hover{
+    cursor: pointer;
   }
   .search-model .search-content .search-input > div:nth-of-type(2) > button:active{
     background: #6da4ff;
@@ -695,7 +736,7 @@ export default {
     color: #d2d2d2;
   }
   .tip-body {
-    padding-left: 53px;
+    padding-left: 98px;
     overflow: hidden;
   }
   .tip-body > img {
@@ -720,6 +761,10 @@ export default {
   }
   .tip-footer > div:nth-of-type(1) {
     float: left;
+    margin-top: 6px;
+  }
+  .tip-footer > div:nth-of-type(1):hover{
+    cursor:pointer;
   }
   .tip-footer > div:nth-of-type(1) > span:nth-of-type(1) {
     font-size: 16px;
@@ -742,6 +787,7 @@ export default {
     border: 0;
     color: #fff;
     font-size: 14px;
+    outline: none;
   }
   .icon{
     color: #5897ff;
@@ -760,6 +806,20 @@ export default {
              border-radius: 2px;
              text-align: center;
         }
+          .save-success{
+            position:fixed;
+            top: 50%;
+            left:50%;
+            width:200px;
+            height:50px;
+            margin-left:-100px;
+            margin-top:-25px;
+        }
+        .save-success>img{
+            width:100%;
+            height:100%;
+        }
+ 
 }
 
 @media screen and (max-width: 1400px) {
@@ -801,7 +861,7 @@ export default {
          float: left;
          font-size: 12px;
          line-height: 34px;
-         margin-right: 7px;
+         margin-right: 14px;
      }
       .item-select>div:nth-of-type(1) div{
           float: left;
@@ -906,16 +966,18 @@ export default {
             height: 93px;
             font-size:14px;
             resize:none; 
-            text-indent: 10px;
+            padding-left: 8px;
+            padding-top: 5px;
             color:#515A6E ;
             outline: none;
+            border:1px solid rgba(232,235,240,1);
         }   
         .save-btn{
                 width:102px;
                 height:35px;
                 float:left;
                 margin-left: 459px;
-                margin-top: 103px;
+                margin-top: 50px;
         }
          .save-btn>button{
                 width:100%;
@@ -1080,7 +1142,7 @@ export default {
     color: #d2d2d2;
   }
   .tip-body {
-    padding-left: 38px;
+    padding-left: 60px;
     overflow: hidden;
   }
   .tip-body > img {
@@ -1105,6 +1167,10 @@ export default {
   }
   .tip-footer > div:nth-of-type(1) {
     float: left;
+    margin-top: 3px;
+  }
+  .tip-footer > div:nth-of-type(1):hover{
+    cursor: pointer;
   }
   .tip-footer > div:nth-of-type(1) > span:nth-of-type(1) {
     font-size: 13px;
@@ -1145,7 +1211,22 @@ export default {
              border-radius: 2px;
              text-align: center;
   }
-
+.search-model .search-content .search-input > div:nth-of-type(2) > button:hover{
+    cursor: pointer;
+  }
+  .save-success{
+            position:fixed;
+            top: 50%;
+            left:50%;
+            width:160px;
+            height:40px;
+            margin-left:-80px;
+            margin-top:-20px;
+        }
+        .save-success>img{
+            width:100%;
+            height:100%;
+        }
 
 }
 </style>

@@ -36,7 +36,7 @@
                                 <td>5</td>
                                 <td>2</td>
                                 <td>7</td>
-                                <td class="tdhover">查看详情</td>
+                                <td class="tdhover" @click="handleToFindDetails">查看详情</td>
                             </tr>
                             </table>
                             </div>
@@ -150,16 +150,28 @@ export default {
                 "detail":false
             }
         },
+        methods: {
+            //查看详情
+            handleToFindDetails(){
+                this.capitalFlowChild =false;
+                this.detail = true;
+            }
+        },
         mounted(){
             if(this.capitalFlowChild){
              this.$nextTick(() =>{
                
-				this.scroll = new Bscroll(this.$refs.main, {
-					click: true,
-					scrollY:true,
-					scrollbar:true,
-					mouseWheel:true
+				this.scroll = new Bscroll(this.$refs.main,{
+                        click: true,
+                        scrollY:true,
+                        scrollbar:{
+                                     fade: false,
+                                     interactive: false, // 1.8.0 新增
+                        },
+			            mouseWheel:true
                 })
+                //改变滚动条颜色
+                document.getElementsByClassName('bscroll-indicator')[0].style.background="rgba(0,0,0,0.2)";
          
 				
             })
@@ -188,7 +200,7 @@ export default {
      .capitalFlow-main{
          height:704px;
          overflow: hidden;
-         margin-top: 40px;
+         margin-top: 20px;
      }
      .capitalFlow-content{
         max-height: max-content;
@@ -263,13 +275,14 @@ export default {
         border-bottom: 1px solid #e7e7e7;
         border-right: 1px solid #e7e7e7;
         line-height: 41px;
-        padding:0 20px;
+        padding:0 ;
         text-align: center;
-        font-size: 14px;
+        font-size: 12px;
         color: #888888;
     }
      .cloudForm > table > tr > td:nth-of-type(1){
         width:27px;
+        padding:0;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -319,9 +332,9 @@ export default {
         border-bottom: 1px solid #e7e7e7;
         border-right: 1px solid #e7e7e7;
         line-height: 41px;
-        padding:0 15px;
+        padding:0;
         text-align: center;
-        font-size: 14px;
+        font-size: 12px;
         color: #888888;
     }
      .bankForm > table > tr > td:nth-of-type(9){
@@ -384,7 +397,7 @@ export default {
         }
      .capitalFlow-main{
          height:514px;
-         margin-top: 29px;
+         margin-top: 18px;
          overflow: hidden;
      }
      .capitalFlow-content{

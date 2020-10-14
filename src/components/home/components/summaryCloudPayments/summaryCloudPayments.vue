@@ -64,6 +64,9 @@
         </div>
         <div class="opations" v-show="selectShow" @click="handleClickOpations($event)">
           <div>
+              <span class="opation" data-id="all">全部</span>
+          </div>
+          <div>
             <span class="opation" data-id="1">未受理</span>
           </div>
           <div>
@@ -73,7 +76,7 @@
             <span class="opation" data-id="3">完成</span>
           </div> 
           <div>
-            <span class="opation" data-id="4">关闭</span>
+            <span class="opation" data-id="4">强制关闭</span>
           </div>
         </div>
       </div>
@@ -88,7 +91,7 @@
       <div class style="clear:both; width:100%;"></div>
     </div>
 
-    <div class="appCloudeForm">
+    <div class="appCloudeForm"  @mouseover="handleTipMaxWidth">
       <table cellpadding="0" cellspacing="0">
         <tr>
           <td>申请日期</td>
@@ -119,11 +122,11 @@
             </Poptip>
           </td>
           <td>{{item.acceptedUsername}}</td>
-          <td :data-id="item.status">{{item.status==1?'未受理':item.status==2?'已受理':item.status==3?'完成':'关闭'}}</td>
+          <td :data-id="item.status">{{item.status==1?'未受理':item.status==2?'已受理':item.status==3?'完成':'强制关闭'}}</td>
         </tr>
 
       </table>
-       <Page :total="count" :page-size="MaxResultCount" class="page" :current="page" @on-change="handleToDatalist" v-show="count<=14?false:true"/>
+       <Page :total="count" :page-size="MaxResultCount" class="page" :current="page" @on-change="handleToDatalist" v-show="count<=11?false:true"/>
     </div>
     
         <div class="ClouPayModel" v-if="ClouPayModel">
@@ -182,9 +185,9 @@
                 </ul>
               </div>
               <table cellpadding="0" cellspacing="0">
-                     <tr v-for="(item,index) in importList">
+                     <tr v-for="(item,index) in importList"  @click="handleClickSelectedPro($event,item,index)" class="importTrsHover">
                       <td>
-                        <span class="iconfont icon-fuxuankuang_weixuanzhong icon" @click="handleClickSelectedPro($event,item)" style="color:#5897FF;"></span>
+                        <span class="iconfont icon-fuxuankuang_weixuanzhong icon" style="color:#5897FF;"></span>
                       </td>
                       <td>{{item.number}}</td>
                       <td>{{item.type}}</td>
@@ -214,9 +217,9 @@ export default {
       openEnd: false,
       dateEnd: "",
       selectShow: false,
-      selected: "未受理",
-      selectedId:1,
-      MaxResultCount:14,
+      selected: "全部",
+      selectedId:"all",
+      MaxResultCount:11,
       page:1,
       //强制关闭
       forcedClos:false,
@@ -243,6 +246,35 @@ export default {
       referenceSingleNumber:false,
 
     };
+  },
+  created(){
+      
+  },
+  mounted(){
+      var today = new Date();
+      today.setTime(today.getTime());
+      var year= today.getFullYear();
+      var month =parseInt(today.getMonth()+1)<10?'0'+parseInt(today.getMonth()+1):today.getMonth()+1;
+      var day = parseInt(today.getDate())<10?'0'+parseInt(today.getDate()):today.getDate();  
+      var end =year +"-" +month + "-" +day;
+      this.dateEnd =end;
+     
+      // //七天之前
+      // var sevenAgo = new Date(today);
+      //  sevenAgo.setDate(today.getDate()-7);
+      //  var year2 =sevenAgo.getFullYear();
+      //  var month2 =parseInt(sevenAgo.getMonth()+1)<10?'0'+parseInt(sevenAgo.getMonth()+1):sevenAgo.getMonth()+1;
+      //  var day2 = parseInt(sevenAgo.getDate())<10?'0'+parseInt(sevenAgo.getDate()):sevenAgo.getDate();
+      this.dateStart =year +"-"+month+"-"+ day ;
+      var param = JSON.stringify({
+          "MaxResultCount":this.MaxResultCount,
+          "SkipCount":0,
+          "Sorting":"",
+          "StartDate":this.dateStart,
+          "EndDate":this.dateEnd,
+          "Status":""
+      })
+      this.getApplicationForms(param);
   },
   computed:{
       ...Vuex.mapState({
@@ -299,6 +331,24 @@ export default {
 
     //查询对应的数据
     handleToSearchForm(){
+        //清空选中栏
+        var trs = document.getElementsByClassName('trhover');
+                var len =trs.length;
+                for(var i=0;i<len;i++){
+                    trs[i].style.background="";
+              }
+
+      if(this.selectedId=="all"){
+           var param = JSON.stringify({
+          "MaxResultCount":this.MaxResultCount,
+          "SkipCount":0,
+          "Sorting":"",
+          "StartDate":this.dateStart,
+          "EndDate":this.dateEnd,
+          "Status":""
+      })
+      this.getApplicationForms(param);
+      }else{
       var param = JSON.stringify({
           "MaxResultCount":this.MaxResultCount,
           "SkipCount":0,
@@ -307,11 +357,13 @@ export default {
           "EndDate":this.dateEnd,
           "Status":this.selectedId
       })
+         this.getApplicationForms(param);
+      }
       //强制关闭
       this.forcedClos=false;
       //修改完成时备注
       this.finishedRemark=false;
-      this.getApplicationForms(param);
+     
     },
   //选中表格中对应的数据
   handlToTrsSelect($event,param,index){
@@ -330,6 +382,9 @@ export default {
                 }else if(param.status==3){
                     this.finishedRemark= true;
                     this.forcedClos=false;
+                }else{
+                     this.finishedRemark= false;
+                    this.forcedClos=false;
                 }
 
   },
@@ -338,15 +393,37 @@ export default {
    //分页
   handleToDatalist(page){
         this.page = page;
-         var param = JSON.stringify({
-          "MaxResultCount":this.MaxResultCount,
-          "SkipCount":(this.page-1)*this.MaxResultCount,
-          "Sorting":"",
-          "StartDate":this.dateStart,
-          "EndDate":this.dateEnd,
-          "Status":this.selectedId
-      })
-      this.getApplicationForms(param);
+        var trs = document.getElementsByClassName('trhover');
+        var len =trs.length;
+       for(var i=0;i<len;i++){
+                    trs[i].style.background="";
+        }
+        if(this.selectedId=="all"){
+             var param = JSON.stringify({
+                "MaxResultCount":this.MaxResultCount,
+                "SkipCount":(this.page-1)*this.MaxResultCount,
+                "Sorting":"",
+                "StartDate":this.dateStart,
+                "EndDate":this.dateEnd,
+                "Status":""
+            })
+          this.getApplicationForms(param);
+        }else{
+             var param = JSON.stringify({
+                "MaxResultCount":this.MaxResultCount,
+                "SkipCount":(this.page-1)*this.MaxResultCount,
+                "Sorting":"",
+                "StartDate":this.dateStart,
+                "EndDate":this.dateEnd,
+                "Status":this.selectedId
+            })
+          this.getApplicationForms(param);
+         
+        }
+          //强制关闭
+            this.forcedClos=false;
+          //修改完成时备注
+          this.finishedRemark=false;
   },
    //文本域得焦时
     handleTofocus(){
@@ -374,7 +451,13 @@ export default {
   },
   //确定向后台发送关闭的备注
   handleTocloseRemark(){
-      if(this.closeRemark!=='请输入原因...'){
+      if(this.closeRemark=='请输入原因...'||this.closeRemark==""){
+          alert('请输入关闭原因');
+      }
+      if(this.closeRemark.length>100){
+          alert('请输入少于100字');
+      }
+      if(this.closeRemark!=='请输入原因...'&&this.closeRemark!==""&&this.closeRemark.length<=100){
             var param = {
                 "id":this.id,
                 "CloseRemark":this.closeRemark
@@ -430,24 +513,27 @@ export default {
 
 
      //引用数据操作
-    handleClickSelectedPro($event,items){
+    handleClickSelectedPro($event,items,index){
       var param ={
           "brandName":items.brandName,
           "type":items.type,
           "number":items.number
       }
-      if($event.target.className.indexOf('icon-fuxuankuang_weixuanzhong')!==-1){
-          $event.target.classList.remove('icon-fuxuankuang_weixuanzhong');
-          $event.target.classList.remove('icon');
-          $event.target.classList.add('icon-fuxuankuang_xuanzhong');
-          $event.target.classList.add('icon1');
+      var trs = document.getElementsByClassName('importTrsHover');
+    
+
+      if(trs[index].firstElementChild.firstElementChild.className.indexOf('icon-fuxuankuang_weixuanzhong')!==-1){
+          trs[index].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_weixuanzhong');
+          trs[index].firstElementChild.firstElementChild.classList.remove('icon');
+          trs[index].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_xuanzhong');
+          trs[index].firstElementChild.firstElementChild.classList.add('icon1');
           this.RemarkData.push(param);
 
       }else{
-          $event.target.classList.remove('icon-fuxuankuang_xuanzhong');
-          $event.target.classList.remove('icon1');
-          $event.target.classList.add('icon-fuxuankuang_weixuanzhong');
-          $event.target.classList.add('icon');
+          trs[index].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_xuanzhong');
+          trs[index].firstElementChild.firstElementChild.classList.remove('icon1');
+          trs[index].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_weixuanzhong');
+          trs[index].firstElementChild.firstElementChild.classList.add('icon');
           var RemarkDataIndex =''
           this.RemarkData.map((item,index)=>{
                if(item.brandName===param.brandName){
@@ -505,7 +591,13 @@ export default {
         this.closeReasonModel= false;
        }
     },
-
+    handleTipMaxWidth(){
+        //  var tips =document.getElementsByClassName('ivu-poptip-popper');
+        //     var len = tips.length;
+        //     for(var i=0;i<len;i++){
+        //       tips[i].style.maxWidth ="200px";
+        //      }  
+    }
 
   }
 }
@@ -595,7 +687,7 @@ export default {
 }
 .selected {
   height: 28px;
-  width:95px;
+  width:106px;
   background: rgba(241, 243, 246, 1);
   border-radius: 4px;
 }
@@ -628,6 +720,9 @@ export default {
   width: 90px;
   height: 36px;
   outline: 0;
+}
+.search-btn > button:hover{
+  cursor: pointer;
 }
 .search-btn > button:active{
   background: #6da4ff;
@@ -662,8 +757,11 @@ export default {
   padding-right: 15px;
   line-height: 36px;
 }
+.btns > button:active{
+  background: #6da4ff;
+}
 .appCloudeForm {
-  margin-top: 49px;
+  margin-top: 25px;
   width: 100%;
   padding-right: 64px;
   margin-left: 67px;
@@ -679,7 +777,6 @@ export default {
   border-right: 1px solid #e7e7e7;
   line-height: 30px;
   text-align: center;
-
   font-size: 14px;
   color: #888888;
 }
@@ -747,8 +844,14 @@ export default {
 .btn-replace:hover{
   cursor: pointer;
 }
+.btn-replace:active{
+   background: #6da4ff;
+}
 .upClos:hover{
   cursor: pointer;
+}
+.upClos:active{
+   background: #6da4ff;
 }
 .ivu-page {
     text-align: center;
@@ -779,7 +882,7 @@ export default {
   top: 275px;
   left: 50%;
   z-index: 11;
-  margin-left: -250px;
+  margin-left: -300px;
 }
 .accept-content3 .accept-head{
   margin: 23px 0;
@@ -849,6 +952,12 @@ export default {
     margin-right: 40px;
     border-radius:4px;
 }
+.accept-content3> .footer>button:hover{
+  cursor: pointer;
+}
+.accept-content3> .footer>button:active{
+  background: #6da4ff;
+}
 
 /* 关闭的原因备注 */
 .closeReason{
@@ -907,6 +1016,9 @@ export default {
    border-radius: 4px;
    margin-right:20px;
 }
+.closeRemarkBtn .closeBtn:hover{
+  cursor: pointer;
+}
 .closeRemarkBtn .sureBtn{
    width:155px;
    height: 40px;
@@ -916,6 +1028,12 @@ export default {
    outline: none;
    border-radius: 4px;
    margin-left: 20px;
+}
+.closeRemarkBtn .sureBtn:hover{
+  cursor: pointer;
+}
+.closeRemarkBtn .sureBtn:active{
+  background: #6da4ff;
 }
 
 /* 引用单号 */
@@ -1044,7 +1162,9 @@ export default {
     width: 120px;
     height: 30px;
   }
-  
+  .importTrsHover:hover{
+    background:rgb(237, 238, 239)
+  }
  .footer {
     width: 140px;
     height: 36px;
@@ -1059,6 +1179,9 @@ export default {
     height: 100%;
     font-size: 16px;
     border-radius: 4px;
+  }
+  .footer > button:hover{
+    cursor: pointer;
   }
   .footer > button:active{
     background:#6da4ff;
@@ -1152,7 +1275,7 @@ export default {
 }
 .selected {
   height: 20px;
-  width: 75px;
+  width: 85px;
   background: rgba(241, 243, 246, 1);
   border-radius: 4px;
 }
@@ -1186,6 +1309,12 @@ export default {
   height: 26px;
   outline: 0;
 }
+.search-btn > button:hover{
+  cursor: pointer;
+}
+.search-btn > button:active{
+   background:#6da4ff;
+}
 /* 日期插件 */
 .date-iview{
    width:102px;
@@ -1216,6 +1345,12 @@ export default {
   padding-right: 11px;
   line-height: 26px;
 }
+.btns > button:hover{
+  cursor: pointer;
+}
+.btns > button:active{
+  background: #6da4ff;
+}
 .appCloudeForm {
   margin-top: 36px;
   width: 100%;
@@ -1245,21 +1380,22 @@ export default {
 .tip-iview-span{
   text-align:center;
   display: block;
-  height: 22px;
+  height: 18px;
   padding-top: 4px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   width:50px;
   margin: 0 auto;
- line-height: 22px;
+ line-height: 18px;
 
 }
 .api{
   width:138px;
 }
 .appCloudeForm > table > tr:nth-of-type(1) > td {
-  line-height: 22px;
+  line-height:30px;
+  height:30px;
   text-align: center;
   font-size: 12px;
   background: rgba(241, 243, 246, 1);
@@ -1306,8 +1442,14 @@ export default {
 .btn-replace:hover{
   cursor: pointer;
 }
+.btn-replace:active{
+   background: #6da4ff;
+}
 .upClos:hover{
   cursor: pointer;
+}
+.upClose:active{
+   background: #6da4ff;
 }
 .page > .ivu-page-item a {
   
@@ -1331,7 +1473,7 @@ export default {
   top: 201px;
   left: 50%;
   z-index: 11;
-  margin-left: -182px;
+  margin-left: -219px;
 }
 .accept-content3 .accept-head{
   margin: 17px 0;
@@ -1388,6 +1530,12 @@ export default {
     margin-right: 29px;
     border-radius:4px;
 }
+.accept-content3> .footer>button:hover{
+  cursor: pointer;
+}
+.accept-content3>.footer>button:active{
+  background: #6da4ff;
+}
 .accept-content3 > .remarks {
     width: 379px;
     height: 162px;
@@ -1409,7 +1557,7 @@ export default {
     position: absolute;
     left: 0;
     right: 0;
-    bottom:146px;
+    bottom:50px;
 }
 /* 关闭的原因备注 */
 .closeReason{
@@ -1468,6 +1616,12 @@ export default {
    border-radius: 4px;
    margin-right:15px;
 }
+.closeRemarkBtn .closeBtn:hover{
+  cursor: pointer;
+}
+.closeRemarkBtn .closeBtn:active{
+   background: #6da4ff;
+}
 .closeRemarkBtn .sureBtn{
    width:113px;
    height: 29px;
@@ -1477,6 +1631,12 @@ export default {
    outline: none;
    border-radius: 4px;
    margin-left: 15px;
+}
+.closeRemarkBtn .sureBtn:hover{
+  cursor: pointer;
+}
+.closeRemarkBtn .sureBtn:active{
+   background: #6da4ff;
 }
 
 
@@ -1617,6 +1777,9 @@ export default {
     overflow: hidden;
     white-space: nowrap;
   }
+  .importTrsHover:hover{
+    background:rgb(237, 238, 239)
+  }
   .footer {
    
     margin-top: 17px;
@@ -1633,6 +1796,9 @@ export default {
     font-size: 12px;
     border-radius: 4px;
   }
+ .footer > button:hover{
+   cursor: pointer;
+ }
 .footer > button:active{
   background:#6da4ff;
 }

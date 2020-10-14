@@ -6,7 +6,7 @@ import router from './router';
 import "./common/css/reset.css";
 import 'iview/dist/styles/iview.css';
 import "./common/font/iconfont.css";
-import "./common/css/animate.min.css";
+// import "./common/css/animate.min.css";
 import store from "./store"
 import iview from 'iview';
 //mock摸拟数据打包时替换
@@ -14,8 +14,10 @@ import iview from 'iview';
 // import './mock/traningOrg/traningOrg.js';
 // import './mock/userAdmin/userAdmin.js';
 import './utils/refreshToken';
+import VueWechatTitle from 'vue-wechat-title'; 
 Vue.config.productionTip = false
 Vue.use(iview);
+Vue.use(VueWechatTitle);
 
 /* eslint-disable no-new */
  const vm =new Vue({

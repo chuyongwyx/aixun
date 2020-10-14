@@ -2,6 +2,8 @@ import Vue from "vue";
 import Vuex from "vuex";
 //银行负责人
 import buildBankManager from "./buildBankManager";
+//兴业银行
+import industrialBank from "./industrialBank";
 //广州培训负责人处理人信息
 import trainingOrg  from './traningOrg';
 //新建申请单
@@ -73,7 +75,8 @@ const store = new Vuex.Store({
         summaryCloudPayment,
         generalApplicationBrandCert,
         taskSummaryStatem, 
-        summaryBrands
+        summaryBrands,
+        industrialBank
     }
 })
 

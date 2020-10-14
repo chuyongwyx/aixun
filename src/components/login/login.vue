@@ -4,18 +4,25 @@
             <!-- <span class="iconfont icon-UserSettings"></span> -->
             <div class="login-form">
                 <div class="login-head">
-                     <div :class="{'login-actived':userLogin}"  @click="handleUserLogin">账号登陆</div>
-                     <div :class="{'login-actived':wxLogin}"  @click="handleWxLogin">微信登陆</div>
+                     <div :class="{'login-actived':userLogin}"  @click="handleUserLogin">账号登录</div>
+                     <div :class="{'login-actived':wxLogin}"  @click="handleWxLogin">微信登录</div>
                 </div> 
               
-                <div class="login-user" v-show="userLogin">
-                        <div><span class="iconfont icon-UserSettings"></span><input type="text" placeholder="用户名" v-model="Username" id="userName" ></div>
-                        <div><span class="iconfont icon-mima"></span><input type="passsword" placeholder="登录密码" v-model="UserPassword"></div>
-                        <p :class="{'login-test':loginError}">*用户名或密码输入错误,请重新输入</p>
+                <div class="login-user" v-show="userLogin" @keydown="handleToLoginKeyDown">
+                        <div><span class="iconfont icon-UserSettings"></span><input type="text" placeholder="用户名或邮箱地址" v-model="Username" id="userName" @focus="handleUserFocus" autocomplete="off" @input="handleUserInput"></div>
+                        <div><span class="iconfont icon-mima"></span><input type="password" placeholder="登录密码" v-model="UserPassword" @focus="handlePswFocus" autocomplete="off"></div>
+                        <p class=login-test>
+                            <span v-show="loginAllError">*用户名或密码输入错误,请重新输入</span>
+                            <span v-show="loginForgetUsername">*请输入用户名或者邮箱</span>
+                            <span v-show="loginForgetPsw">*请输入密码</span>
+                            <span v-show="loginForgetAll">*请输入用户名或者邮箱</span>
+                        </p>
+                        
+                        
                         <button @click="handelLogin"><span v-show="logining==false?true:false">登录</span><span v-show="logining==false?false:true">登录中...</span></button>
                 </div>
                 <div class="login-wx" v-show="wxLogin">
-                        <div>微信扫一扫</div>
+                        <div>扫一扫</div>
                         <div id="login_container">
                             <!-- 获取二维码信息 -->
                             <!-- <img :src="" alt=""> -->
@@ -41,6 +48,14 @@ export default {
                     "loginError":true,
                     "wxEr":'',
                     "logining":false,
+                    //用户名邮箱忘记
+                    "loginForgetUsername":false,
+                    //密码忘记
+                    "loginForgetPsw":false,
+                    //都忘记了
+                    "loginForgetAll":false,
+                    //登录错误
+                    "loginAllError":false
                     
             }
         },
@@ -59,7 +74,55 @@ export default {
                 this.userLogin=false;
                
             },
+            handleUserFocus(){
+                  //都忘记了
+                  this.loginForgetAll=false;
+                  //登录错误
+                  this.loginAllError =false;
+                 this.loginForgetUsername=false;
+            },
+
+            //用户框中输入密码
+            handleUserInput(){
+                this.UserPassword="";
+            },
+
+            handlePswFocus(){
+                  this.loginForgetPsw =false;
+                    //都忘记了
+                    this.loginForgetAll=false;
+                    //登录错误
+                    this.loginAllError =false;
+            },
             handelLogin(){
+                if(this.Username==""&&this.UserPassword!==""){
+                    
+                    this.loginForgetPsw =false;
+                    //都忘记了
+                    this.loginForgetAll=false;
+                    //登录错误
+                    this.loginAllError =false;
+                    this.loginForgetUsername=true;
+                }    
+            if(this.Username!==""&&this.UserPassword==""){
+                   
+                    this.loginForgetPsw =true;
+                    //都忘记了
+                    this.loginForgetAll=false;
+                    //登录错误
+                    this.loginAllError =false;
+                    this.loginForgetUsername=false;
+            }
+            if(this.Username==""&&this.UserPassword==""){
+                    this.loginForgetPsw =false;
+                    //都忘记了
+                    this.loginForgetAll=true;
+                    //登录错误
+                    this.loginAllError =false;
+                    this.loginForgetUsername=false;
+            }
+
+                if(this.Username!==""&&this.UserPassword!==""){
                 var UsernameOrEmailAddress = this.Username;
                 var Password = sha256(this.UserPassword).toLocaleUpperCase();
                 this.logining=true;
@@ -70,7 +133,7 @@ export default {
                 var _this = this;
                 axios({
                     method:"post",
-                    url:"/apis/api/Account/Authenticate",
+                    url:"http://is-test.aserweb.com:50102/api/Account/Authenticate",
                      headers: {
                             'Content-Type':'application/json'
                     },
@@ -84,17 +147,104 @@ export default {
                             Cookies.set("token",Token,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
                             Cookies.set("RefreshToken",RefreshToken,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
                              _this.$router.push('/home');
-                             this.logining=false;
+                             _this.logining=false;
                 }).catch(function(err){
+                         _this.logining=false;
                         if(err.response.data.error.details ==='用户名或密码无效'){
-                                 _this.loginError = false;
+                                _this.loginForgetPsw =false;
+                                //都忘记了
+                                _this.loginForgetAll=false;
+                                //登录错误
+                                _this.loginAllError =true;
+                                _this.loginForgetUsername=false;
+                               
                         }else{
                             alert(err.response.data.error.message);
                         }
-                        this.logining=false;
+                        
                     
                 })
            
+            }
+            },
+
+
+            //回车键登录
+            handleToLoginKeyDown($event){
+                if($event.keyCode===13){
+                      if(this.Username==""&&this.UserPassword!==""){
+                    
+                    this.loginForgetPsw =false;
+                    //都忘记了
+                    this.loginForgetAll=false;
+                    //登录错误
+                    this.loginAllError =false;
+                    this.loginForgetUsername=true;
+                }    
+            if(this.Username!==""&&this.UserPassword==""){
+                   
+                    this.loginForgetPsw =true;
+                    //都忘记了
+                    this.loginForgetAll=false;
+                    //登录错误
+                    this.loginAllError =false;
+                    this.loginForgetUsername=false;
+            }
+            if(this.Username==""&&this.UserPassword==""){
+                    this.loginForgetPsw =false;
+                    //都忘记了
+                    this.loginForgetAll=true;
+                    //登录错误
+                    this.loginAllError =false;
+                    this.loginForgetUsername=false;
+            }
+
+                if(this.Username!==""&&this.UserPassword!==""){
+                var UsernameOrEmailAddress = this.Username;
+                var Password = sha256(this.UserPassword).toLocaleUpperCase();
+                this.logining=true;
+                var param =JSON.stringify({
+                    "usernameOrEmailAddress":UsernameOrEmailAddress,
+                    "password":Password
+                })
+                var _this = this;
+                axios({
+                    method:"post",
+                    url:"http://is-test.aserweb.com:50102/api/Account/Authenticate",
+                     headers: {
+                            'Content-Type':'application/json'
+                    },
+                    data:param,
+                    
+                }).then(function(data){                    
+                           var Token = 'Bearer'+' '+data.data.result.accessToken;
+                           var RefreshToken = data.data.result.refreshToken;
+                           Cookies.set('name',data.data.result.name,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
+                           Cookies.set('email',data.data.result.emailAddress,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
+                            Cookies.set("token",Token,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
+                            Cookies.set("RefreshToken",RefreshToken,{expires:new Date(new Date().getTime() +data.data.result.expiresIn *1000)});
+                             _this.$router.push('/home');
+                             _this.logining=false;
+                }).catch(function(err){
+                         _this.logining=false;
+                        if(err.response.data.error.details ==='用户名或密码无效'){
+                                _this.loginForgetPsw =false;
+                                //都忘记了
+                                _this.loginForgetAll=false;
+                                //登录错误
+                                _this.loginAllError =true;
+                                _this.loginForgetUsername=false;
+                               
+                        }else{
+                            alert(err.response.data.error.message);
+                        }
+                        
+                    
+                })
+           
+            }
+
+             };
             }
             
         },
@@ -106,9 +256,9 @@ export default {
         },
         created(){
             
-            if(Cookies.get('token')){
-                this.$router.push('/home');
-            }
+            // if(Cookies.get('token')){
+            //     this.$router.push('/home');
+            // }
         },
         mounted(){
            document.getElementById('userName').focus();
@@ -119,7 +269,13 @@ export default {
 
 <style lang="" scoped>
 @media screen and (min-width: 1400px){
-    .login{
+        /* 去除input框的登录底色 */
+    
+input:-webkit-autofill { 
+	-webkit-box-shadow: 0 0 0 1000px white inset !important;
+}
+
+ .login{
             width:100%;
             height:100%;
             background: url('../../assets/login-background.png') no-repeat;
@@ -143,7 +299,7 @@ export default {
           float:right;
           margin-top:124px;
           margin-right:82px;
-          font-size: 18px;
+          font-size: 16px;
           overflow: hidden;
      }
      .login>.login-content>.login-form>.login-head{
@@ -190,7 +346,7 @@ export default {
      }
      .login-user>div>span{
          float: left;
-         font-size: 28px;
+         font-size: 24px;
          line-height: 68px;
          color: #A4A4A4;
          margin-left:16px;
@@ -203,6 +359,7 @@ export default {
             margin-top:21px;
             outline: 0;
             text-indent: 1em;
+            font-size: 14px;
             
             
       }
@@ -217,13 +374,13 @@ export default {
            margin-bottom:28px;
        }
        .login-test{
-           visibility: hidden;
+           height:21px;
        }
       .login-user>button{
             width:438px;
             height: 75px;
             border: 0;
-            font-size: 22px;
+            font-size: 18px;
             color: #fff;
             /* margin-top: 63px; */
             background:#7AACFF;
@@ -235,7 +392,7 @@ export default {
     }
         .login-wx{
                 width:250px;
-                font-size: 22px;
+                font-size: 20px;
                 margin-top:48px;
                 float:right;
                 margin-right:85px;
@@ -259,7 +416,10 @@ export default {
 }
 /*笔记本最小统一1024 */
 @media screen and (max-width: 1400px){
-         .login{
+        input:-webkit-autofill { 
+	    -webkit-box-shadow: 0 0 0 1000px white inset !important;
+        }
+    .login{
             width:100%;
             height:100%;
             background: url('../../assets/login-background.png') no-repeat;
@@ -357,7 +517,7 @@ export default {
            margin-bottom:15px;
        }
        .login-test{
-           visibility: hidden;
+          height:15px;
        }
       .login-user>button{
             width:233px;

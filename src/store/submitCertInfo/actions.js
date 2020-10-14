@@ -4,7 +4,7 @@ export default{
    async getApplyingApplicationForms({commit,state}){
        var dataList = await GetApplyingApplicationForms();
        commit("handleDataList",dataList)
-   },
+   }, 
    //提交数据
    async uploadApplicationFormInformation({commit,state},param){
         var paramTwo = JSON.stringify(param)

@@ -63,13 +63,19 @@ export default {
         }
     },
     mounted(){
+           
              this.$nextTick(() =>{
 		this.scroll = new Bscroll(this.$refs.main,{
 			click: true,
 			scrollY:true,
-			scrollbar:true,
+			scrollbar:{
+                                fade: false,
+                                interactive: false, // 1.8.0 新增
+                        },
 			mouseWheel:true
-                })		
+                })
+                //改变滚动条颜色
+                document.getElementsByClassName('bscroll-indicator')[0].style.background="rgba(0,0,0,0.2)";
             })
    },
     computed:{
@@ -86,7 +92,6 @@ export default {
                     var param =JSON.stringify({
                             "ProjectNumber":this.ProjectNumber
                     })
-                    console.log(param);
                     this.getProjectBrands(param);
 
             }
@@ -161,7 +166,7 @@ height: max-content;
   
 }
 .itemCountNav{  
-  width:745px;
+  width:746px;
   line-height: 42px;
   text-align: center;
   font-size: 14px;
@@ -237,6 +242,10 @@ overflow: hidden;
     width:100px;
     height: 42px;
 }
+.bscroll-indicator{
+        /* background:rgba(0,0,0,0) !important; */
+}
+
 }
 
 @media screen and (max-width:1400px){

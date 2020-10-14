@@ -3,8 +3,6 @@
             <div class="header-all">
                 <div class="header clearBox">
                     <div class="header-logo">
-                        <div @click="handleToWeclome"><span class="iconfont icon-hanbaocaidanzhedie navMenu"></span></div>
-                        <div class="border-mock"></div>
                         <div><img src="../../assets/aixun.png" alt=""></div>
                         <div><h2 class="">爱迅内部系统</h2></div>
                     </div>
@@ -12,39 +10,41 @@
                 
                          <div class="mockNav wrapper" id="mockNav" ref="main" style="position:relative;">
                            <div class="content mockNavCon" style="width:max-content;">
-                            <div v-for="(item,index) in routerArray" class="nav-tag">
-                                <div class="nav-tag-kind" :class='{"active": routerActive===item.name?true:false}'>
-                                        <div class="border"></div>
-                                        <div @click="handleToRouter" :data-id="item.path" :save-name="item.name" class="tagName">{{item.text}}</div>
-                                        <div><span class="iconfont icon-del2 iconSpan" :data-id="index" @click="handleToClearRouter" :clear-name="item.name"></span></div>
-                                </div>
-                            </div>
+                          
                          </div> 
 
                        </div>
-
-                 
-                   
                     <!-- 用户登录头像 -->
-                    <div class="userCard">
-                        <div>
+                    <div class="userCard" v-if="userCard">
+                        <div @click="handleClickUserInfo" class="userOpear" @mouseenter="handleMouseover">
                             <div><img src="../../assets/userInfo.png" alt=""></div>
-                            <div v-show="userInfoShow" @click="handleToUserInfoShow" class="userOpear"><img src="../../assets/xia.png" alt=""></div>
-                            <div v-show="userInfoHide" @click="handleToUserInfoHide" class="userOpear"><img src="../../assets/shang.png" alt=""></div>
+                            <div v-show="userInfoShow" ><img src="../../assets/xia.png" alt=""></div>
+                            <div v-show="userInfoHide" ><img src="../../assets/shang.png" alt=""></div>
                         </div>
-                        <div class="userCardInfo" v-show="userInfoHide">
+                        <div class="userCardInfo" v-show="userInfoHide"  @mouseleave="handleMouseOut">
                             <div><span>{{userName}}</span></div>
                             <div><span>{{email}}</span></div>
+                            <div @click="handleToUpdatePsw"><img src="../../assets/mima.png" alt=""><span>修改密码</span></div>
                             <div @click="handleToLoginOut"><img src="../../assets/out.png" alt=""><span>退出登录</span></div>
                         </div>
+                    </div>
+
+                    <!-- 修改密码 -->
+                    <div class="updatePswModel" v-show="updatePswModel">
+                          <div  class="updatePsw">
+                                <div class="updateHead"><span>修改密码</span><span class="iconfont icon-chuyidong" @click="handleCloseUpdateModle"></span></div>
+                                <div class="updatepsw"><span>原密码:</span> <input type="password" placeholder="请输入原密码..." v-model="beforePsw"  @focus="handleBeforePswFocus" @blur="handleBeforePswBlur"></div>
+                                <div class="updatepsw"><span>新密码:</span><input type="password"  placeholder="请输入新密码..."  v-model="newPsw"  @focus="handleNewPswFocus" @blur="handleNewPswBlur"></div>
+                                <div class="updatepsw"><span>确认新密码:</span><input type="password" placeholder="请再次输入密码..." v-model="sureNewPsw"  @focus="handleSureNewPswFocus" @blur="handleSureNewPswBlur"></div>
+                                <div class="updateFooter"><button @click="handleSaveUpdatePsw"><span v-show="updatePswBtn==false?true:false">保存</span><span v-show="updatePswBtn==false?false:true">保存中...</span></button></div>
+                          </div>
                     </div>
                 </div>
             </div>
             <div class="wrap">
-                    <keep-alive :include="keepAlive">
+                    <keep-alive>
                              <router-view></router-view>
-                    </keep-alive>
-                          
+                    </keep-alive>        
             </div>
         </div>
 </template>
@@ -53,25 +53,54 @@
 import Vuex from "vuex";
 import Bscroll from 'better-scroll';
 import Cookies from 'js-cookie';
+ const sha256 = require("js-sha256").sha256;
 export default {
   data() {
     return {
             userName:"",
             email:"",
             userInfoShow:true,
-            userInfoHide:false
-    };
+            userInfoHide:false,
+            updatePswModel:false,
+            beforePsw:"",
+            newPsw:"",
+            sureNewPsw:"",
+            beforePlaceHoldColor:"#CDCDCD",
+            newPlaceHoldColor:"#CDCDCD",
+            surePlaceHoldColor:"#CDCDCD",
+            // updatePswBtn:false,
+            timers:null,
+            userCard:false,
+
+    }; 
   },
   
   computed: {
     ...Vuex.mapState({
-      routerArray: state => state.home.routerArray,
-      keepAlive: state => state.home.keepAlive,
-      routerActive:state=>state.home.routerActive
+      // routerArray: state => state.home.routerArray,
+      // keepAlive: state => state.home.keepAlive,
+      // routerActive:state=>state.home.routerActive,
+      //修改密码成功跳转
+      success:state=>state.home.success,
+      updatePswBtn:state=>state.home.updatePswBtn
     })
   },
  watch: {
-   
+      success(newValue,oldValue){
+        if(newValue ==true){
+          alert('密码修改成功');
+            //  Cookies.remove('name');
+            //   Cookies.remove('email');
+            //   Cookies.remove('token');
+            //   //清除当前所有活跃的按钮
+            //   this.handleClearAllRouter();
+              this.updatePswModel=false;
+              this.beforePsw="";
+              this.newPsw="";
+              this.sureNewPsw="";
+            //   this.$router.push('/login');
+        }
+      }
   },
   created(){
       this.userName = Cookies.get('name');
@@ -85,94 +114,126 @@ export default {
 					scrollbar:false,
 					mouseWheel:true })
             })
+
+       if(this.$route.name=='welcomehome'||this.$route.name=='payItem'||this.$route.name=="payQuery"||this.$route.name=="abnormalMonitoring"||this.$route.name=="intManage"){
+          this.userCard =true;
+       }
   },
   methods: {
     ...Vuex.mapActions({
-      //获取培训人员
-      //   getTraningOrg:'trainingOrg/getBuildBankManager',
-      //获取内部人员
-      getUserAdmin: "userAdmin/getUserAdmininfo",
-      handleClearRouter: "home/handleClearRouter",
-      handlePushRouter:"home/handlePushRouter",
-      handleToRouterActive:"home/handleToRouterActive",
-      //退出云支付收款账号清除的数据
-      handleClickVuexApplyPayReceipt:"applyPayReceipt/handleClickVuexDataList",
-      //退出申请品牌认证时将其vuex状态清除
-      handleClickVuexApplyBrandCertData:"applyBrandCert/handleClickVuexApplyBrandCertData",
-      //退出申请云支付功能总表时删除数据
-      handleClearVuexSumCloudPayDataList:"summaryCloudPayment/handleClearDataList",
-      //退出时申请品牌认证总表
-      handleClearVuexGeneralApplicationBrandCert:"generalApplicationBrandCert/handleClearDatalist",
-      //退出时项目品牌总表
-      handleClearVuexSummaryBrands:"summaryBrands/handleClearDataList",
-      //申请云支付账号总表
-      handleClearVuexTaskSummaryStatem:"taskSummaryStatem/handleClearDataList" 
+      //修改密码
+      handleModifyPassword:"home/modifyPassword"
+
     }),
-    handleToWeclome() {
-      this.$router.push("/payItem");
-    },
-    //跳转缓存路由
-    handleToRouter($event) {
-      var routerpath = $event.target.getAttribute("data-id");
-      this.$router.push(routerpath);
-      var name = $event.target.getAttribute("save-name");
-      var list = document.getElementsByClassName('tagName');
-      this.handleToRouterActive(name)
-    },
-    //删除路由缓存
-    handleToClearRouter($event) {
-      //提示删除confirm
-      if (confirm("是否关闭")){
-        var index = $event.target.getAttribute("data-id");
-        var name = $event.target.getAttribute("clear-name");
-        var param = {
-          delIndex: index,
-          delName: name
-        };
-
-        this.handleClearRouter(param);
-
-        //判断是否申请品牌认证
-        if(name==="applyBrandCert"){
-            this.handleClickVuexApplyBrandCertData();
-        }
-        //判断是否是申请云支付收款账号
-        if(name==="applyPayReceipt"){
-            this.handleClickVuexApplyPayReceipt();
-        }
-
-        //判断是否为申请云支付功能总表
-      
-        if(name==="summaryCloudPayments"){
-            this.handleClearVuexSumCloudPayDataList();
-        }
-
-        //判断是否为申请品牌认证总表
-        if(name==="generalApplicationBrandCert"){
-            this.handleClearVuexGeneralApplicationBrandCert();
-        }
-        //判断是否项目品牌总表
-        if(name==="summaryBrands"){
-            this.handleClearVuexSummaryBrands();
-        }
-        //判断是否为申请云支付账号总表
-        if(name ==="taskSummaryStatem"){
-            this.handleClearVuexTaskSummaryStatem();
-        }
-        if (this.$route.name === name) {
-          this.$router.push("/payItem");
-        }
-      } 
-    },
+    // handleToWeclome() {
+    //   if(this.$route.name=="home"){
+    //     this.$router.push("/payItem");
+    //   }
+    // },
+  
   //显示用户登录信息
-  handleToUserInfoShow(){
-      this.userInfoHide=true;
-      this.userInfoShow=false;
+  handleClickUserInfo(){
+      if(this.userInfoHide==true){
+             this.userInfoHide=false;
+             this.userInfoShow=true;
+      }else{
+            this.userInfoHide=true;
+             this.userInfoShow=false;
+      }
+
   },
-  //隐藏用户登录信息
-  handleToUserInfoHide(){
-      this.userInfoShow=true;
-      this.userInfoHide=false;
+  //修改密码
+  handleToUpdatePsw(){
+      this.updatePswModel=true;
+  },
+  handleCloseUpdateModle(){
+      this.updatePswModel=false;
+      this.beforePsw="";
+      this.newPsw="";
+      this.sureNewPsw="";
+
+
+  },
+  //得焦
+  handleBeforePswFocus(){
+    // if(this.beforePsw == "请输入原密码..."){
+    //     this.beforePsw="";
+    // }
+    //   this.beforePlaceHoldColor="#333333";
+  },
+  handleNewPswFocus(){
+      // if(this.newPsw=="请输入新密码..."){
+      //   this.newPsw="";
+      // }
+      //  this.newPlaceHoldColor ="#333333";
+
+  },
+  handleSureNewPswFocus(){
+    // if(this.sureNewPsw=="请再次输入新密码..."){
+    //   this.sureNewPsw="";
+    // }
+    // this.surePlaceHoldColor="#333333";
+  },
+  //失焦
+  handleBeforePswBlur(){
+    // if(this.beforePsw ==""){
+    //    this.beforePsw="请输入原密码...";
+    //    this.beforePlaceHoldColor="#CDCDCD";
+    // }
+  },
+  handleNewPswBlur(){
+    //   if(this.newPsw ==""){
+    //    this.newPsw="请输入新密码...";
+    //    this.newPlaceHoldColor="#CDCDCD";
+    // }
+  },
+  handleSureNewPswBlur(){
+      // if(this.sureNewPsw==""){
+      //   this.sureNewPsw="请再次输入新密码...";
+      //   this.surePlaceHoldColor="#CDCDCD";
+      // }
+  },
+  //修改密码
+  handleSaveUpdatePsw(){
+      if(this.newPsw==""&&this.beforePsw!==""&&this.sureNewPsw!==""){
+        alert('新密码不能为空');
+      }else if(this.beforePsw==""&&this.newPsw!==""&&this.sureNewPsw!==""){
+        alert('请输入原密码');
+
+      }else if(this.sureNewPsw==""&&this.newPsw!==""&&this.beforePsw!==""){
+        alert('请再次输入新密码');
+      }else if(this.newPsw!==""&&this.newPsw!=="请输入新密码..."&&this.beforePsw!==""&&this.beforePsw!=="请输入原密码..."&&this.sureNewPsw!==""&&this.sureNewPsw!=="请再次输入新密码..."){
+          if(this.newPsw!==this.sureNewPsw){
+              alert('两次输入新密码不一致')
+            }else{
+              var _this =this;
+            
+              if(this.timers){
+                  clearTimeout(this.timers);
+                
+              }
+              this.timers =setTimeout(()=>{
+                   var param =JSON.stringify({
+                    "UsernameOrEmailAddress":Cookies.get('name')!=""?Cookies.get('name'):Cookies.get('email'),
+                    "NewPassword":sha256(_this.newPsw).toLocaleUpperCase(),
+                    "OldPassword": sha256(_this.beforePsw).toLocaleUpperCase()
+                })
+               
+              _this.handleModifyPassword(param);
+
+              },300)
+            }
+      }else{
+           alert('请填写表单在操作');
+      }   
+  },
+  handleMouseover(){
+             this.userInfoHide=true;
+             this.userInfoShow=false;
+  },
+  handleMouseOut(){
+          this.userInfoHide=false;
+           this.userInfoShow=true;
   },
   //退出登录
   handleToLoginOut(){
@@ -215,15 +276,15 @@ export default {
       rgba(130, 80, 255, 1) 100%
     );
   }
-  .header > .header-logo > div:nth-of-type(1) {
+  /* .header > .header-logo > div:nth-of-type(1) {
     width: 18px;
     height: 16px;
     margin-left: 24px;
     line-height: 16px;
     margin-top: 20px;
   
-  }
-  .header > .header-logo > div:nth-of-type(1) span {
+  } */
+  /* .header > .header-logo > div:nth-of-type(1) span {
     font-size: 16px;
     color: #fff;
   }
@@ -233,21 +294,22 @@ export default {
     margin-top:20px;
     border-left: 1px solid #7aacff;
 
-  }
-  .header > .header-logo > div:nth-of-type(3) {
+  } */
+  .header > .header-logo > div:nth-of-type(1) {
     width: 22px;
     height: 22px;
     margin-top: 17px;
+    margin-left:24px;
   }
-  .header > .header-logo > div:nth-of-type(3) > img {
+  .header > .header-logo > div:nth-of-type(1) > img {
     width: 100%;
     height: 100%;
   }
-  .header > .header-logo > div:nth-of-type(4) {
+  .header > .header-logo > div:nth-of-type(2) {
     margin-left: 10px;
     margin-top: 20px;
   }
-  .header > .header-logo > div:nth-of-type(4) > h2 {
+  .header > .header-logo > div:nth-of-type(2) > h2 {
     color: #fff;
     font-size: 16px;
     line-height:1;
@@ -408,7 +470,7 @@ export default {
 .userCardInfo{
   position: absolute;
   width: 157px;
-  height: 118px;
+  height: 160px;
   box-shadow:0px 1px 8px 0px rgba(152,152,152,0.2);
   top: 55px;
   padding:0 15px;
@@ -419,39 +481,130 @@ export default {
   width: 100%;
 }
 .userCardInfo>div:nth-of-type(1){
-  margin-top: 16px;
+  margin-top: 10px;
 }
 .userCardInfo>div:nth-of-type(2){
-  margin-bottom:16px;
+  margin-bottom:10px;
   color: #C0C1C5;
   margin-top: 7px;
 }
 .userCardInfo>div:nth-of-type(3){
-  padding-top: 16px;
   border-top: 1px solid #F2F2F2;
+  border-bottom:1px solid #F2F2F2;
+}
+.userCardInfo>div:nth-of-type(3) span{
+  float: left;
+  display:block;
+  line-height: 47px;
+}
+.userCardInfo>div:nth-of-type(3) img{
+  width: 15px;
+  height: 15px;
+  float: left;
+  margin-top: 13px;
+}
+.userCardInfo>div:nth-of-type(3) span:nth-of-type(1){
+  margin-left:8px;
+  color: #666666;
 }
 .userCardInfo>div:nth-of-type(3):hover{
   cursor: pointer;
 }
-.userCardInfo>div:nth-of-type(3) img{
-  width: 19px;
-  height: 18px;
-  float: left;
-}
-.userCardInfo>div:nth-of-type(3) span{
-  float: left;
-  margin-left: 8px;
+.userCardInfo>div:nth-of-type(4){
+  line-height: 42px;
 }
 
-.userOpear:hover{
+.userCardInfo>div:nth-of-type(4) img{
+  width: 15px;
+  height: 15px;
+  float: left;
+  margin-top: 13px;
+}
+.userCardInfo>div:nth-of-type(4) span{
+  margin-left:8px;
+  color: #666666;
+}
+
+.userCardInfo>div:nth-of-type(4):hover{
   cursor: pointer;
 }
 
 
-
-
+/* 修改密码 */
+.updatePswModel{
+  position: absolute;
+  left:0;
+  top:0;
+  width: 100%;
+  height:100%;
+  background:rgba(0,0,0,0.2);
+  z-index: 11;
+}
+.updatePsw{
+  width:500px;
+  height: 360px;
+  background: #fff;
+  position:absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -180px;
+  margin-left:-250px;
+}
+.updateHead{
+  margin-top: 30px;
+  margin-bottom:40px;
+  overflow: hidden;
+}
+.updateHead span:nth-of-type(1){
+  float:left;
+  margin-left: 203px;
+  font-size:20px;
+}
+.updateHead span:nth-of-type(2){
+  float:right;
+  margin-right: 30px;
+  font-size: 22px;
+  color:#9A9A9A;
+}
+.updatepsw{
+  height: 38px;
+  overflow: hidden;
+  margin-top: 20px;
 }
 
+.updatepsw>span{
+  display: block;
+  width: 138px;
+  text-align: right;
+  float:left;
+  font-size: 14px;
+  line-height: 38px;
+  
+}
+.updatepsw>input{
+  width:270px;
+  height: 38px;
+  font-size: 14px;
+  outline: none;
+  border: 1px solid #E8EBF0;
+  margin-left: 27px;
+  text-indent: 13px;
+}
+.updateFooter{
+    text-align: center;
+    margin-top: 34px;
+}
+.updateFooter>button{
+   background:#5897FF;
+   height:48px;
+   width:185px;
+   border: 0;
+   border-radius: 4px;
+   font-size: 14px;
+   color: #fff;
+  
+}
+}
 /*device-width:1024-1400px*/
 /* 以1024为标准 */
 @media screen and (max-width: 1400px) {
@@ -480,38 +633,22 @@ export default {
    .header > .header-logo>div{
      float: left;
    }
+  
   .header > .header-logo > div:nth-of-type(1) {
-    width: 14px;
-    height: 12px;
-    margin-left: 17px;
-    line-height: 12px;
-    margin-top: 14px;
-
-  }
-  .header > .header-logo > div:nth-of-type(1) span {
-    font-size: 12px;
-    color: #fff;
-  }
-  .border-mock {
-    height: 12px;
-    margin: 0 12px;
-    margin-top: 14px;
-    border-left: 1px solid #7aacff;
-  }
-  .header > .header-logo > div:nth-of-type(3) {
     width: 16px;
     height: 16px;
     margin-top: 12px;
+    margin-left:17px;
   }
-  .header > .header-logo > div:nth-of-type(3) > img {
+  .header > .header-logo > div:nth-of-type(1) > img {
     width: 100%;
     height: 100%;
   }
-  .header > .header-logo > div:nth-of-type(4) {
+  .header > .header-logo > div:nth-of-type(2) {
     margin-left: 7px;
     margin-top: 14px;
   }
-  .header > .header-logo > div:nth-of-type(4) > h2 {
+  .header > .header-logo > div:nth-of-type(2) > h2 {
     color: #fff;
     font-size: 12px;
     line-height: 1;
@@ -670,40 +807,137 @@ export default {
 
 .userCardInfo{
   position: absolute;
-  width: 115px;
-  height: 100px;
+  width: 150px;
+  height: 117px;
+  box-shadow:0px 1px 8px 0px rgba(152,152,152,0.2);
   top: 40px;
+  padding:0 11px;
   left:0;
   z-index:5;
-  box-shadow:0px 1px 8px 0px rgba(152,152,152,0.2);
-  padding: 0 8px;
 }
 .userCardInfo>div{
   width: 100%;
 }
 .userCardInfo>div:nth-of-type(1){
-  margin-top: 12px;
+  margin-top: 7px;
 }
 .userCardInfo>div:nth-of-type(2){
-  margin-bottom:12px;
+  margin-bottom:7px;
   color: #C0C1C5;
   margin-top: 5px;
 }
 .userCardInfo>div:nth-of-type(3){
-  padding-top: 12px;
   border-top: 1px solid #F2F2F2;
-}
-.userCardInfo>div:nth-of-type(3) img{
-  width: 14px;
-  height: 13px;
-  float: left;
+  border-bottom:1px solid #F2F2F2;
 }
 .userCardInfo>div:nth-of-type(3) span{
-  margin-top: -2px;
   float: left;
+  display:block;
+  line-height: 34px;
+}
+.userCardInfo>div:nth-of-type(3) img{
+  width: 11px;
+  height: 11px;
+  float: left;
+  margin-top: 11px;
+}
+.userCardInfo>div:nth-of-type(3) span:nth-of-type(1){
+  margin-left:6px;
+  color: #666666;
+}
+.userCardInfo>div:nth-of-type(3):hover{
+  cursor: pointer;
+}
+.userCardInfo>div:nth-of-type(4){
+  line-height: 29px;
+}
+
+.userCardInfo>div:nth-of-type(4) img{
+  width: 11px;
+  height: 11px;
+  float: left;
+  margin-top: 11px;
+}
+.userCardInfo>div:nth-of-type(4) span{
+  margin-left:6px;
+  color: #666666;
 }
 .userOpear:hover{
   cursor: pointer;
+}
+/* 修改密码 */
+.updatePswModel{
+  position: absolute;
+  left:0;
+  top:0;
+  width: 100%;
+  height:100%;
+  background:rgba(0,0,0,0.2);
+  z-index: 11;
+}
+.updatePsw{
+  width:365px;
+  height: 263px;
+  background: #fff;
+  position:absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -131px;
+  margin-left:-183px;
+}
+.updateHead{
+  margin-top: 22px;
+  margin-bottom:22px;
+  overflow: hidden;
+}
+.updateHead span:nth-of-type(1){
+  float:left;
+  margin-left:148px;
+  font-size:18px;
+}
+.updateHead span:nth-of-type(2){
+  float:right;
+  margin-right: 22px;
+  font-size: 18px;
+  color:#9A9A9A;
+}
+.updatepsw{
+  height: 28px;
+  overflow: hidden;
+  margin-top: 15px;
+}
+
+.updatepsw>span{
+  display: block;
+  width: 105px;
+  text-align: right;
+  float:left;
+  font-size: 12px;
+  line-height: 28px;
+  
+}
+.updatepsw>input{
+  width:197px;
+  height: 28px;
+  font-size: 12px;
+  outline: none;
+  border: 1px solid #E8EBF0;
+  margin-left: 20px;
+  text-indent: 13px;
+}
+.updateFooter{
+    text-align: center;
+    margin-top: 25px;
+}
+.updateFooter>button{
+   background:#5897FF;
+   height:35px;
+   width:135px;
+   border: 0;
+   border-radius: 4px;
+   font-size: 12px;
+   color: #fff;
+  
 }
 
 }

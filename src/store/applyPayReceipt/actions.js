@@ -30,25 +30,29 @@ export default{
 
     //新建申请单
     async addApplicationForm({commit,state},param){
+        state.saveLoading = true;
+        state.saveSuccess=false;
         var dataInfo = await AddApplicationForm(param);
+        
         if(dataInfo.success ===false){
-            state.closeWindow = false; 
+            
+            state.saveLoading=false;
+            state.saveSuccess=false;
+
        }else{
-           state.closeWindow=true
+        state.saveLoading=false;
+        state.saveSuccess=true;
+        state.projects=[];
+        state.banks=[];
+        state.brands=[]; 
        }
- 
+   
     }, 
-    //如果是否关闭当前窗口
-    async handleCloseWindow({commit,state}){
-        state.closeWindow =false;
-    },
+  
     //清空模糊查询查询出来数据
     async  handleclickClearSearchData({commit,state}){
         state.searchProjects=[];
    },
 
-   //路由关闭清除的数据
-   async  handleClickVuexDataList({commit,state}){
-     state.brands=[];
-   }
+   
 }   

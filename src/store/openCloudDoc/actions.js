@@ -9,10 +9,12 @@ export default{
     async openCloudOrder({commit,state},param){
         var paramStr = JSON.stringify(param);
         state.success=false;
+        state.openLoading=true;
         var  dataInfo = await OpenCloudOrder(paramStr);
         //如果返回成功则在vuex中删除他
        if(dataInfo.success){
         state.success=true;
+        state.openLoading=false;
         var len = param.IDs.length;
         for(var i=0;i<len;i++){
             state.GetVerifiedBrands.map((item,index)=>{
@@ -22,8 +24,10 @@ export default{
             })
 
         }
+    }else{
+        state.openLoading=false; 
     }
  
 
     }
-}    
+}      

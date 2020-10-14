@@ -1,9 +1,9 @@
 <template>
         <div class="intManage-r">
-                <div @click="handleToUserAdmin">人员</div>
-                <div @click="handleToSetPermissions">权限</div>
+                <div ><a href="http://is-test.aserweb.com:50101/#/userAdmin" target="_blank">人员</a></div>
+                <div><a href="http://is-test.aserweb.com:50101/#/userPermissions" target="_blank">权限</a></div>
         </div>
-</template>
+</template> 
 <script>
 import Vuex from 'vuex';
 export default {
@@ -17,32 +17,14 @@ export default {
                 ...Vuex.mapActions({
                         //获取内部人员
                         getUserAdmin: 'userAdmin/getUserAdmininfo',
-                        handlePushRouter:"home/handlePushRouter",
                         //获取权限中的人员
                         handlePremissionGetUsers:"permissions/handleGetUsers"
                 }),
-                handleToUserAdmin($event){
-                        var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/userAdmin",
-                                "name":"userAdmin"
-                        }
-                        this.handlePushRouter(paramRouter);
-                        this.getUserAdmin();
-                        this.$router.push("/userAdmin");
-                },
-                  //跳转到设置权限页面
-                handleToSetPermissions($event){
-                         var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/userPermissions",
-                                "name":"userPermissions"
-                        }
-                        this.handlePremissionGetUsers();
-                        this.handlePushRouter(paramRouter);
-                        this.$router.push("/userPermissions");
-                }
-        }
+              
+        },
+     created() {
+          
+     },
 
 }
 </script>
@@ -52,17 +34,22 @@ export default {
 .intManage-r{
             margin-left: 74px;      
     }
-    .intManage-r>div{
+    .intManage-r>div a{
             margin-top: 28px;
             margin-right: 30px;
-            float: left;
-            padding: 14px 31px;
-            border:1px solid rgba(102,102,102,1);
-           border-radius:10px;
-           font-size: 16px;
+            display:block;
+           float: left;
+          font-size: 16px;
+          padding: 15px 21px 14px 20px;
+          border:1px solid rgba(102,102,102,1);
+          border-radius:10px;
+          margin-right: 40px;
+          color: #333;
     }
-.intManage-r>div:hover{
+.intManage-r>div a:hover{
         cursor: pointer;
+        color: #5897FF;
+        border: 1px solid #5897FF;
 }   
 }
 
@@ -71,7 +58,8 @@ export default {
             margin-left: 54px;
             
     }
-    .intManage-r>div{
+    .intManage-r>div a{
+             display:block;
             margin-top: 20px;
             margin-right: 21px;
             float: left;
@@ -79,9 +67,12 @@ export default {
             border:1px solid rgba(102,102,102,1);
            border-radius:7px;
            font-size: 13px;
+           color: #333;
     }
-.intManage-r>div:hover{
+.intManage-r>div a:hover{
         cursor: pointer;
+        color: #5897FF;
+        border:1px solid #5897FF;
 }
 }
    

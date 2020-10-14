@@ -64,16 +64,19 @@
         </div>
         <div class="opations" v-show="selectShow" @click="handleClickOpations($event)">
           <div>
-            <span class="opation" data-id="1">未受理</span>
+             <span class="opation" data-id="all">全部</span>
           </div>
           <div>
-            <span class="opation" data-id="2">已受理</span>
+            <span class="opation" data-id="1">申请中</span>
           </div>
           <div>
-            <span class="opation" data-id="3">完成</span>
+            <span class="opation" data-id="2">待认证</span>
           </div>
           <div>
-            <span class="opation" data-id="4">关闭</span>
+            <span class="opation" data-id="3">已认证</span>
+          </div>
+          <div>
+            <span class="opation" data-id="4">强制关闭</span>
           </div>
         </div>
       </div>
@@ -81,8 +84,8 @@
         <button @click="handleToSearchForm">查询</button>
       </div>
       <div class="btns" v-show="BtnHideaOrShow">
-        <button class="btn-replace" @click="handleClickShowMeans">查看认证资料</button>
-        <button class="upClos" @click="handleClickClose">强制关闭</button>
+        <button class="btn-replace" @click="handleClickShowMeans" v-show="findInfo">查看认证资料</button>
+        <button class="upClos" @click="handleClickClose" v-show="forceClose">强制关闭</button>
       </div>
 
       <div class style="clear:both; width:100%;"></div>
@@ -110,11 +113,11 @@
           <td>{{item.creatorUsername}}</td>
           <td>{{item.informationSubmittedUsername}}</td>
           <td>{{item.verifyUsername}}</td>
-          <td>{{item.status==1?'申请中':item.status==2?'带认证':item.status==3?'已认证':'强制关闭'}}</td>
+          <td>{{item.status==1?'申请中':item.status==2?'待认证':item.status==3?'已认证':'强制关闭'}}</td>
         </tr>
         
       </table>
-         <Page :total="count" :page-size="MaxResultCount" class="page" :current="page" @on-change="handleToDatalist" v-show="count<=14?false:true"/>
+         <Page :total="count" :page-size="MaxResultCount" class="page" :current="page" @on-change="handleToDatalist" v-show="count<=11?false:true"/>
     </div>
     <!-- 请备注你的申请单模态框 -->
             <div class="CertModel" v-show="model">
@@ -124,39 +127,55 @@
                             <span class="iconfont icon-chuyidong" @click="handleCloseModel"></span>
                         </div>
                         <div class="data-body">
-                                <div class="applyNumber apply">
-                                     <div><span>申请单号:</span></div>
+                                <div class="applyNumber apply clearBox">
+                                     <div><span>申请单号:</span></div> 
                                      <div>{{dataBrandCert.number}}</div>
                                 </div>
-                                <div class="applyName apply">
+                                <div class="applyName apply clearBox">
                                       <div><span>品牌名称:</span></div>
                                       <div>{{dataBrandCert.brandName}}</div>
                                 </div>
-                                <div class="submitName apply">
+                                <div class="submitName apply clearBox">
                                       <div><span>提交人:</span></div>
                                       <div>{{dataBrandCert.informationSubmittedUsername}}</div>
 
                                 </div>
-                                <div class="shopImg apply">
+                                <div class="shopImg apply clearBox">
                                         <div><span>门店照片:</span></div>
                                         <div class="showImg">
                                                 <div  class="getImg">
-                                                    <img :src="dataBrandCert.shopPhoto" alt="">
+                                                    <img :src="dataBrandCert.shopPhoto" alt="" @click="handleToShowImgShow">
                                                 </div>
                                         </div>
                                        
                                 </div>
 
                                 <!-- 营业执照 -->
-                                <div class="apply business-license">
+                                <div class="apply business-license clearBox">
                                         <div>营业执照:</div>
-                                                <div>
-                                                    <img :src="dataBrandCert.BusinessLicensePhoto" alt="">
+                                                <div class="getImg">
+                                                    <img :src="dataBrandCert.businessLicensePhoto" alt="" @click="handleToShowImgShowTwo">
                                                 </div>
                                        
                                 </div>
                         </div>
                 </div>
+
+                <!-- 门店大图 -->
+                <div class="imgShowBig" v-show="imgShowBig" id="imgShowBig">
+                                    
+                        <img :src="dataBrandCert.shopPhoto" alt="" id="imgShowBigMain"> 
+                        <div style="width:20px;height:20px;background:rgba(0,0,0,0.2);text-align:center;line-height:20px;" id="imgShowBigIcon" @click="handleTocloseimgShowBig"><span class="iconfont icon-chuyidong"></span></div>
+                </div> 
+
+                    <!-- 营业执照大图 -->
+                <div class="imgShowBigTwo" v-show="imgShowBigTwo" id="imgShowBigTwo">
+                        <img :src="dataBrandCert.businessLicensePhoto" alt="" id="imgShowBigTwoMain"> 
+                      <div style="width:20px;height:20px;background:rgba(0,0,0,0.2);text-align:center;line-height:20px;" id="imgShowBigTwoIcon" @click="handleTocloseimgShowBigTwo"><span class="iconfont icon-chuyidong"></span></div>
+                </div>
+
+
+
         </div>
   
             <!-- 关闭的原因备注 -->
@@ -189,12 +208,16 @@ export default {
       openEnd: false,
       dateEnd: "",
       selectShow: false,
-      selected: "未受理",
-      selectedId:1,
-      MaxResultCount:14,
+      selected: "全部",
+      selectedId:"all",
+      MaxResultCount:11,
       page:1,
       model:false,
       closeModel:false,
+      //查看
+      findInfo:false,
+      //强制关闭
+      forceClose:false,
       //提示文字颜色
       tipText:"color:#c5c8ce;",
       //关闭原因
@@ -202,8 +225,40 @@ export default {
       //传递的id
       id:"",
       //按钮显示与隐藏
-      BtnHideaOrShow:false
+      BtnHideaOrShow:false,
+      imgShowBig:false,
+      //营业执照大图
+      imgShowBigTwo:false
     };
+  },
+  mounted(){
+      var today = new Date();
+      today.setTime(today.getTime());
+      var year= today.getFullYear();
+      var month =parseInt(today.getMonth()+1)<10?'0'+parseInt(today.getMonth()+1):today.getMonth()+1;
+      var day = parseInt(today.getDate())<10?'0'+parseInt(today.getDate()):today.getDate();  
+      var end =year +"-" +month + "-" +day;
+      this.dateEnd =end;
+     
+      //七天之前
+      // var sevenAgo = new Date(today);
+      //  sevenAgo.setDate(today.getDate()-7);
+      //  var year2 =sevenAgo.getFullYear();
+      //  var month2 =parseInt(sevenAgo.getMonth()+1)<10?'0'+parseInt(sevenAgo.getMonth()+1):sevenAgo.getMonth()+1;
+      //  var day2 = parseInt(sevenAgo.getDate())<10?'0'+parseInt(sevenAgo.getDate()):sevenAgo.getDate();
+        this.dateStart =year +"-"+month+"-"+ day ;
+
+       var param = JSON.stringify({
+          "MaxResultCount":this.MaxResultCount,
+          "SkipCount":0,
+          "Sorting":"",
+          "StartDate":this.dateStart,
+          "EndDate":this.dateEnd,
+          "Status":""
+      })
+      this.getApplicationForms(param);
+
+
   },
   computed: {
       ...Vuex.mapState({
@@ -257,16 +312,40 @@ export default {
     },
     //查询对应的信息
     handleToSearchForm(){
-        var param = JSON.stringify({
+        //清空状态栏
+         var trs = document.getElementsByClassName('trhover');
+          var len =trs.length;
+          for(var i=0;i<len;i++){
+                    trs[i].style.background="";
+            }
+
+        if(this.selectedId=="all"){
+             var param = JSON.stringify({
+          "MaxResultCount":this.MaxResultCount,
+          "SkipCount":0, 
+          "Sorting":"",
+          "StartDate":this.dateStart,
+          "EndDate":this.dateEnd,
+          "Status":""
+        })
+        this.BtnHideaOrShow=false;
+        this.getApplicationForms(param);
+
+        }else{
+          var param = JSON.stringify({
           "MaxResultCount":this.MaxResultCount,
           "SkipCount":0, 
           "Sorting":"",
           "StartDate":this.dateStart,
           "EndDate":this.dateEnd,
           "Status":this.selectedId
-      })
-      this.BtnHideaOrShow=false;
-      this.getApplicationForms(param);
+        })
+        this.BtnHideaOrShow=false;
+        this.getApplicationForms(param);
+       
+       }
+
+        
     },
 
     //选中表格中对应的数据
@@ -279,6 +358,22 @@ export default {
            trs[index].style.background="rgba(237,238,239,1)";
             this.id =param.id;
             this.BtnHideaOrShow=true;
+              if(param.status==1||param.status==2){
+                      this.findInfo =true;
+                    //强制关闭
+                    this.forceClose =true;
+                    
+                }else if(param.status==3){
+                     this.findInfo =true;
+                    //强制关闭
+                    this.forceClose =false;
+                }else{
+                     
+                    this.findInfo=false;
+                    this.forceClose=false;
+                }
+
+
 
   },
     // 关闭模态框
@@ -319,19 +414,45 @@ export default {
     //分页
     handleToDatalist(page){
           this.page = page;
-          var param = JSON.stringify({
-            "MaxResultCount":this.MaxResultCount,
-            "SkipCount":(this.page-1)*this.MaxResultCount,
-            "Sorting":"",
-            "StartDate":this.dateStart,
-            "EndDate":this.dateEnd,
-            "Status":this.selectedId
-        })
-        this.getApplicationForms(param);
+           var trs = document.getElementsByClassName('trhover');
+          var len =trs.length;
+          for(var i=0;i<len;i++){
+                    trs[i].style.background="";
+            }
+          if(this.selectedId=="all"){
+              var param = JSON.stringify({
+                "MaxResultCount":this.MaxResultCount,
+                "SkipCount":(this.page-1)*this.MaxResultCount,
+                "Sorting":"",
+                "StartDate":this.dateStart,
+                "EndDate":this.dateEnd,
+                "Status":""
+            })
+           this.getApplicationForms(param);
+          }else{
+              var param = JSON.stringify({
+                "MaxResultCount":this.MaxResultCount,
+                "SkipCount":(this.page-1)*this.MaxResultCount,
+                "Sorting":"",
+                "StartDate":this.dateStart,
+                "EndDate":this.dateEnd,
+                "Status":this.selectedId
+            })
+           this.getApplicationForms(param);
+          }
+           this.BtnHideaOrShow=false;
+         
     },
     //确定向后台发送关闭的备注
     handleTocloseRemark(){
-      if(this.closeRemark!=='请输入原因...'){
+       if(this.closeRemark=='请输入原因...'||this.closeRemark==""){
+          alert('请输入关闭原因');
+      }
+      if(this.closeRemark.length>100){
+          alert('请输入少于100字');
+      }
+
+      if(this.closeRemark!=='请输入原因...'&&this.closeRemark!==""&&this.closeRemark.length<=100){
             var param = {
                 "id":this.id,
                 "CloseRemark":this.closeRemark
@@ -345,6 +466,61 @@ export default {
             
       }
   },
+     //显示大图
+         handleToShowImgShow(){
+               var imgShowBig = document.getElementById('imgShowBig');
+               var imgShowBigMain = document.getElementById('imgShowBigMain');
+               var imgShowBigIcon = document.getElementById('imgShowBigIcon');
+
+               this.imgShowBig=true;
+               var w= document.documentElement.clientWidth*0.6 ;
+               var h = document.documentElement.clientHeight*0.8;
+                imgShowBig.style.width=w+'px';
+                imgShowBig.style.height =h+'px';
+                imgShowBig.style.top = document.documentElement.clientHeight*0.5 - h*0.5 +'px';
+                imgShowBig.style.left =document.documentElement.clientWidth*0.5-w*0.5 +'px';
+                //图片的最大高度宽度不超过
+                imgShowBigMain.style.maxWidth =w+'px';
+                imgShowBigMain.style.maxHeight=h+'px';
+                imgShowBigMain.style.top =h*0.5-imgShowBigMain.height*0.5+"px";
+                imgShowBigMain.style.left =w*0.5-imgShowBigMain.width*0.5+'px';
+                //字体图标
+                imgShowBigIcon.style.color='#fff';
+                imgShowBigIcon.style.position="absolute";
+                imgShowBigIcon.style.top =h*0.5-imgShowBigMain.height*0.5+20+"px";
+                imgShowBigIcon.style.left =w*0.5-imgShowBigMain.width*0.5+imgShowBigMain.width*0.9+'px';
+         },
+
+         //关闭大图
+         handleTocloseimgShowBig(){
+              this.imgShowBig=false;
+         },
+
+          handleToShowImgShowTwo(){
+               var imgShowBig = document.getElementById('imgShowBigTwo');
+               var imgShowBigMain = document.getElementById('imgShowBigTwoMain');
+               var imgShowBigIcon = document.getElementById('imgShowBigTwoIcon');
+               this.imgShowBigTwo=true;
+               var w= document.documentElement.clientWidth*0.6 ;
+               var h = document.documentElement.clientHeight*0.8;
+                imgShowBig.style.width=w+'px';
+                imgShowBig.style.height =h+'px';
+                imgShowBig.style.top = document.documentElement.clientHeight*0.5 - h*0.5 +'px';
+                imgShowBig.style.left =document.documentElement.clientWidth*0.5-w*0.5 +'px';
+                //图片的最大高度宽度不超过
+                imgShowBigMain.style.maxWidth =w+'px';
+                imgShowBigMain.style.maxHeight=h+'px';
+                imgShowBigMain.style.top =h*0.5-imgShowBigMain.height*0.5+"px";
+                imgShowBigMain.style.left =w*0.5-imgShowBigMain.width*0.5+'px';
+                //字体图标
+                imgShowBigIcon.style.color='#fff';
+                imgShowBigIcon.style.position="absolute";
+                imgShowBigIcon.style.top =h*0.5-imgShowBigMain.height*0.5+20+"px";
+                imgShowBigIcon.style.left =w*0.5-imgShowBigMain.width*0.5+imgShowBigMain.width*0.9+'px';
+         },
+         handleTocloseimgShowBigTwo(){
+              this.imgShowBigTwo=false;
+         }
   }
 };
 </script>
@@ -508,7 +684,7 @@ export default {
  
 }
 .appCloudeForm {
-  margin-top: 49px;
+  margin-top: 25px;
   width: 100%;
   padding-right: 64px;
   margin-left: 67px;
@@ -522,14 +698,14 @@ export default {
 .appCloudeForm > table > tr > td {
   border-bottom: 1px solid #e7e7e7;
   border-right: 1px solid #e7e7e7;
-  line-height: 30px;
+  line-height: 39px;
   text-align: center;
 
   font-size: 14px;
   color: #888888;
 }
 .appCloudeForm > table > tr:nth-of-type(1) > td {
-  line-height: 30px;
+  line-height: 39px;
   text-align: center;
   font-size: 14px;
   background: rgba(241, 243, 246, 1);
@@ -628,7 +804,7 @@ export default {
 
 }
 .apply{
-    overflow: hidden;
+    /* overflow: hidden; */
     margin-left:46px;
     margin-bottom:20px;
 }
@@ -644,10 +820,19 @@ export default {
 }
 .apply>div:nth-of-type(1){
     width: 101px;
-    text-align: right;
+    text-align: left;
+    margin-left: 40px;
 }
 .apply>div:nth-of-type(2){
-    margin-left:41px;
+    margin-left:20px;
+}
+.clearBox:after{
+   content:".";
+   display:block;
+   clear:both;
+   height:0; 
+   overflow:hidden; 
+   visibility:hidden;
 }
 .shopImg{
 
@@ -663,6 +848,9 @@ export default {
 .getImg{
     width:180px;
     height:160px;
+}
+.getImg:hover{
+  cursor: pointer;
 }
 .getImg>img{
     width:100%;
@@ -803,6 +991,24 @@ export default {
    outline: none;
    border-radius: 4px;
    margin-left: 20px;
+}
+img[src=""],img:not([src]){opacity:0;}
+/* 显示门店大图 */
+.imgShowBig{
+    position: absolute;
+    z-index: 12;    
+}
+.imgShowBig>img{
+    position: absolute;
+}
+.imgShowBigTwo{
+    position: absolute;
+    z-index: 12;
+   
+    
+}
+.imgShowBigTwo>img{
+    position: absolute;
 }
 
 }
@@ -980,14 +1186,15 @@ export default {
 .appCloudeForm > table > tr > td {
   border-bottom: 1px solid #e7e7e7;
   border-right: 1px solid #e7e7e7;
-  line-height: 22px;
+  line-height: 24px;
   text-align: center;
 
   font-size: 12px;
   color: #888888;
 }
 .appCloudeForm > table > tr:nth-of-type(1) > td {
-  line-height: 22px;
+  line-height: 24px;
+  height:24px;
   text-align: center;
   font-size: 12px;
   background: rgba(241, 243, 246, 1);
@@ -1039,7 +1246,7 @@ export default {
     position: absolute;
     left: 0;
     right: 0;
-    bottom:100px;
+    bottom:50px;
 }
 /* 模态框的显示隐藏 */
 .CertModel {
@@ -1085,7 +1292,7 @@ export default {
 
 }
 .apply{
-    overflow: hidden;
+    /* overflow: hidden; */
     margin-left:33px;
     margin-bottom:15px;
 }
@@ -1094,6 +1301,14 @@ export default {
     margin-right:41px;
     padding-bottom: 15px;
 }
+.clearBox:after{
+   content:".";
+   display:block;
+   clear:both;
+   height:0; 
+   overflow:hidden; 
+   visibility:hidden;
+}
 .apply>div{
     float:left;
     font-size: 14px;
@@ -1101,7 +1316,7 @@ export default {
 }
 .apply>div:nth-of-type(1){
     width: 74px;
-    text-align: right;
+    text-align: left;
 }
 .apply>div:nth-of-type(2){
     margin-left:30px;
@@ -1120,6 +1335,9 @@ export default {
 .getImg{
     width:131px;
     height:117px;
+}
+.getImg:hover{
+  cursor: pointer;
 }
 .getImg>img{
     width:100%;
@@ -1263,7 +1481,27 @@ export default {
    border-radius: 4px;
    margin-left: 15px;
 }
-
+img[src=""],img:not([src]){opacity:0;}
+/* 显示门店大图 */
+.imgShowBig{
+    position: absolute;
+    z-index: 12;
+   
+    
+}
+.imgShowBig>img{
+    position: absolute;
+}
+.imgShowBigTwo{
+    position: absolute;
+    z-index: 12;
+   
+    
+}
+.imgShowBigTwo>img{
+    position: absolute;
+ 
+}
 
 }
 </style>

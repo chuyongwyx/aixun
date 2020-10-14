@@ -11,8 +11,8 @@
                         <td>项目编号</td>
                         <td>项目名称</td>
                      </tr>
-                     <tr v-for="(item,index) in GetVerifiedBrands"  class="trhover">
-                       <td><span class="iconfont icon-fuxuankuang_weixuanzhong icon" @click="handleSelectedOpenCloudDoc($event,item)" ></span></td>
+                     <tr v-for="(item,index) in GetVerifiedBrands"  class="trhover" @click="handleSelectedOpenCloudDoc($event,item,index)">
+                       <td><span class="iconfont icon-fuxuankuang_weixuanzhong icon"></span></td>
                        <td>{{item.name}}</td>
                        <td>{{item.projectNumber}}</td>
                        <td>{{item.projectName}}</td>
@@ -22,9 +22,10 @@
             <div class="footer">
                     <button @click="handleToFinished" :class="{'Notselect':dataId.length==0?true:false}"> <span v-show="openLoading==false?true:false">开通</span><span v-show="openLoading==false?false:true">开通中...</span>  </button>
             </div>
+             <div class="save-success" v-show="saveSuccessTip"><img src="../../../../assets/saveSuccess.png" alt=""></div>
      </div>
 </template> 
-
+ 
 <script>
 import Vuex  from 'vuex'
 export default {
@@ -33,9 +34,11 @@ export default {
       return {
            dataId:[],
           //  没选中
-          openLoading:false,
+          // openLoading:false,
           //函数防抖
-          timer:null,
+          timer:null, 
+          //保存成功
+          saveSuccessTip:false,
           
       }
     },
@@ -44,7 +47,7 @@ export default {
             // this.Notselect="background:rgba(88, 151, 255, 1);color:#fff";
              //清空其他的复选框颜色
              if(newValue==true){
-              this.openLoading=false;
+              // this.openLoading=false;
               var trs =document.getElementsByClassName('trhover');
               var len =trs.length;
               for(var i=0;i<len;i++){
@@ -52,13 +55,21 @@ export default {
                 trs[i].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_weixuanzhong','icon');
               }
               this.dataId=[];
+              this.saveSuccessTip=true;
+              var _this =this;
+              var timerTwo =setTimeout(()=>{
+                  _this.saveSuccessTip=false;
+                  clearTimeout(timerTwo);
+              },1000)
+
             }
         }
     },
     computed:{
         ...Vuex.mapState({
             "GetVerifiedBrands":state=>state.openCloudDoc.GetVerifiedBrands,
-            "success":state=>state.openCloudDoc.success
+            "success":state=>state.openCloudDoc.success,
+            "openLoading":state=>state.openCloudDoc.openLoading
         })
     },
     methods: {
@@ -69,20 +80,19 @@ export default {
               openCloudOrder:"openCloudDoc/openCloudOrder"
           }),
           //选中需要开通的云单据 
-          handleSelectedOpenCloudDoc($event,param){
-           
-           
-             if($event.target.className.indexOf('icon-fuxuankuang_weixuanzhong') !==-1){
-                $event.target.classList.remove('icon-fuxuankuang_weixuanzhong');
-                $event.target.classList.remove('icon');
-                $event.target.classList.add('icon-fuxuankuang_xuanzhong');
-                $event.target.classList.add('icon1');
+          handleSelectedOpenCloudDoc($event,param,index){
+             var trs = document.getElementsByClassName('trhover'); 
+             if(trs[index].firstElementChild.firstElementChild.className.indexOf('icon-fuxuankuang_weixuanzhong') !==-1){
+               trs[index].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_weixuanzhong');
+               trs[index].firstElementChild.firstElementChild.classList.remove('icon');
+              trs[index].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_xuanzhong');
+               trs[index].firstElementChild.firstElementChild.classList.add('icon1');
                  this.dataId.push(param.id);
             }else{
-                $event.target.classList.remove('icon-fuxuankuang_xuanzhong'); 
-                $event.target.classList.remove('icon1');
-                $event.target.classList.add('icon-fuxuankuang_weixuanzhong');
-                $event.target.classList.add('icon');
+               trs[index].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_xuanzhong'); 
+               trs[index].firstElementChild.firstElementChild.classList.remove('icon1');
+               trs[index].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_weixuanzhong');
+               trs[index].firstElementChild.firstElementChild.classList.add('icon');
                  this.dataId.map((item,index)=>{
                     if(item==param.id){
                       this.dataId.splice(index,1);
@@ -97,7 +107,7 @@ export default {
             clearTimeout(this.timer);
           }
          if(this.dataId.length!==0){
-            this.openLoading=true;
+            // this.openLoading=true;
              this.timer=setTimeout(()=>{
                 var param = {
                  "IDs":_this.dataId
@@ -222,6 +232,24 @@ export default {
 .icon1{
   color: #5897FF;
 }
+.trhover:hover{
+  background:#EDEEEF;
+  cursor: pointer;
+}
+ .save-success{
+            position:fixed;
+            top: 50%;
+            left:50%;
+            width:200px;
+            height:50px;
+            margin-left:-100px;
+            margin-top:-25px;
+        }
+        .save-success>img{
+            width:100%;
+            height:100%;
+        }
+
 }
 @media screen  and (max-width:1400px){
   .cloudDoc{
@@ -321,5 +349,22 @@ export default {
 .icon1{
   color: #5897FF;
 }
+.trhover:hover{
+  background:#EDEEEF;
+  cursor: pointer;
+}
+.save-success{
+            position:fixed;
+            top: 50%;
+            left:50%;
+            width:160px;
+            height:40px;
+            margin-left:-80px;
+            margin-top:-20px;
+  }
+.save-success>img{
+            width:100%;
+            height:100%;
+  }
 }
 </style>

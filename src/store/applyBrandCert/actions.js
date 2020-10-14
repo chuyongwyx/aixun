@@ -40,31 +40,26 @@ export default{
    },
    //新建申请单
    async addApplicationForm({commit,state},param){
+            state.saveLoading=true;
+            state.saveSuccess=false;
         var datainfo =await AddApplicationForm(param);
         if(datainfo.success ===false){
-            state.closeWindow = false; 
+            state.saveLoading=false;
+            state.saveSuccess=false;
        }else{
-           state.closeWindow=true;
+           state.saveLoading=false;
            state.success=false;
            state.isUnique=false;
            state.btnBg=true;
+           state.saveSuccess=true;
        }
-   },
+   }, 
 
-    //如果是否关闭当前窗口
-    async handleCloseWindow({commit,state}){
-        state.closeWindow =false;
-    },
+   
      //清空查询出来数据
     async handleclickClearSearchData({commit,state}){
         state.searchProjects=[];
    },
 
-   //清除路由时需要将当前申请品牌认证的状态清除
-   async handleClickVuexApplyBrandCertData({commit,state}){
-        state.success=false;
-        state.isUnique=false;
-        state.btnBg=true;
-   }
 
-} 
+}  

@@ -24,7 +24,7 @@
         <tr v-for="(item,index) in buildBankManager ">
           <td>{{item.name}}</td>
           <td>{{item.mobile}}</td>
-          <td @click="handelBankMangerShow" class="status" :data-id="item.id">{{item.status}}</td>
+          <td @click="handelBankMangerShow" class="status" :data-id="item.id"  style="color:rgb(88, 151, 255);">{{item.status}}</td>
         </tr>
       </table>
       <div class="footer">
@@ -45,7 +45,7 @@
           <td>{{item.name}}</td>
           <td>{{item.mobile}}</td>
           <td :style="workCard" @click="handleTofindCard">查看附件</td>
-          <td class="status" :data-id="item.id" @click="handelBankDealShow">{{item.status}}</td>
+          <td class="status" :data-id="item.id">{{item.status}}</td>
         </tr>
       </table>
     </div>
@@ -61,7 +61,7 @@
             <span class="iconfont icon-chuyidong" @click="handelToAddHide"></span>
           </div>
           <div class="wx-tit">
-            <p>扫一扫成为培训负责人</p>
+            <p>微信扫一扫,成为培训负责人</p>
           </div>
           <div class="wx-er">
             <img :src="buildBankWxER" alt />
@@ -94,23 +94,45 @@
                 </div>
                
           </div>
-           <div class="bankManager-footer2 footerModel" v-if="buildUserInfo.status===2?true:false">
-                <div @click="handleClickRevoke" :data-id="buildUserInfo.id">撤销负责人资格</div>
-
-           </div>
-           <div class="bankManager-footer footerModel" v-else>
-                <!-- :class="{'examine-active': buildUserInfo.status==3?true:false}" -->
-                <!-- :class="{'examine-active':buildUserInfo.status==1?true:false}" -->
+          <div class="bankManager-footer footerModel" v-if="buildUserInfo.status===1?true:false">
                 <div  @click="handleClickUnpass" :data-id="buildUserInfo.id" :class="{'examine-active':footerMangerUnPass}">审核不通过</div>
                 <div  @click="handleClickExaminePass" :data-id="buildUserInfo.id" :class="{'examine-active':footerMangerPass}">审核通过</div>
            </div>
+           <div class="bankManager-footer2 footerModel" v-if="buildUserInfo.status===2?true:false">
+                <div @click="handleClickRevoke" :data-id="buildUserInfo.id">撤销负责人资格</div>
+           </div>
+           <div class="bankManager-footer2 footerModel" v-if="buildUserInfo.status===3?true:false">
+           </div>
+
+            <div class="opeationTip" v-if="opeationTip">
+                 <div class="opeationTip-head"><span>提示</span><span class="iconfont icon-chuyidong" @click="handleToCloseOpeationTip"></span></div>
+                 <div class="opeationTip-body">
+                        <p>是否确认撤销办理人资格，确认撤销后，</p>
+                        <p>该人员后续将无法注册成为其他办理人</p>
+                 </div>
+                 <div class="opeationTip-footer">
+                        <button @click="handleToCloseOpeationTip">取消</button>
+                        <button @click="handleClickRevokeSure">确定</button>
+                 </div>
+            </div>
+
+            <div class="opeationTip" v-if="opeationTipFail">
+                 <div class="opeationTip-head"><span>提示</span><span class="iconfont icon-chuyidong" @click="handleToCloseOpeationFailTip"></span></div>
+                 <div class="opeationTip-body">
+                        <p>确认失败</p>
+                 </div>
+                 <div class="opeationTip-footer">
+                        <button @click="handleToCloseOpeationFailTip">取消</button>
+                        <button @click="handleClickUnpassSure">确定</button>
+                 </div>
+            </div>
           
         </div>
       </div>
    
     <!-- 银行办理人员信息 -->
      
-          <div class="buildBankManger-model" v-if="BuildBandDeal"> 
+          <!-- <div class="buildBankManger-model" v-if="BuildBandDeal"> 
                    <div class="bankManagerInfo">
                         <div class="bankManager-head">
                             <span>培训人员</span>
@@ -133,12 +155,18 @@
                           </div>
                         
                     </div>
-                    <div class="bankManager-footer footerModel">
+                    <div class="bankManager-footer footerModel" v-if="buildUserInfo.status===1?true:false">
                           <div  @click="handleClickUnpass" :data-id="buildUserInfo.id" :class="{'examine-active':footerDealUnPass}">审核不通过</div>
                           <div  @click="handleClickExaminePass" :data-id="buildUserInfo.id" :class="{'examine-active':footerDealPass}">审核通过</div>
                     </div>
+                    <div class="bankManager-footer2 footerModel" v-if="buildUserInfo.status===2?true:false">
+                       <div @click="handleClickRevoke" :data-id="buildUserInfo.id">撤销培训人员资格</div>
+                    </div>
+                    
+                    <div class="bankManager-footer2 footerModel" v-if="buildUserInfo.status===3?true:false">
+                    </div>
               </div>
-          </div>
+          </div> -->
          <!-- 查看办理人员附件 -->
          <div class="findDealCard" v-if="WorkingCarById">
                 <div class="findDealCardConent">
@@ -164,7 +192,11 @@ export default {
       DealShow: false,
       BuildBandShow: false,
       BuildBandManager:false,
-      BuildBandDeal:false,
+      // BuildBandDeal:false,
+      //操作后提示
+      opeationTip:false,
+      //审核失败提示
+      opeationTipFail:false,
       //办理人员附件
       WorkingCarById:false,
       footerExamine:false,
@@ -233,12 +265,12 @@ export default {
         this.BuildBandManager=true;
     },
     //查看办理人员的状态信息
-    handelBankDealShow($event){
-      //传递当前id获取用户信息
-        var paramId = $event.target.getAttribute('data-id');
-        this.getBuildUserInfo(paramId);
-        this.BuildBandDeal=true;
-    },
+    // handelBankDealShow($event){
+    //   //传递当前id获取用户信息
+    //     var paramId = $event.target.getAttribute('data-id');
+    //     this.getBuildUserInfo(paramId);
+    //     this.BuildBandDeal=true;
+    // },
 
     //隐藏建行负责人模态框
      handelBankMangerHide(){
@@ -250,25 +282,37 @@ export default {
     },
      //撤销建行负责人资格
      handleClickRevoke($event){
-          var userId =$event.target.getAttribute('data-id');
+        this.opeationTip =true;
+          this.userId =$event.target.getAttribute('data-id');
+          
+     },
+     handleClickRevokeSure(){
             var param =JSON.stringify({
-            "id":userId
+            "id":this.userId
           })
           this.revokeBuidlManager(param);
           this.getBuildBankManager();
+          this.opeationTip=false;
+           this.opeationTipFail=false;
           this.BuildBandManager=false;
-          this.BuildBandDeal=false;
+          
      },
      //审核不通过
      handleClickUnpass($event){
-       var userId =$event.target.getAttribute('data-id');
-        var param =JSON.stringify({
-         "id":userId
-       })
-       this.refuseUserUnpass(param);
-         this.BuildBandManager=false;
-        this.BuildBandDeal=false;
-         this.getBuildBankManager();
+       this.userId =$event.target.getAttribute('data-id');
+         this.opeationTipFail=true;
+        
+     },
+
+     handleClickUnpassSure(){
+         var param =JSON.stringify({
+         "id":this.userId
+       }) 
+        this.refuseUserUnpass(param);
+        this.getBuildBankManager();
+        this.BuildBandManager=false;
+        this.opeationTip=false;
+        this.opeationTipFail=false;
      },
      //审核通过
      handleClickExaminePass($event){
@@ -289,8 +333,15 @@ export default {
      //关闭办理人员附件
      handleColseFindDealCardConent(){
         this.WorkingCarById=false;
+     },
+     //关闭提示框
+     handleToCloseOpeationTip(){
+       this.opeationTip =false;
+     },
+     //关闭失败提示框
+     handleToCloseOpeationFailTip(){
+       this.opeationTipFail=false;
      }
-
 
   },
   created() {
@@ -403,6 +454,7 @@ export default {
   width: 450px;
   height: 480px;
   position: absolute;
+  z-index: 5;
   top: 50%;
   left: 50%;
   margin-left: -225px;
@@ -447,6 +499,7 @@ export default {
   width: 600px;
   height: 480px;
   position: absolute;
+  z-index:5;
   top: 50%;
   left: 50%;
   margin-left: -300px;
@@ -551,6 +604,7 @@ export default {
     width: 100%;
     height: 100%;
     position: absolute;
+    z-index: 5;
     top: 0;
     left: 0;
     background: rgba(0,0,0,0.3);
@@ -561,7 +615,7 @@ export default {
    position: absolute;
    top:50%;
    left:50%;
-   z-index:5;
+   z-index:6;
    background: #fff;
    margin-left: -225px;
    margin-top: -240px;
@@ -591,6 +645,62 @@ export default {
 .CardImg>img{
   width: 100%;
   height: 100%;
+}
+/* 操作提示框 */
+.opeationTip{
+  position: absolute;
+  top:50%;
+  left:50%;
+  z-index: 5;
+  width:420px;
+  height:220px;
+  margin-left:-210px;
+  margin-top: -80px;
+  background:rgba(255,255,255,1);
+  box-shadow:0px 4px 21px 0px rgba(199, 198, 198, 0.35);
+}
+.opeationTip-head{
+  overflow: hidden;
+  margin-top:31px;
+}
+.opeationTip-head>span:nth-of-type(1){
+  float:left;
+  margin-left: 187px;
+  font-size: 20px;
+}
+.opeationTip-head>span:nth-of-type(2){
+  float:right;
+  margin-right:30px;
+  color: #D2D2D2;
+  font-size: 20px;
+}
+.opeationTip-body{
+   text-align: center;
+   font-size: 14px;
+   margin-top: 30px;
+}
+.opeationTip-footer{
+  margin-top: 26px;
+}
+.opeationTip-footer>button{
+    width: 160px;
+    height:40px;
+    float:left;
+    outline: none;
+}
+.opeationTip-footer>button:nth-of-type(1){
+  border:1px solid #5897FF;
+  background:#fff;
+  color: #5897FF;
+  border-radius:4px;
+  margin-left:40px;
+  margin-right:20px;
+}
+.opeationTip-footer>button:nth-of-type(2){
+  border:0;
+  background:#5897FF;
+  color: #FFFEFEFE;
+  border-radius:4px;
 }
 }
 
@@ -690,6 +800,7 @@ export default {
   width: 328px;
   height: 350px;
   position: absolute;
+  z-index: 5;
   top: 50%;
   left: 50%;
   margin-left: -164px;
@@ -734,6 +845,7 @@ export default {
   width: 438px;
   height: 350px;
   position: absolute;
+  z-index: 5;
   top: 50%;
   left: 50%;
   margin-left: -219px;
@@ -838,6 +950,7 @@ export default {
     width: 100%;
     height: 100%;
     position: absolute;
+    z-index: 5;
     top: 0;
     left: 0;
     background: rgba(0,0,0,0.3);
@@ -848,7 +961,7 @@ export default {
    position: absolute;
    top:50%;
    left:50%;
-   z-index:5;
+   z-index:6;
    background: #fff;
    margin-left: -164px;
    margin-top: -164px;
@@ -879,5 +992,62 @@ export default {
   width: 100%;
   height: 100%;
 }
+/* 操作提示框 */
+.opeationTip{
+  position: absolute;
+  top:50%;
+  left:50%;
+  z-index: 5;
+  width:306px;
+  height:160px;
+  margin-left:-153px;
+  margin-top: -58px;
+  background:rgba(255,255,255,1);
+  box-shadow:0px 4px 21px 0px rgba(199, 198, 198, 0.35);
+}
+.opeationTip-head{
+  overflow: hidden;
+  margin-top:23px;
+}
+.opeationTip-head>span:nth-of-type(1){
+  float:left;
+  margin-left: 136px;
+  font-size: 15px;
+}
+.opeationTip-head>span:nth-of-type(2){
+  float:right;
+  margin-right:22px;
+  color: #D2D2D2;
+  font-size: 15px;
+}
+.opeationTip-body{
+   text-align: center;
+   font-size: 12px;
+   margin-top: 22px;
+}
+.opeationTip-footer{
+  margin-top: 19px;
+}
+.opeationTip-footer>button{
+    width: 117px;
+    height:29px;
+    float:left;
+    outline: none;
+}
+.opeationTip-footer>button:nth-of-type(1){
+  border:1px solid #5897FF;
+  background:#fff;
+  color: #5897FF;
+  border-radius:4px;
+  margin-left:29px;
+  margin-right:15px;
+}
+.opeationTip-footer>button:nth-of-type(2){
+  border:0;
+  background:#5897FF;
+  color: #FFFEFEFE;
+  border-radius:4px;
+}
+
 }
 </style>

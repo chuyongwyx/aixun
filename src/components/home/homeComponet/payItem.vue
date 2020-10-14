@@ -2,51 +2,51 @@
      <div class="pay-item-r">
            <div>
                <h4>商户向爱迅申请开通云支付</h4>
-               <div class="new-request-form" @click="handleToNewRequestForm">新建申请单</div>
+               <div class="new-request-form"><a href="http://is-test.aserweb.com:50101/#/newRequestForm" target="_blank" > 新建申请单</a></div>
                <Badge :count="AcceptingCloudApplicationFormCount">
-                             <a href="#" class="demo-badge"  @click="handleToRequestFormFinished">受理&完成申请单</a>
+                             <a  class="demo-badge" href="http://is-test.aserweb.com:50101/#/requestFormFinished" target="_blank">受理&完成申请单</a>
                </Badge>
                
               
            </div>
            <div>
                <h4>为商户申请品牌认证</h4>
-               <div @click="handelToApplyBrandCert">申请品牌认证</div>
+               <div><a href="http://is-test.aserweb.com:50101/#/applyBrandCert" target="_blank">申请品牌认证</a></div>
              
                    <Badge :count="ApplyingBrandCertificationApplicationFormCount">
-                             <a href="##" class="demo-badge" @click="handleToSubmitCertInfo">提交认证资料</a>
+                             <a  class="demo-badge" href="http://is-test.aserweb.com:50101/#/submitCertInfo" target="_blank">提交认证资料</a>
                     </Badge>
               
                
                    <Badge :count="InformationSubmittedBrandCertificationApplicationFormCount">
-                             <a href="##" class="demo-badge" @click="handleToBrandCert">品牌认证</a>
+                             <a  class="demo-badge" href="http://is-test.aserweb.com:50101/#/brandCert" target="_blank">品牌认证</a>
                     </Badge>
                
                
                    <Badge :count="VerifiedBrandCertificationApplicationFormCount">
-                             <a href="##" class="demo-badge" @click="handleToOpenCloudDoc">开通云单据</a>
+                             <a  class="demo-badge" href="http://is-test.aserweb.com:50101/#/openCloudDoc" target="_blank">开通云单据</a>
                     </Badge>
               
                
                    <Badge :count="OpenedCloudOrderBrandCertificationApplicationFormCount">
-                             <a href="##" class="demo-badge" @click="handleToOpenCloudPay">开通云支付</a>
+                             <a  class="demo-badge"  href="http://is-test.aserweb.com:50101/#/openCloudPay" target="_blank">开通云支付</a>
                     </Badge>
                
            </div>
            <div>
                     <h4>爱迅、银行配合开通云支付收款账号</h4>
-                    <div @click="handleToApplyPayReceipt" >申请云支付收款账号</div>
+                    <div><a href="http://is-test.aserweb.com:50101/#/applyPayReceipt" target="_blank">申请云支付收款账号</a></div>
                     
                    <Badge :count="SettedReceivableAccountApplicationFormCount">
-                             <a href="##" class="demo-badge" @click="handleToOrganTrainingInst">安排培训人员</a>
+                             <a  class="demo-badge" href="http://is-test.aserweb.com:50101/#/organTrainingInst" target="_blank">安排培训人员</a>
                     </Badge>
                
            </div>
            <div>
                 <h4>第三方人员管理</h4>
-                    <div @click="handleToBuildBank">建行</div>
-                    <div>兴业</div>
-                    <div @click="handleToTrainingOrg">广州培训</div>
+                    <div> <a href="http://is-test.aserweb.com:50101/#/buildBank" target="_blank" >建行</a></div>
+                    <div> <a href="http://is-test.aserweb.com:50101/#/industrialBank" target="_blank" >兴业</a></div>
+                    <div> <a href="http://is-test.aserweb.com:50101/#/trainingOrg" target="_blank" >广州培训</a></div>
            </div>
      </div>
 </template>
@@ -59,7 +59,7 @@ export default {
                    
             }
         },
-        computed:{
+        computed:{ 
             ...Vuex.mapState({
                 // 未受理的云单据/云支付申请单数量（显示在：受理&完成申请单）
                 AcceptingCloudApplicationFormCount: state=>state.payItem.AcceptingCloudApplicationFormCount,
@@ -78,141 +78,7 @@ export default {
         methods:{
             ...Vuex.mapActions({
                     payItemMessage :"payItem/hanlePayItemMessage",
-                    //缓存路由
-                     handlePushRouter:"home/handlePushRouter",
-                     //安排培训人员初始化信息
-                     getSettedApplicationForms:"organTrainingInst/getSettedApplicationForms",
-                     //获取新建申请单的项目信息
-                    //  getInitialAddDatas:"newRequestForm/getInitialAddDatas",
-                     //获取品牌认证的项目信息
-                    //  applyBrandCertInitialAddDatas:"applyBrandCert/initialAddDatas",
-                     //获取提交资料页面的数据信息
-                     getApplyingApplicationForms:"submitCertInfo/getApplyingApplicationForms",
-                     //获取申请云支付收款账号的初始信息
-                    //  getPayReceiptInitialAddDatas:"applyPayReceipt/initialAddDatas",
-                     //开通云单据的初始信息
-                     getVerifiedBrands:"openCloudDoc/getVerifiedBrands",
-                     //开通云支付
-                     getOpenedCloudOrderBrands:"openCloudPay/getOpenedCloudOrderBrands",
             }),
-            //跳转新建表单
-            handleToNewRequestForm($event){
-                 var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/newRequestForm",
-                                "name":"newRequestForm"
-                }
-                // this.getInitialAddDatas();
-                 this.handlePushRouter(paramRouter);
-                 this.$router.push('/newRequestForm');
-            },
-            //跳转受理&完成申请单
-            handleToRequestFormFinished($event){
-                  var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/requestFormFinished",
-                                "name":"requestFormFinished"
-                }
-                this. handlePushRouter(paramRouter);
-                this.$router.push('/requestFormFinished');
-            },
-            //建行
-            handleToBuildBank($event){
-                 var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/buildBank",
-                                "name":"buildBank"
-                }
-                 this. handlePushRouter(paramRouter);
-                this.$router.push('/buildBank');
-            },
-            //广州培训
-            handleToTrainingOrg($event){
-                var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/trainingOrg",
-                                "name":"trainingOrg"
-                }
-                 this. handlePushRouter(paramRouter);
-                this.$router.push('/trainingOrg');
-            },
-               //跳转到申请品牌认证
-            handelToApplyBrandCert($event){
-                 var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/applyBrandCert",
-                                "name":"applyBrandCert"
-                }
-                 this. handlePushRouter(paramRouter);
-                this.$router.push('/applyBrandCert');
-                // this.applyBrandCertInitialAddDatas();
-            },
-            //提交资料
-            handleToSubmitCertInfo($event){
-                 var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/submitCertInfo",
-                                "name":"submitCertInfo"
-                }
-                 this. handlePushRouter(paramRouter);
-                 this.getApplyingApplicationForms();
-                this.$router.push('/submitCertInfo');
-            },
-            //品牌认证
-            handleToBrandCert($event){
-                 var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/brandCert",
-                                "name":"brandCert"
-                }
-                 this. handlePushRouter(paramRouter);
-                this.$router.push('/brandCert');
-            },
-            //开通云单据
-            handleToOpenCloudDoc($event){
-                 var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/openCloudDoc",
-                                "name":"openCloudDoc"
-                }
-                 this. handlePushRouter(paramRouter);
-                 this.getVerifiedBrands();
-                this.$router.push('/openCloudDoc');
-            },
-            //开通云支付
-            handleToOpenCloudPay($event){
-                 var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/openCloudPay",
-                                "name":"openCloudPay"
-                }
-                 this. handlePushRouter(paramRouter);
-                 this.getOpenedCloudOrderBrands();
-                this.$router.push('/openCloudPay');
-            },
-            //申请云支付收款账号
-            handleToApplyPayReceipt($event){
-                  var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/applyPayReceipt",
-                                "name":"applyPayReceipt"
-                }
-                 this. handlePushRouter(paramRouter);
-                //  this.getPayReceiptInitialAddDatas();
-                this.$router.push('/applyPayReceipt');
-            },
-            //安排培训人员
-            handleToOrganTrainingInst($event){
-                this.getSettedApplicationForms();
-                 var paramRouter ={
-                                "text":$event.target.innerText,
-                                "path":"/organTrainingInst",
-                                "name":"organTrainingInst"
-                }
-                 this.handlePushRouter(paramRouter);
-                this.$router.push('/organTrainingInst');
-            }
-        },
         created(){
             this.payItemMessage();
         },
@@ -220,6 +86,7 @@ export default {
            
         }
     
+}
 }
 </script>
 <style lang="" scoped>
@@ -244,35 +111,46 @@ export default {
           margin-bottom:24px; 
      }
       .pay-item-r>div>div{
-          float: left;
+          
+      }
+     .pay-item-r>div>div a{
+         display:block;
+         float: left;
           font-size: 16px;
           padding: 15px 21px 14px 20px;
           border:1px solid rgba(102,102,102,1);
           border-radius:10px;
           margin-right: 40px;
-      }
-      .pay-item-r>div>div:hover{
+          color: #333;
+    }
+   
+     .pay-item-r>div>div a:hover{
           cursor: pointer;
+          border:1px solid #5897FF;
+          color:#5897FF ;
       }
       .pay-item-r>div .ivu-badge{
           cursor: pointer;
+
       }
       .ivu-badge{
            margin-right: 40px;
       }
+      .demo-badge:hover{
+           border:1px solid #5897FF;
+           color:#5897FF;
+      }
       .demo-badge{
-           padding: 15px 21px 14px 20px;
-          border:1px solid rgba(102,102,102,1);
-          border-radius:10px;
-          background: #fff;
+         padding: 15px 21px 14px 20px;
+         border:1px solid rgba(102,102,102,1);
+         border-radius:10px;
+         background: #fff;
          display: inline-block;
          font-size: 16px;
          color: #333;
          
     }
-    .demo-badge:hover{
-        color: #333;
-    }
+  
 }
 @media screen  and (max-width: 1400px){ 
       .pay-item-r{
@@ -295,34 +173,48 @@ export default {
           margin-bottom:17px; 
      }
       .pay-item-r>div>div{
+          
+      }
+    .pay-item-r>div>div a{
+          display:block;
           float: left;
           font-size: 14px;
           padding: 11px 15px 10px 14px;
           border:1px solid rgba(102,102,102,1);
           border-radius:7px;
           margin-right: 29px;
-      }
-      .pay-item-r>div>div:hover{
+          color: #333;
+    }
+   
+     .pay-item-r>div>div a:hover{
           cursor: pointer;
+          border:1px solid #5897FF;
+          color:#5897FF ;
       }
+
+
+
+
       .pay-item-r>div .ivu-badge{
           cursor: pointer;
       }
       .ivu-badge{
-           margin-right: 29px;
+          margin-right: 29px;
       }
       .demo-badge{
-           padding: 11px 15px 10px 14px;
-          border:1px solid rgba(102,102,102,1);
-          border-radius:7px;
-          background: #fff;
+         padding: 11px 15px 10px 14px;
+         border:1px solid rgba(102,102,102,1);
+         border-radius:7px;
+         background: #fff;
          display: inline-block;
          font-size: 14px;
          color: #333;
          
     }
+    
     .demo-badge:hover{
-        color: #333;
+        color: #5897FF;
+        border: 1px solid #5897FF;
     }
 }
 

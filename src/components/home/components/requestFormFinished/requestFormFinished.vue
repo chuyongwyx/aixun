@@ -8,7 +8,7 @@
         <button @click="handleFinishedAcceptModel">完成该申请</button>
       </div>
     </div>
-    <div class="accept-tabel">
+    <div class="accept-tabel"  @mouseover="handleTipMaxWidth">
       <table cellpadding="0" cellspacing="0">
         <tr>
           <td>申请日期</td>
@@ -32,7 +32,7 @@
           <td>{{item.linkman}}</td>
           <td>{{item.phoneNumber}}</td>
           <!-- <td>{{item.remark}}</td> -->
-          <td> 
+          <td class="tdshover"> 
               <Poptip placement="bottom-start" trigger="hover" word-wrap class="tip-iview">
               <span class="tip-iview-span">{{item.remark}}</span>
               <div class="api" slot="content">
@@ -44,7 +44,7 @@
           <td>{{item.acceptedUsername}}</td>
         </tr>
       </table>
-      <Page :total="count" :page-size="MaxResultCount" class="page" :current="page" @on-change="handleToDatalist" v-show="count<=12?false:true"/>
+      <Page :total="count" :page-size="MaxResultCount" class="page" :current="page" @on-change="handleToDatalist" v-show="count<=13?false:true"/>
     </div>
 
     <div class="accept-model" v-show="acceptModel">
@@ -93,7 +93,7 @@
               <span>备注</span>
             </div>
             <div>
-              <span>{{acceptRemarkText}}</span>
+              <span class="applyFormRemark" :title="acceptRemarkText">{{acceptRemarkText}}</span>
             </div>
           </div>
         </div>
@@ -166,9 +166,9 @@
                 </ul>
               </div>
               <table cellpadding="0" cellspacing="0">
-                     <tr v-for="(item,index) in importForms">
+                     <tr v-for="(item,index) in importForms" @click="handleClickSelected($event,item,index)" class="childHover">
                       <td>
-                        <span class="iconfont icon-fuxuankuang_weixuanzhong icon" @click="handleClickSelected($event,item)" style="color:#5897FF;"></span>
+                        <span class="iconfont icon-fuxuankuang_weixuanzhong icon"  style="color:#5897FF;"></span>
                       </td>
                       <td>{{item.number}}</td>
                       <td>{{item.type}}</td>
@@ -221,7 +221,7 @@ export default {
       index:"",
       //获取的申请单页数
       page: 1,
-      MaxResultCount: 12,
+      MaxResultCount: 13,
       Sorting: ""
     };
   },
@@ -232,6 +232,9 @@ export default {
       Sorting: this.Sorting
     });
     this.handleGetRequestForms(param);
+    
+  },
+  mounted() {
   },
   watch: {},
   computed: {
@@ -246,6 +249,7 @@ export default {
       importForms: state=>state.requestFormFinished.importForms
     })
   },
+  
   methods: {
     ...Vuex.mapActions({
       handleGetRequestForms: "requestFormFinished/handleGetRequestForms",
@@ -297,7 +301,10 @@ export default {
         this.btnOne = false;
       }else if (param.status===3){
          this.btnTwo = false;
-        this.btnOne = false;
+          this.btnOne = false;
+      }else{
+          this.btnTwo = false;
+          this.btnOne = false;
       }
       var trs = document.getElementsByClassName('trhover');
                 var len =trs.length;
@@ -396,24 +403,25 @@ export default {
       this.referenceSingleNumber = true;
     },
     //引用数据操作
-    handleClickSelected($event,items){
+    handleClickSelected($event,items,index){
       var param ={
           "brandName":items.brandName,
           "type":items.type,
           "number":items.number
       }
-      if($event.target.className.indexOf('icon-fuxuankuang_weixuanzhong')!==-1){
-          $event.target.classList.remove('icon-fuxuankuang_weixuanzhong');
-          $event.target.classList.remove('icon');
-          $event.target.classList.add('icon-fuxuankuang_xuanzhong');
-          $event.target.classList.add('icon1');
+      var trs = document.getElementsByClassName('childHover');
+      if(trs[index].firstElementChild.firstElementChild.className.indexOf('icon-fuxuankuang_weixuanzhong')!==-1){
+         trs[index].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_weixuanzhong');
+         trs[index].firstElementChild.firstElementChild.classList.remove('icon');
+         trs[index].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_xuanzhong');
+         trs[index].firstElementChild.firstElementChild.classList.add('icon1');
           this.RemarkData.push(param);
 
       }else{
-          $event.target.classList.remove('icon-fuxuankuang_xuanzhong');
-          $event.target.classList.remove('icon1');
-          $event.target.classList.add('icon-fuxuankuang_weixuanzhong');
-          $event.target.classList.add('icon');
+           trs[index].firstElementChild.firstElementChild.classList.remove('icon-fuxuankuang_xuanzhong');
+           trs[index].firstElementChild.firstElementChild.classList.remove('icon1');
+          trs[index].firstElementChild.firstElementChild.classList.add('icon-fuxuankuang_weixuanzhong');
+          trs[index].firstElementChild.firstElementChild.classList.add('icon');
           var RemarkDataIndex =''
           this.RemarkData.map((item,index)=>{
                if(item.brandName===param.brandName){
@@ -474,7 +482,16 @@ export default {
       Sorting: this.Sorting
     });
     this.handleGetRequestForms(param);
-  }
+  },
+
+  //
+  handleTipMaxWidth(){
+     var tips =document.getElementsByClassName('ivu-poptip-popper');
+                  var len = tips.length;
+                  for(var i=0;i<len;i++){
+                      tips[i].style.maxWidth ="200px";
+                  }  
+    }
   }
 };
 
@@ -531,6 +548,9 @@ export default {
     border-radius: 4px;
     border: 1px solid rgba(88, 151, 255, 1);
     outline: none;
+  }
+  .accept-tit > .btnTwo-head >button:hover{
+    cursor: pointer;
   }
   .accept-tit > .btnTwo-head > button:nth-of-type(1) {
     color: rgba(88, 151, 255, 1);
@@ -660,7 +680,7 @@ export default {
     position: fixed;
     top: 275px;
     left: 50%;
-    margin-left: -250px;
+    margin-left: -300px;
     z-index: 11;
   }
 
@@ -740,6 +760,9 @@ export default {
     float: right;
     margin-right: 29px;
   }
+  .accept-footer > button:hover{
+    cursor: pointer;
+  }
   .accept-footer > button:active{
     background:#6da4ff;
   }
@@ -748,6 +771,16 @@ export default {
   }
   .itemInfo:hover {
     cursor: pointer;
+  }
+  /* 申请单中的备注溢出问题*/
+  .applyFormRemark{
+      display:block;
+      width:310px;
+      height:21px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+
   }
   /* 请备注申请单 */
   .accept-content3 > .btn-href {
@@ -795,9 +828,11 @@ export default {
     outline: none;
     color: #fff;
     font-size: 14px;
-
     border-radius: 4px;
   }
+   .accept-content3 > .footer > button:hover{
+     cursor: pointer;
+   }
  .accept-content3 > .footer > button:active{
    background:#6da4ff;
  }
@@ -889,13 +924,14 @@ export default {
     overflow: hidden;
     border-top: 1px  solid #e7e7e7;
     border-left:1px  solid #e7e7e7;
+    border-bottom: 1px   solid #e7e7e7;
   }
   .guide-nav>li{
     float: left;
     border-right: 1px solid #e7e7e7;
   }
   .guide-nav>li:nth-of-type(1){
-     width: 43px;
+     width: 42px;
      height: 30px;
   }
   .guide-nav>li:nth-of-type(2){
@@ -907,7 +943,7 @@ export default {
      height: 30px;
   }
   .guide-nav>li:nth-of-type(4){
-     width: 140px;
+     width: 141px;
      height: 30px;
   }
    .guide-nav>li:nth-of-type(5){
@@ -924,10 +960,13 @@ export default {
     table-layout: fixed;
     display: block;
     overflow: auto;
-    border-top: 1px solid #e7e7e7;
-    border-left: 1px solid #e7e7e7;
+    /* border-top: 1px solid #e7e7e7;
+    border-left: 1px solid #e7e7e7; */
   }
   .accept-guide .guide-form > table > tr:nth-of-type(1) {
+  }
+  .accept-guide .guide-form >table>tr>td:nth-of-type(1){
+    border-left: 1px solid #e7e7e7;
   }
   .accept-guide .guide-form > table > tr > td {
     border-bottom: 1px solid #e7e7e7;
@@ -965,6 +1004,10 @@ export default {
     width: 120px;
     height: 30px;
   }
+  .childHover:hover{
+    cursor: pointer;
+    background:#EDEEEF;
+  }
   .footer {
     width: 140px;
     height: 36px;
@@ -979,6 +1022,9 @@ export default {
     height: 100%;
     font-size: 16px;
     border-radius: 4px;
+  }
+  .footer > button:hover{
+    cursor: pointer;
   }
   .footer > button:active{
     background:#6da4ff;
@@ -1050,6 +1096,9 @@ export default {
     border: 1px solid rgba(88, 151, 255, 1);
     outline: none;
   }
+  .accept-tit > .btnTwo-head > button:hover{
+    cursor: pointer;
+  }
   .accept-tit > .btnTwo-head > button:nth-of-type(1) {
     color: rgba(88, 151, 255, 1);
     background: #fff;
@@ -1083,14 +1132,14 @@ export default {
   .tip-iview-span{
   text-align:left;
   display: block;
-  height: 22px;
+  height: 18px;
   padding-top: 4px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   width:50px;
   margin: 0 auto;
- line-height: 22px;
+ line-height: 18px;
 
 }
 
@@ -1173,7 +1222,7 @@ export default {
     position: absolute;
     top: 200px;
     left: 50%;
-    margin-left: -182px;
+    margin-left: -219px;
     z-index: 11;
   }
 
@@ -1253,11 +1302,24 @@ export default {
     float: right;
     margin-right: 21px;
   }
+   .accept-footer > button:hover{
+     cursor: pointer;
+   }
   .accept-footer > button:active{
     background:#6da4ff;
   }
   .itemInfo:hover {
     cursor: pointer;
+  }
+  /* 申请单中的备注溢出问题*/
+  .applyFormRemark{
+      display:block;
+      width:225px;
+      height:18px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+
   }
   /* 请备注申请单 */
   .accept-content3 > .btn-href {
@@ -1273,6 +1335,9 @@ export default {
     font-size: 12px;
     color: #5897ff;
     margin-right: 38px;
+  }
+  .accept-content3 > .btn-href > span:hover{
+    cursor: pointer;
   }
   .accept-content3 > .remarks {
     width: 379px;
@@ -1302,8 +1367,10 @@ export default {
     outline: none;
     color: #fff;
     font-size: 12px;
-
     border-radius: 4px;
+  }
+  .accept-content3 > .footer > button:hover{
+    cursor: pointer;
   }
   .accept-content3 > .footer > button:active{
     background:#6da4ff;
@@ -1386,8 +1453,6 @@ export default {
     width: 532px;
     height: 173px;
     table-layout: fixed;
-    border-top: 1px solid #e7e7e7;
-    border-left: 1px solid #e7e7e7;
     display: block;
     overflow: auto;
   }
@@ -1403,13 +1468,14 @@ export default {
     overflow: hidden;
     border-top: 1px  solid #e7e7e7;
     border-left:1px  solid #e7e7e7;
+    border-bottom:1px solid #e7e7e7;
   }
   .guide-nav>li{
     float: left;
     border-right: 1px solid #e7e7e7;
   }
   .guide-nav>li:nth-of-type(1){
-     width: 30px;
+     width: 29px;
      height: 22px;
   }
   .guide-nav>li:nth-of-type(2){
@@ -1421,7 +1487,7 @@ export default {
      height: 22px;
   }
   .guide-nav>li:nth-of-type(4){
-     width: 102px;
+     width: 103px;
      height: 22px;
   }
    .guide-nav>li:nth-of-type(5){
@@ -1449,6 +1515,7 @@ export default {
   .accept-guide .guide-form > table > tr > td:nth-of-type(1) {
     text-indent: 0;
     text-align: center;
+    border-left: 1px solid #e7e7e7;
   }
   .accept-guide .guide-form > table > tr:nth-of-type(1) > td {
     
@@ -1479,6 +1546,10 @@ export default {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+  }
+  .childHover:hover{
+    cursor: pointer;
+    background:#EDEEEF;
   }
   .footer {
     width: 102px;
